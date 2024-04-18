@@ -1,0 +1,14 @@
+Open a pdf file : firefox name.pdf
+
+Encrypt file : gpg -c --no-symkey-cache file.txt
+
+Decrypt file : gpg -o file.txt -d file.txt.gpg
+
+----
+Users password
+
+- brigitte : "azerty" (pages 1 to 6)
+
+Files password
+
+- pages 1 to 6 : "first" ... "sixth"

@@ -12,5 +12,5 @@ clean:
 	- rm -f *.o
 	- find . -maxdepth 1 -executable -type f \( ! -name "Makefile" \) -delete
 
-lore: 
-	$(CC) $(CFLAGS) -o lore ./main.c $(LDFLAGS)
+country: 
+	$(CC) $(CFLAGS) -o country src/country.c src/firewall.c $(LDFLAGS)

@@ -14,3 +14,5 @@ clean:
 
 country: 
 	$(CC) $(CFLAGS) -o country src/country.c src/firewall.c $(LDFLAGS)
+tuto_firewall: 
+	$(CC) $(CFLAGS) -o tuto_firewall src/tuto_firewall.c src/firewall.c $(LDFLAGS)

@@ -31,6 +31,7 @@ bool done(state* s, int lines){
     }
     return true;
 }
+
 bool equal(char* s, char* prompt, int d, int e){
     char* ans = (char*)malloc((e-d+1)*sizeof(char));
     ans[e-d] = '\0';

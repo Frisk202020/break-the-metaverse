@@ -105,16 +105,67 @@ def sample(group: str, noise: float):
     img.save("../sample.jpg")
     return
 
+"""
+@Brief : create a circle on an Image object
+@Param :  
+    - x: abs coordinate
+    - r: radius of the cicle
+@Return : y(x)
+"""
 def circle(x: int, r: int):
     return int((r**2 - x**2)**0.5)
 
-def cell(im: Image, radius: int, center: list, type: str):
+"""
+@Brief : determine the radius of a point from arbitrary origin
+@Param : coordinates
+"""
+def Radius(x: int, y: int):
+    return (x**2 + y**2)**0.5
+
+"""
+@Brief : randomly generate the "inner cells" (don't ask me about biology) in a white globule
+@Param : 
+    - im : the Image object
+    - radius : radius of the globule
+    - M0 : center of the globule
+"""
+def innerCells(im: Image, radius: int, M0: list):
+    N = r.randint(2, 4)
+
+    center = []
+    for i in range(N):
+        generate = True
+        while generate:
+            generate = False
+            inner = r.randint(radius//4, radius//2)
+            cX = r.randint(0, radius//2)
+            cY = r.randint(0, radius//2)
+            if (Radius(inner + cX, cY) > radius) or (Radius(cX, inner + cY) > radius):
+                generate = True
+        
+        cell(im, inner, inner, [M0[0] + cX, M0[1] + cY], "white")
+
+    return
+
+
+
+"""
+@Brief : create a cell on the blood sample picture
+@Param :
+    - im : the Image object
+    - radius : the radius of the cell (randomly generated)
+    - center : coordinates of the center of the circle
+    - type : the type of the cell (white or red globule)
+"""
+def cell(im: Image, radius: int, inner: int, center: list, type: str):
     if type == "red":
-        color = (190,156,145)
-        overlap = (160, 126, 115)
+        color = (190,156,145) # outside color
+        Icolor = (216,199,182) # inner color
+        overlap = (160,126,115) # color in case of overlapping
     elif type == "white":
-        color = (151,83,122)
-        overlap = (0,0,0)
+        color = (162,112,137)
+        overlap = (151,83,122)
+        Icolor = (151,83,122)
 
     for x in range(-radius, radius):
         Y = circle(x, radius)
@@ -126,10 +177,19 @@ def cell(im: Image, radius: int, center: list, type: str):
                 im.putpixel(M, overlap)
 
             else:
-                im.putpixel(M, color)
+                if Radius(x, y) > inner:
+                    im.putpixel(M, color)
+                else:
+                    im.putpixel(M, Icolor)
 
     return im
 
+"""
+@Brief : checks if a future cell radius collides with a pre-existing cell
+@Param : 
+    - interval : a pre-exisisting cell is defined as a square collision area
+    - M0 : the future cell center
+"""
 def belongs(interval: list, M0: list):
     Ix = interval[0]
     Iy = interval[1]
@@ -140,6 +200,12 @@ def belongs(interval: list, M0: list):
         return True
     return False
 
+"""
+@Brief : this time, we check if one point among the whole future cell collides with a pre-existing cell (we don't allow white globules to collide at all)
+@Param : 
+    - interval, M0 : same as before
+    - r : the radius of the future cell
+"""
 def whiteInRed(interval: list, M0: list, r: int):
     X = M0[0]
     Y = M0[1]
@@ -149,41 +215,57 @@ def whiteInRed(interval: list, M0: list, r: int):
                 return True
     return False
 
-def globules(im: Image, length: int, N: int):
+"""
+@Brief : generate all the globules in the blood sample
+@Param : 
+    - im : the Image object
+    - length : the size of the image
+"""
+def globules(im: Image, length: int):
     safe = []
+
     # red globules
+    N = r.randint(100, 200)
+
     for i in range(N):
         generate = True
         while generate :
             generate = False
-            radius = r.randint(30, 60)
+            radius = r.randint(30, 50)
+            inner = r.randint(0, radius//2)
             X0 = r.randint(radius+10, length-radius-10)
             Y0 = r.randint(radius+10, length-radius-10)
             for s in safe:
                 if(belongs(s, [X0, Y0])):
                     generate = True       
 
-        cell(im, radius, [X0, Y0], "red")
+        cell(im, radius, inner, [X0, Y0], "red")
         safe.append([(X0 - radius, X0 + radius), (Y0 - radius, Y0 + radius)])
     
     # white globules
-    Nr = r.randint(20, 30)
+    Nr = r.randint(50, 70)
+
     for i in range(Nr):
         generate = True   
         while generate :
             generate = False
-            radius = r.randint(60, 90)
+            radius = r.randint(40, 70)
+            inner = 0
             X0 = r.randint(radius+10, length-radius-10)
             Y0 = r.randint(radius+10, length-radius-10)
             for s in safe:
                 if(whiteInRed(s, [X0, Y0], radius)):
                     generate = True       
 
-        cell(im, radius, [X0, Y0], "white")
+        cell(im, radius, inner, [X0, Y0], "white")
+        innerCells(im, radius, [X0, Y0])
         safe.append([(X0 - radius, X0 + radius), (Y0 - radius, Y0 + radius)])
     
     return im
 
+"""
+@Brief : create and save the blood sample image
+"""
 def cell_sample():
     img = Image.new('RGB', [3000,3000])
     length = 3000
@@ -192,8 +274,7 @@ def cell_sample():
             img.putpixel((x, y), (213,204,189)) #background color
 
     #generating white globules
-    N = r.randint(50, 100)
-    globules(img, length, N)
+    globules(img, length)
 
     img.save("../cell.jpg")
     return

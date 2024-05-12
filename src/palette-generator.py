@@ -243,7 +243,7 @@ def globules(im: Image, length: int):
         safe.append([(X0 - radius, X0 + radius), (Y0 - radius, Y0 + radius)])
     
     # white globules
-    Nr = r.randint(50, 70)
+    Nr = r.randint(40, 70)
 
     for i in range(Nr):
         generate = True   
@@ -261,7 +261,7 @@ def globules(im: Image, length: int):
         innerCells(im, radius, [X0, Y0])
         safe.append([(X0 - radius, X0 + radius), (Y0 - radius, Y0 + radius)])
     
-    return im
+    return Nr
 
 """
 @Brief : create and save the blood sample image
@@ -274,9 +274,9 @@ def cell_sample():
             img.putpixel((x, y), (213,204,189)) #background color
 
     #generating white globules
-    globules(img, length)
+    N = globules(img, length)
 
-    img.save("../cell.jpg")
+    img.save("../cell_"+str(N)+".jpg")
     return
 
 def main():

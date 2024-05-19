@@ -5,6 +5,7 @@
 
 int strcmp(const char* s1, const char* s2);
 
+/* Checks if strings s and prompt[e : d] are equal. */
 bool equal(char* s, char* prompt, int d, int e){
     char* ans = (char*)malloc((e-d+1)*sizeof(char));
     ans[e-d] = '\0';
@@ -19,6 +20,7 @@ bool equal(char* s, char* prompt, int d, int e){
     return false;
 }
 
+/* Software to open or close the door of the trap room at the country club*/
 int main(){
     FILE *file = NULL;
     file = fopen("data.txt","r");

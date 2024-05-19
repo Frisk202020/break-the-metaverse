@@ -3,6 +3,7 @@
 
 #include "translate.h"
 
+/* Translation from UNDERDOG numbers to normal numbers*/
 void main(int argc, char* argv[]){
     char* input = argv[1];
     char* ans = (char*)malloc(15*sizeof(char));

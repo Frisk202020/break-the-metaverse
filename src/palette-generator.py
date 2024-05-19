@@ -1,6 +1,9 @@
 from PIL import Image
 import random as r
 
+""" This file is used for all picture related code"""
+
+
 """ To generate the blood palette, uncomment line 90
 To generate a sample, uncomment and choose a noise (line 92), then uncomment line 93 and choose a group (O, A or B) """
 
@@ -19,7 +22,7 @@ def palette():
                     img.putpixel((I,j), (250, 65, 52))
                 else:
                     img.putpixel((I, j), (255, 88, 77))
-    img.save("../palette.jpg")
+    img.save("../data/palette.jpg")
     return
 
 """
@@ -102,7 +105,7 @@ def sample(group: str, noise: float):
                 else:
                     img.putpixel((j, k), (255, 88, 77))
     
-    img.save("../sample.jpg")
+    img.save("../data/sample.jpg")
     return
 
 """
@@ -276,8 +279,24 @@ def cell_sample():
     #generating white globules
     N = globules(img, length)
 
-    img.save("../cell_"+str(N)+".jpg")
+    img.save("../data/cell_"+str(N)+".jpg")
     return
+
+def randomColor():
+    return (r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
+
+def corruption(path: str, lx: int, ly: int, noise: float):
+    im = Image.open(path)
+    noiseX = random_list(int(lx*noise), 0, lx - 1)
+    noiseY = random_list(int(ly*noise), 0, ly - 1)
+
+    for x in noiseX:
+        for y in noiseY:
+            im.putpixel((x, y), randomColor())
+
+    im.save("../data/corrupt.jpg")
+    return       
+
 
 def main():
     # palette()
@@ -285,7 +304,9 @@ def main():
     # noise = 0.1
     # sample('O', noise)
 
-    cell_sample()
+    #cell_sample()
+
+    corruption("../Table_cipher.jpg", 555, 291, 0.8)
 
     return
 

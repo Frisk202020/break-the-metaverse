@@ -35,6 +35,7 @@ char* random_character(int command){
     return c;
 }
 
+/* Generates the password file of Mr Feignard*/
 void main(){
     FILE* file = NULL;
     file = fopen("./passwords.txt","w");

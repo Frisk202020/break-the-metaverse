@@ -13,6 +13,16 @@ clean:
 	- find . -maxdepth 1 -executable -type f \( ! -name "Makefile" \) -delete
 
 country: 
-	$(CC) $(CFLAGS) -o country src/country.c src/firewall.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o result/country src/country.c src/firewall.c $(LDFLAGS)
 tuto_firewall: 
-	$(CC) $(CFLAGS) -o tuto_firewall src/tuto_firewall.c src/firewall.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o result/tuto_firewall src/tuto_firewall.c src/firewall.c $(LDFLAGS)
+underdog_ip:
+	$(CC) $(CFLAGS) -o result/underdog_ip src/underdog_ip.c src/translate.c $(LDFLAGS)
+normal_ip:
+	$(CC) $(CFLAGS) -o result/normal_ip src/normal_ip.c src/translate.c $(LDFLAGS)
+adn:
+	$(CC) $(CFLAGS) -o result/adn src/adn.c src/firewall.c $(LDFLAGS)
+metadata:
+	$(CC) $(CFLAGS) -o result/metadata src/metadata.c $(LDFLAGS)
+battle:
+	$(CC) $(CFLAGS) -o battle src/battle/battle.c src/battle/attack.c src/battle/utilities.c src/battle/dragon.c $(LDFLAGS)

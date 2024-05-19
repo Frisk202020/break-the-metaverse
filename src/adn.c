@@ -59,6 +59,8 @@ int convert(char tenth, char unit){
 
 /* The software Flavie will use. Available prompts are listed on her manual*/
 void software(){
+    printf("DNA Analyzer - by Flavie Bit\n");
+
     srand(time(NULL));
     int N = rand()%10;
     N += 4;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+/* Generates an unreadable file in binary code*/
 void main(){
     FILE* file = NULL;
     file = fopen("./netcfg.dll","w");

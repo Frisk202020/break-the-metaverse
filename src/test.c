@@ -25,8 +25,5 @@ char* little_endian(int c, int N){
 }
 
 void main(){
-    for (int i = 0; i < 8; i++){
-        char* s = little_endian(i, 3);
-        printf("%s\n", s);
-    }
+    int arr[5] = {1,2,3,4,5};
 }

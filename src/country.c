@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+/* Firewall software used at the country club*/
 void main(){
     printf("Firewall decipher - by Flavie Bit\nSearching for computers to hack ...\n");
     sleep(1);

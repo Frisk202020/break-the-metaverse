@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* generates random ip adress*/
 void main(){
     srand(time(NULL));
     char* ip = (char*)malloc(15*sizeof(char));

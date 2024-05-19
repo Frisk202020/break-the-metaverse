@@ -32,6 +32,7 @@ bool done(state* s, int lines){
     return true;
 }
 
+/* Checks if strings s and prompt[e : d] are equal. */
 bool equal(char* s, char* prompt, int d, int e){
     char* ans = (char*)malloc((e-d+1)*sizeof(char));
     ans[e-d] = '\0';
@@ -46,6 +47,7 @@ bool equal(char* s, char* prompt, int d, int e){
     return false;
 }
 
+/* analyze command of the software : reveals a character of the firewall*/
 void analyze(char** wall, int lines, char* sol, int* left, state* s){
     if (!done(s, lines)){
         int* pos = (int*)malloc(*left*sizeof(int));
@@ -86,6 +88,7 @@ void analyze(char** wall, int lines, char* sol, int* left, state* s){
     }
 }
 
+/* The firewall destroyer software*/
 void firewall(int lines, char* sol, float cooldown){
     /**
     * @param lines : lines of the firewall 

@@ -114,20 +114,89 @@ int dice_range(character ch, int result){
 int attack(character ch, int dice){
     int pow = ch.POW;
     if (dice == 0){
-        double ratio = (10 + rand()%10) / 100.;
-        return (Int(ratio * pow));
+        return entropy(pow, 10, 10);
     }
     else if (dice == 1){
-        double ratio = (20 + rand()%30) / 100.;
-        return (Int(ratio * pow));
+        return entropy(pow, 20, 30);
     }
     else if (dice == 2){
-        double ratio = (50 + rand()%40) / 100.;
-        return (Int(ratio * pow));
+        return entropy(pow, 50, 40);
     }
     else{
         return pow;
     }
+}
+
+stats enemy_attack(stats* s_p){
+    stats s = *s_p; // We use the pointer only for the heal functionality, cause it does not uses arrays so the new value was discarded when exiting the function
+    int ActionID = rand()%s.enemy.NOA; // Choose a random action for the enemy
+    action Action = s.enemy.actions[ActionID];
+    printf("The enemy attacks with %s !\n", Action.name);
+    bool dodge = false;
+
+    if (Action.POW > 0){
+        if (Action.aim == 'a'){
+            for (int i = 0; i < 5; i++){
+                s.team[i].HP -= entropy(Action.POW, 100, 40);
+            }
+        }
+
+        else{
+            crew Alive = alive(s);
+            int targetID = rand()%Alive.N;
+            character* target = (Alive.team[targetID]);
+            printf("The target is %s !\n", target->name);
+
+            if (Action.superguard){
+                char* prompt = (char*)malloc(100*sizeof(char));
+                printf("Attack dodged (y/N)? ");
+                fgets(prompt, 100, stdin);
+                if (equal("y", prompt, 0, 1)){
+                    dodge = true;
+                }
+                free(prompt);
+            }
+            if (!dodge){
+                target->HP -= entropy(Action.POW, 80, 30);
+            }
+            free(Alive.team);
+        }
+    } 
+
+    if (Action.heal > 0 && !dodge){
+        int recover = entropy(Action.heal, 100, 100);
+        printf("The enemy recovers %d hearts !\n", recover);
+        s_p->enemy.HP += recover;
+    }
+
+    return s;
+}
+
+crew alive(stats s){
+    int n = 0;
+    bool* alive = (bool*)malloc(5*sizeof(bool));
+    for (int i = 0; i < 5; i++){
+        if (s.team[i].HP > 0){
+            alive[i] = true;
+            n++;
+        }
+        else{
+            alive[i] = false;
+        }
+    }
+    crew ans = {
+        .N = n,
+        .team = malloc(n*sizeof(character*)),
+    };
+    int count = 0;
+    for (int i = 0; i < 5; i++){
+        if (alive[i]){
+            ans.team[count] = &(s.team[i]);
+            count++;
+        }
+    }
+    free(alive);
+    return ans;
 }
 
 /* 

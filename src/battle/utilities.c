@@ -12,6 +12,12 @@ int Int(double x){
     return ans;
 }
 
+/* creates a gap from a fixed value. The new value is between [min*value/100, (min+var)*value/100] */
+int entropy(int value, int min, int var){
+    double ratio = (min + rand()%var) / 100.;
+    return (Int(ratio * value));
+}
+
 bool equal(char* s, char* prompt, int d, int e){
     char* ans = (char*)malloc((e-d+1)*sizeof(char));
     ans[e-d] = '\0';

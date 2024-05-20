@@ -16,6 +16,7 @@ Ranges of the dices :
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "battle.h"
 
 /* Attributes a grade to a dice throw regarding the charcater*/
@@ -127,6 +128,103 @@ int attack(character ch, int dice){
     }
 }
 
+bool action_success(action act){
+    bool* arr = (bool*)malloc(100*sizeof(bool));
+    int count = 0;
+    for (int i = 0; i < 100; i++){
+        if (count < act.odd){
+            arr[i] = true;
+            count++;
+        }
+        else{
+            arr[i] = false;
+        }
+    }
+    bool pick = arr[rand()%100];
+    free(arr);
+    return pick;
+}
+
+stats execute_action(stats* s_p, action act, int ch_id, int act_id){
+    stats s = *s_p;
+    if (act.aim == 'g'){
+        if (act.POW > 0){
+            s_p->enemy.HP -= act.POW;
+        }
+        s.team[ch_id].actions[act_id].aim = 'l';
+        s.team[ch_id].actions[act_id].odd = 0;
+    }
+    else{
+        if (action_success(act)){
+            printf("Executing %s...\n", act.name);
+            if (act.POW > 0){
+                s_p->enemy.HP -= act.POW;
+            }
+        }
+        else{
+            printf("action failed !\n");
+        }
+    }
+    return s;
+}
+
+void assert_ennemy_stats(character ch){
+    action* test = ch.actions;
+    int sum = 0;
+    for (int i = 0; i < ch.NOA; i++){
+        sum += test[i].odd;
+    }
+    assert(sum == 100);
+}
+
+/* 
+   ** Test for choose_enemy_action ** 
+
+void test_enemy_choose(int* arr){
+    int zero = 0;
+    int one = 0;
+    int two = 0;
+    int three = 0;
+    for (int i = 0; i < 100; i++){
+        if (arr[i] == 0){
+            zero++;
+        }
+        else if (arr[i] == 1){
+            one++;
+        }
+        else if (arr[i] == 2){
+            two++;
+        }
+        else {
+            three++;
+        }
+    }
+    printf("%d %d %d %d\n", zero, one, two, three);
+}
+
+*/
+
+action choose_enemy_action(action* acts){
+    int* arr = (int*)malloc(100*sizeof(int));
+    int count = 0;
+    int j = 0;
+    for (int i = 0; i < 100; i++){
+        if (j < acts[count].odd){
+            printf("%d %d \n", j, acts[count].odd);
+            arr[i] = count;
+            j++;
+        }
+        else{
+            j = 1;
+            count++;
+            arr[i] = count;
+        }
+    }
+    int pick = arr[rand()%100];
+    free(arr);
+    return acts[pick];
+}
+
 stats enemy_attack(stats* s_p){
     stats s = *s_p; // We use the pointer only for the heal functionality, cause it does not uses arrays so the new value was discarded when exiting the function
     int ActionID = rand()%s.enemy.NOA; // Choose a random action for the enemy
@@ -202,7 +300,6 @@ crew alive(stats s){
 /* 
 
 ***Code pour tester dice_range***
-For testing, change line 19 to #include "../../include/battle.h"
 
 void main(int argc, char *argv[]){
     char* f = argv[1];

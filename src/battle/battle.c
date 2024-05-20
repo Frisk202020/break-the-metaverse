@@ -37,7 +37,6 @@ void print_alive(stats s){
 void print_state(stats* s_p){
     stats s = *s_p;
     if (s.enemy.HP > s.enemy.maxHP){
-        printf("hi");
         s_p->enemy.HP = s.enemy.maxHP;
     }
     s = *s_p;
@@ -73,6 +72,7 @@ void free_all(stats s){
 void main(){
     printf("Start of the battle against the dragon !\n");
     stats s = dragon_initialize();
+    assert_ennemy_stats(s.enemy);
 
     while (!end(s)){
         print_state(&(s));
@@ -81,56 +81,52 @@ void main(){
         fgets(prompt, 100, stdin);
 
         if (equal("attack", prompt, 0, 6)){
-            if (equal("Derek", prompt, 7, 12)){    
-                char d = prompt[13];
-                char u = prompt[14];
-                int dice = convert(d, u);
-                int att = attack(s.team[0], dice_range(s.team[0], dice));
-                s.enemy.HP -= att;
+            bool done = false;
+            for (int i = 0; i < 5; i++){
+                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                    done = true;
+                    if (s.team[i].HP <= 0){
+                        printf("You can't attack with a K-O character\n");
+                    }
+                    else{
+                        char d = prompt[8+s.team[i].name_length];
+                        char u = prompt[9+s.team[i].name_length];
+                        int dice = convert(d, u);
+                        int att = attack(s.team[i], dice_range(s.team[i], dice));
+                        s.enemy.HP -= att;
+                    }
+                }
             }
 
-            else if (equal("Flavie", prompt, 7, 13)){
-                char d = prompt[14];
-                char u = prompt[15];
-                int dice = convert(d, u);
-                int att = attack(s.team[1], dice_range(s.team[1], dice));
-                s.enemy.HP -= att;
-            }
-
-            else if (equal("Haloise", prompt, 7, 14)){
-                char d = prompt[15];
-                char u = prompt[16];
-                int dice = convert(d, u);
-                int att = attack(s.team[2], dice_range(s.team[2], dice));
-                s.enemy.HP -= att;
-            }
-
-            else if (equal("Xhara", prompt, 7, 12)){
-                char d = prompt[13];
-                char u = prompt[14];
-                int dice = convert(d, u);
-                int att = attack(s.team[3], dice_range(s.team[3], dice));
-                s.enemy.HP -= att;
-            }
-
-            else if (equal("Clover", prompt, 7, 13)){
-                char d = prompt[14];
-                char u = prompt[15];
-                int dice = convert(d, u);
-                int att = attack(s.team[4], dice_range(s.team[4], dice));
-                s.enemy.HP -= att;
-            }
-
-            else if (equal(s.enemy.name, prompt, 7, 13)){
+            if (equal(s.enemy.name, prompt, 7, 13)){
+                done = true;
                 enemy_attack(&(s));               
             }
             
-            else{
+            if (!done){
                 printf("Unreconized character\n");
             }
         }
+
+        else if (equal("action", prompt, 0, 6)){
+            for (int i = 0; i < 5; i++){
+                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                    if (s.team[i].HP <= 0){
+                        printf("You can't act with a K-O character\n");
+                    }
+                    else{
+                        for (int j = 0; j < s.team[i].NOA; j++){
+                            if (equal(s.team[i].actions[j].name, prompt, 8+s.team[i].name_length, 8+s.team[i].name_length+s.team[i].actions[j].name_length)){
+                                execute_action(&(s), s.team[i].actions[j], i, j);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         else{
-            printf("issue\n");
+            printf("Unreconized prompt\n");
             s.enemy.HP = 0;
         }
         free(prompt);

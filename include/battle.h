@@ -5,14 +5,17 @@
 
 typedef struct{
     char* name;
+    int name_length;
     int POW;
     int heal;
-    char aim; // Indiv (i) or All (a)
+    char aim; // types Indiv (i) or All (a) for the enemy ; types Garanted (g) or luck-based (l) for the party. Garanded actions are 1 time use
     bool superguard; // utilized for enemies. Set to true if the attack is dodgeable
+    int odd; // probability for the action to be picked from the enemy ; probability for a luck-based action to succeed for the party
 }action;
 
 typedef struct{
     char* name;
+    int name_length;
     int maxHP;
     int HP;
     int POW;
@@ -44,6 +47,10 @@ stats dragon_initialize();
 //from attack.c
 int dice_range(character ch, int result);
 int attack(character ch, int dice);
+bool action_success(action act);
+stats execute_action(stats* s_p, action act, int ch_id, int act_id);
+void assert_ennemy_stats(character ch);
+action choose_enemy_action(action* acts);
 stats enemy_attack(stats* s_p);
 crew alive(stats s);
 

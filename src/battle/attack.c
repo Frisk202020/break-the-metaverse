@@ -145,25 +145,80 @@ bool action_success(action act){
     return pick;
 }
 
-stats execute_action(stats* s_p, action act, int ch_id, int act_id){
-    stats s = *s_p;
+stats special_act(action act, stats s){
+    if (equal("shield", act.st.name, 0, 6)){
+        for (int i = 0; i < 5; i++){
+            s.team[i].st.name = "shield";
+            s.team[i].st.end = s.turn + act.st.end;
+        }
+        printf("\033[0;32m The party is protected from the following attack ! \033[0;0m\n");
+    }
+    else if (equal("provoke", act.st.name, 0, 7)){
+        s.enemy.st.name = "Derek";
+        s.enemy.st.end = s.turn + act.st.end;
+        printf("\033[0;32m The enemy will focus Derek for 2 turns \033[0;0m\n");
+    }
+    else if (equal("corrupt", act.st.name, 0, 7)){
+        action* new_actions = (action*)malloc(3*sizeof(action));
+        for (int i = 0; i < 3; i++){
+            new_actions[i] = s.enemy.actions[i+1];
+        }
+        free(s.enemy.actions);
+        s.enemy.actions = new_actions;
+        s.enemy.actions[0].odd = 50;
+        s.enemy.actions[1].odd = 45;
+        s.enemy.actions[2].odd = 5;
+        s.enemy.NOA -= 1;
+        printf("The dragon can't breath fire anymore !\n");
+    }
+    else{
+        printf("Unreconized state\n");
+    }
+    return s;
+}
+
+stats execute_action(stats s, action act, int ch_id, int act_id){
     if (act.aim == 'g'){
         if (act.POW > 0){
-            s_p->enemy.HP -= act.POW;
+            s.enemy.HP -= act.POW;
+        }
+        if (!equal("normal", act.st.name, 0, 6)){    
+            s = special_act(act, s);
         }
         s.team[ch_id].actions[act_id].aim = 'l';
         s.team[ch_id].actions[act_id].odd = 0;
     }
-    else{
+    else if (act.aim == 'l'){
         if (action_success(act)){
             printf("Executing %s...\n", act.name);
             if (act.POW > 0){
-                s_p->enemy.HP -= act.POW;
+                s.enemy.HP -= act.POW;
+            }
+            if (!equal("normal", act.st.name, 0, 6)){    
+                s = special_act(act, s);
             }
         }
         else{
             printf("action failed !\n");
         }
+    }
+    else{
+        char* prompt = (char*)malloc(100*sizeof(char));
+        printf("Look at the battle book to see the action success condition\nIs action successful (y/N) ?");
+        fgets(prompt, 100, stdin);
+        if (equal("y", prompt, 0, 1)){
+            printf("Success !\n");
+            if (act.POW > 0){
+                s.enemy.HP -= act.POW;
+            }
+            if (!equal("normal", act.st.name, 0, 6)){    
+                s = special_act(act, s);
+            }
+        }
+        else{
+            printf("Fail...\n");
+        }
+        free(prompt);
     }
     return s;
 }
@@ -210,7 +265,6 @@ action choose_enemy_action(action* acts){
     int j = 0;
     for (int i = 0; i < 100; i++){
         if (j < acts[count].odd){
-            printf("%d %d \n", j, acts[count].odd);
             arr[i] = count;
             j++;
         }
@@ -225,25 +279,55 @@ action choose_enemy_action(action* acts){
     return acts[pick];
 }
 
-stats enemy_attack(stats* s_p){
-    stats s = *s_p; // We use the pointer only for the heal functionality, cause it does not uses arrays so the new value was discarded when exiting the function
-    int ActionID = rand()%s.enemy.NOA; // Choose a random action for the enemy
-    action Action = s.enemy.actions[ActionID];
+stats enemy_attack(stats s){
+    assert_ennemy_stats(s.enemy);
+    action Action = choose_enemy_action(s.enemy.actions);
     printf("The enemy attacks with %s !\n", Action.name);
     bool dodge = false;
+    bool shield = false;
 
     if (Action.POW > 0){
         if (Action.aim == 'a'){
             for (int i = 0; i < 5; i++){
-                s.team[i].HP -= entropy(Action.POW, 100, 40);
+                if (equal("shield", s.team[i].st.name, 0, 7)){
+                    shield = true;
+                    printf("The team is protected\n");
+                }
+                else{
+                    s.team[i].HP -= entropy(Action.POW, 100, 40);
+                }
             }
         }
 
         else{
-            crew Alive = alive(s);
-            int targetID = rand()%Alive.N;
-            character* target = (Alive.team[targetID]);
-            printf("The target is %s !\n", target->name);
+            character* target = &(s.team[0]);
+            crew Alive;
+
+            if (equal("normal", s.enemy.st.name, 0, 6)){
+                Alive = alive(s);
+                int targetID = rand()%Alive.N;
+                target = (Alive.team[targetID]);
+                if (equal(target->st.name, "shield", 0, 6)){
+                    printf("The target is %s, but they're protected !\n", target->name);
+                }
+                else{
+                    printf("The target is %s !\n", target->name);
+                }
+            }
+            else{
+                for (int i = 0; i < 5; i++){
+                    if (equal(s.team[i].name, s.enemy.st.name, 0, s.team[i].name_length)){
+                        target = (&(s.team[i]));
+                        if (equal(target->st.name, "shield", 0, 6)){
+                            printf("The enemy focuses %s, but they're protected !\n", target->name);
+                            shield = true;
+                        }
+                        else{
+                            printf("The enemy focuses %s !\n", target->name);
+                        }
+                    }  
+                }
+            }
 
             if (Action.superguard){
                 char* prompt = (char*)malloc(100*sizeof(char));
@@ -255,16 +339,20 @@ stats enemy_attack(stats* s_p){
                 free(prompt);
             }
             if (!dodge){
-                target->HP -= entropy(Action.POW, 80, 30);
+                if (!shield){
+                    target->HP -= entropy(Action.POW, 80, 30);
+                }
             }
-            free(Alive.team);
+            if (equal("normal", s.enemy.st.name, 0, 6)){
+                free(Alive.team);
+            }
         }
     } 
 
-    if (Action.heal > 0 && !dodge){
+    if (Action.heal > 0 && !dodge && !shield){
         int recover = entropy(Action.heal, 100, 100);
-        printf("The enemy recovers %d hearts !\n", recover);
-        s_p->enemy.HP += recover;
+        printf("\033[0;35m The enemy recovers %d hearts ! \033[0;0m\n", recover);
+        s.enemy.HP += recover;
     }
 
     return s;

@@ -34,13 +34,42 @@ void print_alive(stats s){
 */
 
 /* prints the health of all parties*/
-void print_state(stats* s_p){
-    stats s = *s_p;
+stats reset_state(stats s){
     if (s.enemy.HP > s.enemy.maxHP){
-        s_p->enemy.HP = s.enemy.maxHP;
+        s.enemy.HP = s.enemy.maxHP;
     }
-    s = *s_p;
-    printf("\nBoss : ♥ %d\n\n", s.enemy.HP);
+
+    if (s.turn == s.enemy.st.end){
+        printf("reset dragon state\n");
+        s.enemy.st.name = "normal";
+    }
+    for (int i = 0; i < 5; i++){
+        if (s.turn == s.team[i].st.end){
+            s.team[i].st.name = "normal";
+        }
+    }
+
+    return s;
+}
+
+/* 
+
+*** Test : afficher les actions disponibles pour l'ennemi ***
+
+void print_actions(stats s){
+    for (int i = 0; i < s.enemy.NOA; i++){
+        printf("%s ", s.enemy.actions[i].name);
+    }
+    printf("\n");
+}
+
+*/
+
+void print_state(stats s){
+    printf("\033[0;37m");
+    printf("\n*** turn %d ***\n", s.turn);
+    
+    printf("\033[0;31m \nBoss : \033[0;35m ♥ %d \033[0;31m [%s] \033[0;0m\n\n", s.enemy.HP, s.enemy.st.name);
 
     for (int i = 0; i < 5; i++){
         if (s.team[i].HP < 0){
@@ -53,7 +82,7 @@ void print_state(stats* s_p){
             printf("%s : DOWN\n", s.team[i].name);
         }
         else{
-            printf("%s : ♥ %d\n", s.team[i].name, s.team[i].HP);
+            printf("\033[0;36m %s : \033[0;35m ♥ %d \033[0;36m [%s] \033[0;0m\n", s.team[i].name, s.team[i].HP, s.team[i].st.name);
         }
     }
     printf("\n");
@@ -71,11 +100,13 @@ void free_all(stats s){
 
 void main(){
     printf("Start of the battle against the dragon !\n");
+    srand(time(NULL));
     stats s = dragon_initialize();
     assert_ennemy_stats(s.enemy);
 
     while (!end(s)){
-        print_state(&(s));
+        s = reset_state(s);
+        print_state(s);
         char* prompt = (char*)malloc(100*sizeof(char));
         printf("> ");
         fgets(prompt, 100, stdin);
@@ -100,7 +131,8 @@ void main(){
 
             if (equal(s.enemy.name, prompt, 7, 13)){
                 done = true;
-                enemy_attack(&(s));               
+                s = enemy_attack(s);  
+                s.turn++;             
             }
             
             if (!done){
@@ -109,19 +141,24 @@ void main(){
         }
 
         else if (equal("action", prompt, 0, 6)){
+            bool done = false;
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                    done = true;
                     if (s.team[i].HP <= 0){
                         printf("You can't act with a K-O character\n");
                     }
                     else{
                         for (int j = 0; j < s.team[i].NOA; j++){
                             if (equal(s.team[i].actions[j].name, prompt, 8+s.team[i].name_length, 8+s.team[i].name_length+s.team[i].actions[j].name_length)){
-                                execute_action(&(s), s.team[i].actions[j], i, j);
+                                s = execute_action(s, s.team[i].actions[j], i, j);
                             }
                         }
                     }
                 }
+            }
+            if (!done){
+                printf("Unreconized character\n");
             }
         }
 

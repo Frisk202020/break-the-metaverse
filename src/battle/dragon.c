@@ -9,23 +9,23 @@ stats dragon_initialize(){
         .maxHP = 250,
         .HP = 250,
         .POW = 50,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,
         },
         .dice = 6,
-        .actions = malloc(2*sizeof(action)),
-        .NOA = 2,
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
-    /*
     action taser = {
         .name = "taser",
         .name_length = 5,
         .POW = 10,
         .heal = 0,
         .st = {
-            .name = "taser",
+            .name = "stun",
             .end = 1,
         },
         .aim = 'l',
@@ -33,7 +33,6 @@ stats dragon_initialize(){
         .odd = 30,
         // effect : stuns the enemy for the current turn
     };
-    */
 
     action sword = {
         .name = "sword",
@@ -64,9 +63,9 @@ stats dragon_initialize(){
         .odd = 80,
         // effect : the enemy will focus Derek for 2 turns
     };  
-    //Derek.actions[0] = taser;  
-    Derek.actions[0] = sword;
-    Derek.actions[1] = provoke;
+    Derek.actions[0] = taser;  
+    Derek.actions[1] = sword;
+    Derek.actions[2] = provoke;
 
     character Flavie = { // Flavie is a mage
         .name = "Flavie",
@@ -74,6 +73,7 @@ stats dragon_initialize(){
         .maxHP = 120,
         .HP = 120,
         .POW = 20,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,
@@ -132,25 +132,60 @@ stats dragon_initialize(){
     Flavie.actions[2] = potion;
 
     character Haloise = { // Haloïse est une naine érudite
-        .name = "Haloïse",
+        .name = "Haloise",
         .name_length = 7,
         .maxHP = 350,
         .HP = 350,
         .POW = 10,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,
         },
         .dice = 10,
-        .actions = malloc(0*sizeof(action)),
-        .NOA = 0,
+        .actions = malloc(2*sizeof(action)),
+        .NOA = 2,
     };
+
+    action encyclopedia = { 
+        .name = "encyclopedia",
+        .name_length = 12,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "normal",
+            .end = -1,
+        },
+        .aim = 'r',
+        .superguard = false,
+        .odd = 100,
+        // effect : retrieve information of the enemy 
+    };
+
+    action stone = { 
+        .name = "stone",
+        .name_length = 5,
+        .POW = 0,
+        .heal = 50,
+        .st = {
+            .name = "defense",
+            .end = 3,
+        },
+        .aim = 'g',
+        .superguard = false,
+        .odd = 100,
+        // effect : retrieve information of the enemy 
+    };
+    Haloise.actions[0] = encyclopedia;
+    Haloise.actions[1] = stone;
+
     character Chara = { // Xhara est un archer
         .name = "Xhara",
         .name_length = 5,
         .maxHP = 150,
         .HP = 150,
         .POW = 30,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,
@@ -165,6 +200,7 @@ stats dragon_initialize(){
         .maxHP = 80,
         .HP = 80,
         .POW = 60,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,
@@ -187,6 +223,7 @@ stats dragon_initialize(){
         .maxHP = 1000,
         .HP = 1000,
         .POW = 0,
+        .DEF = 0,
         .st = {
             .name = "normal",
             .end = -1,

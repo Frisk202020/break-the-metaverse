@@ -12,7 +12,7 @@ typedef struct{
     char* name;
     int name_length;
     int POW;
-    int heal;
+    int heal; // utilized for heal and defense purposes
     state st;
     char aim; // types Indiv (i) or All (a) for the enemy ; types Garanted (g), luck-based (l) or real-life (r) for the party. (g) actions are 1 time use, (r) actions require a real action in the game to succed.
     bool superguard; // utilized for enemies. Set to true if the attack is dodgeable
@@ -25,6 +25,7 @@ typedef struct{
     int maxHP;
     int HP;
     int POW;
+    int DEF;
     state st;
     int dice;
     action* actions;

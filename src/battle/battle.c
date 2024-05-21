@@ -40,12 +40,12 @@ stats reset_state(stats s){
     }
 
     if (s.turn == s.enemy.st.end){
-        printf("reset dragon state\n");
         s.enemy.st.name = "normal";
     }
     for (int i = 0; i < 5; i++){
         if (s.turn == s.team[i].st.end){
             s.team[i].st.name = "normal";
+            s.team[i].DEF = 0;
         }
     }
 
@@ -142,6 +142,7 @@ void main(){
 
         else if (equal("action", prompt, 0, 6)){
             bool done = false;
+            bool found = false;
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
                     done = true;
@@ -151,6 +152,7 @@ void main(){
                     else{
                         for (int j = 0; j < s.team[i].NOA; j++){
                             if (equal(s.team[i].actions[j].name, prompt, 8+s.team[i].name_length, 8+s.team[i].name_length+s.team[i].actions[j].name_length)){
+                                found = true;
                                 s = execute_action(s, s.team[i].actions[j], i, j);
                             }
                         }
@@ -159,6 +161,9 @@ void main(){
             }
             if (!done){
                 printf("Unreconized character\n");
+            }
+            if (!found){
+                printf("Unreconized action\n");
             }
         }
 

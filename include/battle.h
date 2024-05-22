@@ -67,6 +67,9 @@ crew alive(stats s);
 
 //from battle.c
 bool end(stats s);
+state affect_state(char* retrieve, int end);
+stats restore_state(stats s);
+void write_state(stats s);
 stats reset_state(stats s_p);
 void print_state(stats s);
 

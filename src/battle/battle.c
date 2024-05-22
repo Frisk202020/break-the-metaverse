@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <assert.h>
 #include "battle.h"
 
 /* Checks if the battle reaches the end (i-e one party goes down)*/
@@ -21,19 +22,75 @@ bool end(stats s){
     }
 }
 
-/*
-** Test for alive funtion **
-
-void print_alive(stats s){
-    crew Alive = alive(s);
-    for (int i = 0; i < Alive.N; i++){
-        printf("%s\n", Alive.team[i].name);
+state affect_state(char* retrieve, int end){
+    state st;
+    st.end = end;
+    if (equal(retrieve, "normal", 0, 6)){
+        st.name = "normal";
     }
+    else if (equal(retrieve, "defense", 0, 7)){
+        st.name = "defense";
+    }
+    else if (equal(retrieve, "focus", 0, 5)){
+        st.name = "focus";
+    }
+    else if (equal(retrieve, "stun", 0, 4)){
+        st.name = "stun";
+    }
+    else if (equal(retrieve, "Derek", 0, 5)){
+        st.name = "Derek";
+    }
+    else if (equal(retrieve, "danger", 0, 6)){
+        st.name = "danger";
+    }
+    else {
+        st.name = "?";
+        printf("%c%c%c", retrieve[0], retrieve[1], retrieve[2]);
+    }
+
+    return st;
 }
 
-*/
+// restore the state of the battle if the software crashed
+stats restore_state(stats s){
+    FILE* file = fopen("src/battle/data/state.txt", "r");
+    assert(file != NULL);
+    for (int i = 0; i < 5; i++){
+        character ch = s.team[i];
+        char* retrieve = (char*)malloc(100*sizeof(char));
+        int* end = (int*)malloc(sizeof(int));
+        fscanf(file, "%d %d %d %s %d\n", &(ch.HP), &(ch.POW), &(ch.DEF), retrieve, end);
+        ch.st = affect_state(retrieve, *end);
+        s.team[i] = ch;
+        free(retrieve);
+        free(end);
+    }
+    character ch = s.enemy;
+    char* retrieve = (char*)malloc(100*sizeof(char));
+    int end;
+    fscanf(file, "%d %s %d\n", &(ch.HP), retrieve, &(end));
+    ch.st = affect_state(retrieve, end);
+    s.enemy = ch; 
+    fscanf(file, "%d\n", &(s.turn));
+    free(retrieve);
+    fclose(file);
+    return s;
+}
 
-/* prints the health of all parties*/
+// write the current state of the battle for every action
+void write_state(stats s){
+    FILE* file = fopen("src/battle/data/state.txt", "w");
+    assert(file != NULL);
+    for (int i = 0; i < 5; i++){
+        character ch = s.team[i];
+        fprintf(file, "%d %d %d %s %d\n", ch.HP, ch.POW, ch.DEF, ch.st.name, ch.st.end);
+    }
+    character ch = s.enemy;
+    fprintf(file, "%d %s %d\n%d\n", ch.HP, ch.st.name, ch.st.end, s.turn);
+    fclose(file);
+}
+
+/* removes a state if the turn is right*/
 stats reset_state(stats s){
     if (s.enemy.HP > s.enemy.maxHP){
         s.enemy.HP = s.enemy.maxHP;
@@ -79,7 +136,7 @@ void print_state(stats s){
             s.team[i].HP = s.team[i].maxHP;
         }
         if (s.team[i].HP == 0){
-            printf("%s : DOWN\n", s.team[i].name);
+            printf("\033[0;34m %s : DOWN \033[0;0m\n", s.team[i].name);
         }
         else{
             printf("\033[0;36m %s : \033[0;35m ♥ %d \033[0;36m [%s] \033[0;0m\n", s.team[i].name, s.team[i].HP, s.team[i].st.name);
@@ -98,15 +155,23 @@ void free_all(stats s){
     free(s.team);
 }
 
-void main(){
+void main(int argc, char *argv[]){
     printf("Start of the battle against the dragon !\n");
     srand(time(NULL));
-    stats s = dragon_initialize();
-    assert_ennemy_stats(s.enemy);
 
+    stats s = dragon_initialize();
+    if (argc > 1){
+        if (equal(argv[1], "restore", 0, 7)){
+            s = restore_state(s);
+        }
+    }
+
+    assert_ennemy_stats(s.enemy);
     while (!end(s)){
         s = reset_state(s);
         print_state(s);
+        write_state(s);        
+
         char* prompt = (char*)malloc(100*sizeof(char));
         printf("> ");
         fgets(prompt, 100, stdin);
@@ -148,7 +213,6 @@ void main(){
                     done = true;
                     if (s.team[i].HP <= 0){
                         printf("\033[0;31m You can't act with a K-O character \033[0;0m\n");
-                        done = false;
                     }
                     else{
                         for (int j = 0; j < s.team[i].NOA; j++){
@@ -166,19 +230,20 @@ void main(){
                                 }
                             }
                         }
+                        if (!found){
+                            printf("Unreconized action\n");
+                        }
                     }
                 }
             }
-            if (!done && !found){
+            if (!done){
                 printf("Unreconized character\n");
-            }
-            if (!found && done){
-                printf("Unreconized action\n");
             }
         }
 
         else{
             printf("Unreconized prompt\n");
+            printf("%s\n", prompt);
             s.enemy.HP = 0;
         }
         free(prompt);

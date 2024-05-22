@@ -1,0 +1,7 @@
+250 50 0 normal -1
+120 20 0 normal -1
+350 10 0 normal -1
+150 30 0 normal -1
+0 60 0 clone 4
+1000 Clover 3
+2

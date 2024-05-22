@@ -283,10 +283,26 @@ stats dragon_initialize(){
             .end = -1,
         },
         .dice = 4,
-        .actions = malloc(0*sizeof(action)),
-        .NOA = 0,
+        .actions = malloc(1*sizeof(action)),
+        .NOA = 1,
     };
 
+    action fake = { 
+        .name = "fake",
+        .name_length = 4,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "clone",
+            .end = 3,
+        },
+        .aim = 'i',
+        .type = 'g',
+        .superguard = false,
+        .odd = 100,
+    };
+    Clover.actions[0] = fake;
+        // effect : Clover creates 2 fake copies of himself that the enemy can attack instead of him. For each turn, he should choose left, right or middle, and the enemy chooses randomly one of the copies
     character* team = (character*)malloc(5*sizeof(character));
     team[0] = Derek;
     team[1] = Flavie;

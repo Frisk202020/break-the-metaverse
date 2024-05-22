@@ -212,6 +212,12 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
             }
         }
 
+        else if (equal("clone", act.st.name, 0, 5)){
+            s.team[ch_id].st.name = "clone";
+            s.team[ch_id].st.end = s.turn + act.st.end;
+            printf("\033[0;32m Clover creates 2 clones that stand for 3 turns \033[0;0m\n");
+        }
+
         else if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7) && !equal("danger", act.st.name, 0, 6)){    
             s = special_act(act, s);
         }
@@ -333,6 +339,17 @@ stats enemy_attack(stats s){
                         shield = true;
                         printf("The team is protected\n");
                     }
+                    else if (equal("clone", s.team[i].st.name, 0, 5)){
+                        char* picks[3] = {"left", "middle", "right"};
+                        char* pick = picks[rand()%3];
+                        printf("The enemy picks the %s clone : is Clover protected ? (y/N) ", pick);
+                        char* ans = (char*)malloc(100*sizeof(char));
+                        fgets(ans, 100, stdin);
+                        if (ans[0] != 'y'){
+                            s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                        }
+                        free(ans);
+                    }
                     else{
                         s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
                     }
@@ -350,6 +367,7 @@ stats enemy_attack(stats s){
                     if (equal(target->st.name, "shield", 0, 6)){
                         printf("The target is %s, but they're protected !\n", target->name);
                     }
+        
                     else if (equal(target->st.name, "focus", 0, 5)){
                         printf("Focus failed\n");
                         target->st.name = "normal";
@@ -384,7 +402,20 @@ stats enemy_attack(stats s){
                 }
                 if (!dodge){
                     if (!shield){
-                        target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 80, 30));
+                        if (equal("clone", target->st.name, 0, 5)){
+                            char* picks[3] = {"left", "middle", "right"};
+                            char* pick = picks[rand()%3];
+                            printf("The enemy picks the %s clone : is Clover protected ? (y/N) ", pick);
+                            char* ans = (char*)malloc(100*sizeof(char));
+                            fgets(ans, 100, stdin);
+                            if (ans[0] != 'y'){
+                                target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 100, 40));
+                            }
+                            free(ans);
+                        }
+                        else{
+                            target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 80, 30));
+                        }
                     }
                 }
                 if (equal("normal", s.enemy.st.name, 0, 6)){

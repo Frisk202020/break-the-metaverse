@@ -157,14 +157,6 @@ stats special_act(action act, stats s){
         s.enemy.st.end = s.turn + act.st.end;
         printf("\033[0;32m The enemy will focus Derek for 2 turns \033[0;0m\n");
     }
-
-    else if (equal("shield", act.st.name, 0, 6)){
-        for (int i = 0; i < 5; i++){
-            s.team[i].st.name = "shield";
-            s.team[i].st.end = s.turn + act.st.end;
-        }
-        printf("\033[0;32m The party is protected from the following attack ! \033[0;0m\n");
-    }
     
     else if (equal("corrupt", act.st.name, 0, 7)){
         action* new_actions = (action*)malloc(3*sizeof(action));
@@ -187,27 +179,39 @@ stats special_act(action act, stats s){
 }
 
 stats execute_action(stats s, action act, int ch_id, int act_id){
-    if (act.aim == 'g'){
+    if (act.type == 'g'){
         if (act.POW > 0){
             s.enemy.HP -= act.POW;
+            if (equal(act.st.name, "danger", 0, 6)){
+                int pick = rand()%100;
+                s.team[ch_id].HP -= Int(act.POW * pick / 100.);
+                printf("\033[0;31m %s hurts themselves from the action \033[0;0m\n", s.team[ch_id].name);
+            }
         }
         
         if (act.heal > 0){
-            printf("hi\n");
             if (equal("defense", act.st.name, 0, 7)){
-                s.team[ch_id].st.name = "defense";
-                s.team[ch_id].st.end = s.turn + act.st.end;
-                s.team[ch_id].DEF += act.heal;
-                printf("\033[0;32m %s has high defense for %d turns ! \033[0;0m\n", s.team[ch_id].name, act.st.end);
+                if (ch_id < 5){
+                    s.team[ch_id].st.name = "defense";
+                    s.team[ch_id].st.end = s.turn + act.st.end;
+                    s.team[ch_id].DEF += act.heal;
+                    printf("\033[0;32m %s has high defense for %d turns ! \033[0;0m\n", s.team[ch_id].name, act.st.end);
+                }
+                else{
+                    for (int i = 0; i < 5; i++){
+                        s.team[i].st.name = "defense";
+                        s.team[i].st.end = s.turn + act.st.end;
+                        s.team[i].DEF += act.heal;
+                    }
+                    printf("\033[0;32m The party has high defense for %d turns ! \033[0;0m\n", act.st.end);
+                }
             }
         }
-        if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7)){    
+        if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7) && !equal("danger", act.st.name, 0, 6)){    
             s = special_act(act, s);
         }
-        s.team[ch_id].actions[act_id].aim = 'l';
-        s.team[ch_id].actions[act_id].odd = 0;
     }
-    else if (act.aim == 'l'){
+    else if (act.type == 'l'){
         if (action_success(act)){
             printf("Executing %s...\n", act.name);
             if (act.POW > 0){

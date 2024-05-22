@@ -153,7 +153,16 @@ void main(){
                         for (int j = 0; j < s.team[i].NOA; j++){
                             if (equal(s.team[i].actions[j].name, prompt, 8+s.team[i].name_length, 8+s.team[i].name_length+s.team[i].actions[j].name_length)){
                                 found = true;
-                                s = execute_action(s, s.team[i].actions[j], i, j);
+                                if (s.team[i].actions[j].aim == 'i'){
+                                    s = execute_action(s, s.team[i].actions[j], i, j);
+                                }
+                                else{
+                                    s = execute_action(s, s.team[i].actions[j], 5, j);
+                                }
+                                if (s.team[i].actions[j].type == 'g'){
+                                    s.team[i].actions[j].type = 'l';
+                                    s.team[i].actions[j].odd = 0;
+                                }
                             }
                         }
                     }

@@ -28,7 +28,8 @@ stats dragon_initialize(){
             .name = "stun",
             .end = 1,
         },
-        .aim = 'l',
+        .aim = 'e',
+        .type = 'l',
         .superguard = false,
         .odd = 30,
         // effect : stuns the enemy for the current turn
@@ -43,7 +44,8 @@ stats dragon_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .aim = 'g',
+        .aim = 'e',
+        .type = 'g',
         .superguard = false,
         .odd = 100,
         // effect : massive garanted damage output
@@ -58,7 +60,8 @@ stats dragon_initialize(){
             .name = "provoke",
             .end = 2,
         },
-        .aim = 'l',
+        .aim = 'e',
+        .type = 'l',
         .superguard = false,
         .odd = 80,
         // effect : the enemy will focus Derek for 2 turns
@@ -92,7 +95,8 @@ stats dragon_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .aim = 'r',
+        .aim = 'e',
+        .type = 'r',
         .superguard = false,
         .odd = 100,
         // effect : hack the code of the battle to do insane dammage. 
@@ -102,12 +106,13 @@ stats dragon_initialize(){
         .name = "shield",
         .name_length = 6,
         .POW = 0,
-        .heal = 0,
+        .heal = 100,
         .st = {
-            .name = "shield",
+            .name = "defense",
             .end = 1,
         },
-        .aim = 'g',
+        .aim = 'a',
+        .type = 'g',
         .superguard = false,
         .odd = 100,
         // effect : the action protects the crew from one attack
@@ -122,7 +127,8 @@ stats dragon_initialize(){
             .name = "corrupt",
             .end = 1000,
         },
-        .aim = 'r',
+        .aim = 'e',
+        .type = 'r',
         .superguard = false,
         .odd = 100,
         // effect : if the dragon is tased, then he looses its firebreath. Otherwise it throws the potion away
@@ -143,8 +149,8 @@ stats dragon_initialize(){
             .end = -1,
         },
         .dice = 10,
-        .actions = malloc(2*sizeof(action)),
-        .NOA = 2,
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action encyclopedia = { 
@@ -156,7 +162,8 @@ stats dragon_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .aim = 'r',
+        .aim = 'e',
+        .type = 'r',
         .superguard = false,
         .odd = 100,
         // effect : retrieve information of the enemy 
@@ -171,13 +178,31 @@ stats dragon_initialize(){
             .name = "defense",
             .end = 3,
         },
-        .aim = 'g',
+        .aim = 'i',
+        .type = 'g',
         .superguard = false,
         .odd = 100,
-        // effect : retrieve information of the enemy 
+        // effect : high defense
+    };
+
+    action hammer = { 
+        .name = "hammer",
+        .name_length = 6,
+        .POW = 300,
+        .heal = 0,
+        .st = {
+            .name = "danger",
+            .end = 3,
+        },
+        .aim = 'i',
+        .type = 'g',
+        .superguard = false,
+        .odd = 100,
+        // effect : high damage output, but the character may receive damage
     };
     Haloise.actions[0] = encyclopedia;
     Haloise.actions[1] = stone;
+    Haloise.actions[2] = hammer;
 
     character Chara = { // Xhara est un archer
         .name = "Xhara",

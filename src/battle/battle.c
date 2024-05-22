@@ -117,7 +117,7 @@ void main(){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
                     done = true;
                     if (s.team[i].HP <= 0){
-                        printf("You can't attack with a K-O character\n");
+                        printf("\033[0;31m You can't attack with a K-O character \033[0;0m\n");
                     }
                     else{
                         char d = prompt[8+s.team[i].name_length];
@@ -147,7 +147,8 @@ void main(){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
                     done = true;
                     if (s.team[i].HP <= 0){
-                        printf("You can't act with a K-O character\n");
+                        printf("\033[0;31m You can't act with a K-O character \033[0;0m\n");
+                        done = false;
                     }
                     else{
                         for (int j = 0; j < s.team[i].NOA; j++){
@@ -168,10 +169,10 @@ void main(){
                     }
                 }
             }
-            if (!done){
+            if (!done && !found){
                 printf("Unreconized character\n");
             }
-            if (!found){
+            if (!found && done){
                 printf("Unreconized action\n");
             }
         }

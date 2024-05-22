@@ -114,7 +114,11 @@ int dice_range(character ch, int result){
 /* Attributes an attack result based of the character and a dice throw*/
 int attack(character ch, int dice){
     int pow = ch.POW;
-    if (dice == 0){
+    if (equal(ch.st.name, "focus success", 0, 13)){
+        printf("\033[0;32m %s will doo massive damage !\n", ch.name);
+        return 3*pow;
+    }
+    else if (dice == 0){
         return entropy(pow, 10, 10);
     }
     else if (dice == 1){
@@ -207,22 +211,30 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
                 }
             }
         }
-        if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7) && !equal("danger", act.st.name, 0, 6)){    
+
+        else if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7) && !equal("danger", act.st.name, 0, 6)){    
             s = special_act(act, s);
         }
     }
     else if (act.type == 'l'){
         if (action_success(act)){
             printf("Executing %s...\n", act.name);
+
             if (act.POW > 0){
                 s.enemy.HP -= act.POW;
             }
-            if (!equal("normal", act.st.name, 0, 6)){    
+
+            if (equal("focus", act.st.name, 0, 5)){
+                s.team[ch_id].st.name = "focus";
+                s.team[ch_id].st.end = -1;
+            }
+
+            else if (!equal("normal", act.st.name, 0, 6)){    
                 s = special_act(act, s);
             }
         }
         else{
-            printf("action failed !\n");
+            printf("\033[0;31m action failed ! \033[0;0m\n");
         }
     }
     else{
@@ -313,6 +325,10 @@ stats enemy_attack(stats s){
         if (Action.POW > 0){
             if (Action.aim == 'a'){
                 for (int i = 0; i < 5; i++){
+                    if (equal(s.team[i].st.name, "focus", 0, 5)){
+                        printf("Focus failed\n");
+                        s.team[i].st.name = "normal";
+                    }
                     if (equal("shield", s.team[i].st.name, 0, 7)){
                         shield = true;
                         printf("The team is protected\n");
@@ -333,6 +349,10 @@ stats enemy_attack(stats s){
                     target = (Alive.team[targetID]);
                     if (equal(target->st.name, "shield", 0, 6)){
                         printf("The target is %s, but they're protected !\n", target->name);
+                    }
+                    else if (equal(target->st.name, "focus", 0, 5)){
+                        printf("Focus failed\n");
+                        target->st.name = "normal";
                     }
                     else{
                         printf("The target is %s !\n", target->name);
@@ -377,6 +397,13 @@ stats enemy_attack(stats s){
             int recover = entropy(Action.heal, 100, 100);
             printf("\033[0;35m The enemy recovers %d hearts ! \033[0;0m\n", recover);
             s.enemy.HP += recover;
+        }
+
+        for (int i = 0; i < 5; i++){
+            if (equal(s.team[i].st.name, "focus", 0, 5)){
+                s.team[i].st.name = "focus success";
+                s.team[i].st.end = s.turn + 2;
+            }
         }
 
         return s;

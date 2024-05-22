@@ -192,7 +192,7 @@ stats dragon_initialize(){
         .heal = 0,
         .st = {
             .name = "danger",
-            .end = 3,
+            .end = 1,
         },
         .aim = 'i',
         .type = 'g',
@@ -204,7 +204,7 @@ stats dragon_initialize(){
     Haloise.actions[1] = stone;
     Haloise.actions[2] = hammer;
 
-    character Chara = { // Xhara est un archer
+    character Xhara = { // Xhara est un archer
         .name = "Xhara",
         .name_length = 5,
         .maxHP = 150,
@@ -216,9 +216,61 @@ stats dragon_initialize(){
             .end = -1,
         },
         .dice = 20,
-        .actions = malloc(0*sizeof(action)),
-        .NOA = 0,
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
+
+    action betrayal = { 
+        .name = "betrayal",
+        .name_length = 8,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "normal",
+            .end = -1,
+        },
+        .aim = 'i',
+        .type = 'g',
+        .superguard = false,
+        .odd = 100,
+        // effect : high damage output, but the character may receive damage
+    };
+
+    action retreat = { 
+        .name = "retreat",
+        .name_length = 7,
+        .POW = 0,
+        .heal = 100,
+        .st = {
+            .name = "defense",
+            .end = 3,
+        },
+        .aim = 'i',
+        .type = 'g',
+        .superguard = false,
+        .odd = 100,
+        // effect : backs from the arena : the character is protected but can only attack
+    };
+
+    action focus = { 
+        .name = "focus",
+        .name_length = 5,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "focus",
+            .end = 1,
+        },
+        .aim = 'i',
+        .type = 'l',
+        .superguard = false,
+        .odd = 100,
+        // effect : if the character is not atttacked on the following turn, he'll do triple damage for 1 turn
+    };
+    Xhara.actions[0] = betrayal;
+    Xhara.actions[1] = retreat;
+    Xhara.actions[2] = focus;
+
     character Clover = { // Clover est un gobelin assassin
         .name = "Clover",
         .name_length = 6,
@@ -239,7 +291,7 @@ stats dragon_initialize(){
     team[0] = Derek;
     team[1] = Flavie;
     team[2] = Haloise;
-    team[3] = Chara;
+    team[3] = Xhara;
     team[4] = Clover;
 
     character Dragon = {

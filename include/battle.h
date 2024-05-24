@@ -54,6 +54,9 @@ int convert(char tenth, char unit);
 //from dragon.c
 stats dragon_initialize();
 
+//from sensei.c
+stats sensei_initialize();
+
 //from attack.c
 int dice_range(character ch, int result);
 int attack(character ch, int dice);

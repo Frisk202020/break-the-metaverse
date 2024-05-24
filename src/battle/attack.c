@@ -163,6 +163,10 @@ stats special_act(action act, stats s){
     }
     
     else if (equal("corrupt", act.st.name, 0, 7)){
+        if (s.enemy.NOA < 4){
+            printf("The enemy has already drank the potion\n");
+            return s;
+        }
         action* new_actions = (action*)malloc(3*sizeof(action));
         for (int i = 0; i < 3; i++){
             new_actions[i] = s.enemy.actions[i+1];
@@ -224,18 +228,22 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
     }
     else if (act.type == 'l'){
         if (action_success(act)){
-            printf("Executing %s...\n", act.name);
+            printf("\033[0;32m Executing %s... \033[0;0m\n", act.name);
 
-            if (act.POW > 0){
+            if (act.POW > 0 && !equal(act.st.name, "boost", 0, 5)){
                 s.enemy.HP -= act.POW;
             }
 
-            if (equal("focus", act.st.name, 0, 5)){
+            else if (equal(act.st.name, "boost", 0, 5)){
+                s.team[ch_id].POW += act.POW;
+            }
+
+            else if (equal("focus", act.st.name, 0, 5)){
                 s.team[ch_id].st.name = "focus";
                 s.team[ch_id].st.end = -1;
             }
 
-            else if (!equal("normal", act.st.name, 0, 6)){    
+            if (!equal("normal", act.st.name, 0, 6) && !equal(act.st.name, "boost", 0, 5)){    
                 s = special_act(act, s);
             }
         }
@@ -245,14 +253,14 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
     }
     else{
         char* prompt = (char*)malloc(100*sizeof(char));
-        printf("Look at the battle book to see the action success condition\nIs action successful (y/N) ?");
+        printf("Look at the battle book to see the action success condition\nIs action successful (y/N) ? ");
         fgets(prompt, 100, stdin);
         if (equal("y", prompt, 0, 1)){
             printf("\033[0;32m Success ! \033[0;0m\n");
             if (act.POW > 0){
                 s.enemy.HP -= act.POW;
             }
-            if (!equal("normal", act.st.name, 0, 6)){    
+            else if (!equal("normal", act.st.name, 0, 6)){    
                 s = special_act(act, s);
             }
         }
@@ -335,9 +343,8 @@ stats enemy_attack(stats s){
                         printf("Focus failed\n");
                         s.team[i].st.name = "normal";
                     }
-                    if (equal("shield", s.team[i].st.name, 0, 7)){
-                        shield = true;
-                        printf("The team is protected\n");
+                    if (s.team[i].DEF == 100){
+                        printf("\033[0;32m %s is protected\033[0;0m\n", s.team[i].name);
                     }
                     else if (equal("clone", s.team[i].st.name, 0, 5)){
                         char* picks[3] = {"left", "middle", "right"};
@@ -345,7 +352,9 @@ stats enemy_attack(stats s){
                         printf("The enemy picks the %s clone : is Clover protected ? (y/N) ", pick);
                         char* ans = (char*)malloc(100*sizeof(char));
                         fgets(ans, 100, stdin);
+                        shield = true;
                         if (ans[0] != 'y'){
+                            shield = false;
                             s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
                         }
                         free(ans);
@@ -364,7 +373,7 @@ stats enemy_attack(stats s){
                     Alive = alive(s);
                     int targetID = rand()%Alive.N;
                     target = (Alive.team[targetID]);
-                    if (equal(target->st.name, "shield", 0, 6)){
+                    if (target->DEF == 100){
                         printf("The target is %s, but they're protected !\n", target->name);
                     }
         
@@ -380,8 +389,8 @@ stats enemy_attack(stats s){
                     for (int i = 0; i < 5; i++){
                         if (equal(s.team[i].name, s.enemy.st.name, 0, s.team[i].name_length)){
                             target = (&(s.team[i]));
-                            if (equal(target->st.name, "shield", 0, 6)){
-                                printf("The enemy focuses %s, but they're protected !\n", target->name);
+                            if (target->DEF == 100){
+                                printf("\033[0;32m The enemy focuses %s, but they're protected !\033[0;0m\n", target->name);
                                 shield = true;
                             }
                             else{
@@ -408,7 +417,9 @@ stats enemy_attack(stats s){
                             printf("The enemy picks the %s clone : is Clover protected ? (y/N) ", pick);
                             char* ans = (char*)malloc(100*sizeof(char));
                             fgets(ans, 100, stdin);
+                            shield = true;
                             if (ans[0] != 'y'){
+                                shield = false;
                                 target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 100, 40));
                             }
                             free(ans);

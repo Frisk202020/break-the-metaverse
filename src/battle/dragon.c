@@ -29,9 +29,9 @@ stats dragon_initialize(){
             .end = 1,
         },
         .aim = 'e',
-        .type = 'l',
+        .type = 'g',
         .superguard = false,
-        .odd = 30,
+        .odd = 100,
         // effect : stuns the enemy for the current turn
     };
 
@@ -283,8 +283,8 @@ stats dragon_initialize(){
             .end = -1,
         },
         .dice = 4,
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action fake = { 
@@ -300,8 +300,41 @@ stats dragon_initialize(){
         .type = 'g',
         .superguard = false,
         .odd = 100,
+        // effect : massive damage. Challenge -> throw shuttlecock in mug (or throw arrow if I have one)
+    };
+
+    action knife = { 
+        .name = "knife",
+        .name_length = 5,
+        .POW = 300,
+        .heal = 0,
+        .st = {
+            .name = "normal",
+            .end = -1,
+        },
+        .aim = 'e',
+        .type = 'r',
+        .superguard = false,
+        .odd = 100,
+    };
+
+    action gold = { 
+        .name = "gold",
+        .name_length = 4,
+        .POW = 40,
+        .heal = 0,
+        .st = {
+            .name = "boost",
+            .end = -1,
+        },
+        .aim = 'i',
+        .type = 'l',
+        .superguard = false,
+        .odd = 60,
     };
     Clover.actions[0] = fake;
+    Clover.actions[1] = knife;
+    Clover.actions[2] = gold;
         // effect : Clover creates 2 fake copies of himself that the enemy can attack instead of him. For each turn, he should choose left, right or middle, and the enemy chooses randomly one of the copies
     character* team = (character*)malloc(5*sizeof(character));
     team[0] = Derek;

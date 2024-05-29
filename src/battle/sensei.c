@@ -14,8 +14,12 @@ stats sensei_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .smell = {
+            .name = "none",
+            .end = -1,
+        },
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action taser = {
@@ -34,6 +38,38 @@ stats sensei_initialize(){
         // effect : stuns the enemy for the current turn
     };
 
+    action protect = {
+        .name = "protect",
+        .name_length = 7,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "vulnerable",
+            .end = 1,
+        },
+        .aim = 'i',
+        .type = 'l',
+        .superguard = false,
+        .odd = 100,
+        // effect : protect a foe, but receive double damage
+    };
+
+    action smell = {
+        .name = "smell",
+        .name_length = 5,
+        .POW = 0,
+        .heal = 0,
+        .st = {
+            .name = "smell",
+            .end = 1,
+        },
+        .aim = 'i',
+        .type = 'l',
+        .superguard = false,
+        .odd = 100,
+        // effect : receive a smell to eventually increase you damage output
+    };
+
     
     Derek.actions[0] = taser;  
 
@@ -48,8 +84,12 @@ stats sensei_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .smell = {
+            .name = "none",
+            .end = -1,
+        },
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action hack = { 
@@ -81,8 +121,12 @@ stats sensei_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .smell = {
+            .name = "none",
+            .end = -1,
+        },
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action encyclopedia = { 
@@ -114,8 +158,12 @@ stats sensei_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .smell = {
+            .name = "none",
+            .end = -1,
+        },
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action betrayal = { 
@@ -147,8 +195,12 @@ stats sensei_initialize(){
             .name = "normal",
             .end = -1,
         },
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .smell = {
+            .name = "none",
+            .end = -1,
+        },
+        .actions = malloc(3*sizeof(action)),
+        .NOA = 3,
     };
 
     action fake = { 
@@ -175,6 +227,11 @@ stats sensei_initialize(){
     team[2] = Haloise;
     team[3] = Xhara;
     team[4] = Clover;
+
+    for (int i = 0; i < 5; i++){
+        team[i].actions[1] = protect;
+        team[i].actions[2] = smell;
+    }
 
     character Sensei = {
         .name = "Sensei",
@@ -203,7 +260,7 @@ stats sensei_initialize(){
         },
         .aim = 'i',
         .superguard = true,
-        .odd = 00,
+        .odd = 0,
     };
     action horizontal = {
         .name = "horizontal swing",
@@ -243,4 +300,84 @@ stats sensei_initialize(){
     };
 
     return s;
+}
+
+state smell_scale(int choice){   
+    if (choice < 6){
+        state ans = {
+            .name = "strawberry",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 18){
+        state ans = {
+            .name = "kiwi",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 38){
+        state ans = {
+            .name = "rose",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 44){
+        state ans = {
+            .name = "banana",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 49){
+        state ans = {
+            .name = "coconut",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 53){
+        state ans = {
+            .name = "lila",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 68){
+        state ans = {
+            .name = "tomato",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 82){
+        state ans = {
+            .name = "violet",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 84){
+        state ans = {
+            .name = "mint",
+            .end = -1,
+        };
+        return ans;
+    }
+    else if (choice < 100){
+        state ans = {
+            .name = "lemon",
+            .end = -1,
+        };
+        return ans;
+    }
+    else{
+        state ans = {
+            .name = "rotten egg",
+            .end = -1,
+        };
+        return ans;
+    }
 }

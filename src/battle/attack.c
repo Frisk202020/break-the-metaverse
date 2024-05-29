@@ -242,8 +242,20 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
                 s.team[ch_id].st.name = "focus";
                 s.team[ch_id].st.end = -1;
             }
-
-            if (!equal("normal", act.st.name, 0, 6) && !equal(act.st.name, "boost", 0, 5)){    
+            else if (equal("smell", act.st.name, 0, 5)){
+                char* prompt = (char*)malloc(100*sizeof(char));
+                printf("How much time to focus (seconds) ? ");
+                fgets(prompt, 100, stdin);
+                if (!belongs(prompt[2], "0123456789", 10)){
+                    int choice = convert(prompt[0], prompt[1]);
+                    s.team[ch_id].smell = smell_scale(choice);
+                }
+                else{
+                    s.team[ch_id].smell = smell_scale(100);
+                }
+                free(prompt);
+            }
+            else if (!equal("normal", act.st.name, 0, 6)){    
                 s = special_act(act, s);
             }
         }
@@ -360,7 +372,16 @@ stats enemy_attack(stats s){
                         free(ans);
                     }
                     else{
-                        s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                        bool protect = false;
+                        for (int j = 0; j < 5; j++){
+                            if (s.team[j].name == s.team[i].st.name){
+                                s.team[j].HP -= entropy(Action.POW, 100, 40);
+                                protect = true;
+                            }
+                        }
+                        if (!protect){
+                            s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                        }
                     }
                 }
             }
@@ -373,6 +394,12 @@ stats enemy_attack(stats s){
                     Alive = alive(s);
                     int targetID = rand()%Alive.N;
                     target = (Alive.team[targetID]);
+                    for (int i = 0; i < 5; i++){
+                        if (target->st.name == s.team[i].name){
+                            target = &(s.team[i]);
+                        }
+                    }
+
                     if (target->DEF == 100){
                         printf("The target is %s, but they're protected !\n", target->name);
                     }

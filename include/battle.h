@@ -28,6 +28,7 @@ typedef struct{
     int POW;
     int DEF;
     state st;
+    state smell;
     int dice;
     action* actions;
     int NOA; // Number Of Actions
@@ -56,6 +57,7 @@ stats dragon_initialize();
 
 //from sensei.c
 stats sensei_initialize();
+state smell_scale(int choice);
 
 //from attack.c
 int dice_range(character ch, int result);

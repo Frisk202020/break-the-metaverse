@@ -12,13 +12,24 @@ bool end(stats s){
         return true;
     }
     else{
-        for (int i = 0; i < 5; i++){
-            if (s.team[i].HP > 0){
-                return false;
+        if (equal("Dragon", s.enemy.name, 0, 6)){
+            for (int i = 0; i < 5; i++){
+                if (s.team[i].HP > 0){
+                    return false;
+                }
+            }
+            printf("\033[0;31m The team is defeated...\033[0;31m\n");
+            return true;
+        }
+        else{
+            for (int i = 0; i < 5; i++){
+                if (s.team[i].HP <= 0){
+                    print_state(s);
+                    printf("\033[0;31m A character didn't pass the test...\033[0;31m\n");
+                    return true;
+                }
             }
         }
-        printf("\033[0;31m The team is defeated...\033[0;31m\n");
-        return true;
     }
 }
 
@@ -198,7 +209,7 @@ void print_state(stats s){
                 printf("%s : \033[0;35m Grade : %0.2f/20  ", s.team[i].name, grade);
                 life_bar(s.team[i]);
                 printf("%s ", belts[i]);
-                printf("[%s] \033[0;0m\n", s.team[i].st.name);
+                printf("[%s] [%s]\033[0;0m\n", s.team[i].st.name, s.team[i].smell.name);
             }
         }
         printf("\n");
@@ -275,11 +286,20 @@ void main(int argc, char *argv[]){
                             printf("Did the player beat you ? (y/N) ");
                             fgets(prompt, 100, stdin);
                             if (prompt[0] == 'y'){
-                                s.enemy.HP -= s.team[i].POW;
+                                if (equal(s.team[i].smell.name, "lila", 0, 4)){
+                                    s.enemy.HP -= 2*s.team[i].POW;
+                                }
+                                else if (equal(s.team[i].smell.name, "rotten egg", 0, 10)){
+                                    printf("The attack failed because of the horrible smell");
+                                }
+                                else{
+                                    s.enemy.HP -= s.team[i].POW;
+                                }
                             }
                             else{
                                 printf("\033[0;31m attack failed...\033[0;0m");
                             }
+                            free(prompt);
                         }
                     }
                 }
@@ -304,6 +324,22 @@ void main(int argc, char *argv[]){
                     done = true;
                     if (s.team[i].HP <= 0){
                         printf("\033[0;31m You can't act with a K-O character \033[0;0m\n");
+                    }
+                    else if (equal("protect", prompt, 8+s.team[i].name_length, 15+s.team[i].name_length)){
+                        for (int j = 0; j < 5; j++){
+                            if (equal(s.team[j].name, prompt, 16+s.team[i].name_length, 16+s.team[i].name_length+s.team[j].name_length)){
+                                if (equal("vulnerable", s.team[j].st.name, 0, 10)){
+                                    printf("can't protect the character because they're already protecting someone");
+                                }
+                                else{
+                                    s.team[j].st.name = s.team[i].name;
+                                    s.team[j].st.end = s.turn + 1;
+                                    s.team[i].st.name = "vulnerable";
+                                    s.team[i].DEF = -100;
+                                    s.team[i].st.end = s.turn + 1;
+                                }
+                            }
+                        }
                     }
                     else{
                         for (int j = 0; j < s.team[i].NOA; j++){

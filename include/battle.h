@@ -28,8 +28,8 @@ typedef struct{
     int POW;
     int DEF;
     state st;
-    state smell;
-    int dice;
+    state smell; // for sensei fight
+    int dice; // for dragon fight
     action* actions;
     int NOA; // Number Of Actions
 }character;
@@ -43,6 +43,7 @@ typedef struct{
     character* team;
     character enemy;
     int turn;
+    int* orb; //used for spirit fight
 }stats;
 
 //from utilities.c
@@ -50,6 +51,7 @@ int Int(double x);
 int entropy(int value, int min, int var);
 bool equal(char* s, char* prompt, int d, int e);
 bool belongs(char c, char* s, int N);
+bool In(int* array, int N, int pick);
 int convert(char tenth, char unit);
 
 //from dragon.c
@@ -58,6 +60,12 @@ stats dragon_initialize();
 //from sensei.c
 stats sensei_initialize();
 state smell_scale(int choice);
+
+//from spirit.c
+char* merge_magic(int i, int j);
+character create_spirit(char* name, int name_length, state st);
+stats choose_spirit(stats s, int* took, int took_len);
+stats spirit_initialize();
 
 //from attack.c
 int dice_range(character ch, int result);

@@ -156,33 +156,7 @@ void life_bar(character ch){
 }
 
 void print_state(stats s){
-    if (equal(s.enemy.name, "Dragon", 0, 6)){
-        printf("\033[0;37m");
-        printf("\n*** turn %d ***\n", s.turn);
-        
-        printf("\033[0;31m \nBoss : \033[0;35m ♥ %d  ", s.enemy.HP); 
-        life_bar(s.enemy);
-        printf("\033[0;31m [%s] \033[0;0m\n\n", s.enemy.st.name);
-
-        for (int i = 0; i < 5; i++){
-            if (s.team[i].HP < 0){
-                s.team[i].HP = 0;
-            }
-            if (s.team[i].HP > s.team[i].maxHP){
-                s.team[i].HP = s.team[i].maxHP;
-            }
-            if (s.team[i].HP == 0){
-                printf("\033[0;34m %s : DOWN \033[0;0m\n", s.team[i].name);
-            }
-            else{
-                printf("\033[0;36m %s : \033[0;35m ♥ %d  ", s.team[i].name, s.team[i].HP);
-                life_bar(s.team[i]);
-                printf("\033[0;36m [%s] \033[0;0m\n", s.team[i].st.name);
-            }
-        }
-        printf("\n");
-    }
-    else if (equal(s.enemy.name, "Sensei", 0, 6)){
+    if (equal(s.enemy.name, "Sensei", 0, 6)){
         printf("\033[0;37m");
         printf("\n*** turn %d ***\n", s.turn);
         int gardes[5] = {18, 8, 12, 16, 10};
@@ -211,6 +185,38 @@ void print_state(stats s){
                 printf("%s ", belts[i]);
                 printf("[%s] [%s]\033[0;0m\n", s.team[i].st.name, s.team[i].smell.name);
             }
+        }
+        printf("\n");
+    }
+
+    else{
+        printf("\033[0;37m");
+        printf("\n*** turn %d ***\n", s.turn);
+        
+        printf("\033[0;31m \n%s : \033[0;35m ♥ %d  ",s.enemy.name, s.enemy.HP); 
+        life_bar(s.enemy);
+        printf("\033[0;31m [%s] \033[0;0m\n\n", s.enemy.st.name);
+
+        for (int i = 0; i < 5; i++){
+            if (s.team[i].HP < 0){
+                s.team[i].HP = 0;
+            }
+            if (s.team[i].HP > s.team[i].maxHP){
+                s.team[i].HP = s.team[i].maxHP;
+            }
+            if (s.team[i].HP == 0){
+                printf("\033[0;34m %s : DOWN \033[0;0m\n", s.team[i].name);
+            }
+            else{
+                printf("\033[0;36m %s : \033[0;35m ♥ %d  ", s.team[i].name, s.team[i].HP);
+                life_bar(s.team[i]);
+                printf("\033[0;36m [%s] \033[0;0m\n", s.team[i].st.name);
+            }
+        }
+
+        if (s.orb != NULL){
+            char* arr[6] = {"None", "Fire", "Ice", "Water", "Light", "Vegetal"};
+            printf("\n\033[0;33m Orb state : {%s, %s}\033[0;0m\n", arr[s.orb[0]+1], arr[s.orb[1]+1]);
         }
         printf("\n");
     }
@@ -243,6 +249,10 @@ void main(int argc, char *argv[]){
             printf("Start of the battle against the sensei !\n");
             s = sensei_initialize();
         }
+        else if (equal(argv[1], "Spirit", 0, 6)){
+            printf("Start of the battle against the spirits !\n");
+            s = spirit_initialize();
+        }
         else{
             printf("Unknown\n");
             return;
@@ -259,7 +269,7 @@ void main(int argc, char *argv[]){
     while (!end(s) || the_end){
         s = reset_state(s);
         print_state(s);
-        write_state(s);        
+        write_state(s);
 
         char* prompt = (char*)malloc(100*sizeof(char));
         printf("> ");
@@ -305,9 +315,16 @@ void main(int argc, char *argv[]){
                 }
             }
 
-            if (equal(s.enemy.name, prompt, 7, 13)){
+            if (equal(s.enemy.name, prompt, 7, 13) || equal("Spirit", prompt, 7, 13)){
                 done = true;
                 s = enemy_attack(s);  
+
+                // reset orb   
+                if (s.orb != NULL){
+                    s.orb[0] = -1;
+                    s.orb[1] = -1;
+                }   
+
                 s.turn++;             
             }
             

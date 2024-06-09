@@ -42,6 +42,15 @@ bool belongs(char c, char* s, int N){
     return false;
 }
 
+bool In(int* array, int N, int pick){
+    for (int i = 0; i < N; i++){
+        if (pick == array[i]){
+            return true;
+        }
+    }
+    return false;
+}
+
 int convert(char tenth, char unit){
     int n = 0;
     if (belongs(unit, "0123456789", 10)){ //check if the user prompted a two-digit number

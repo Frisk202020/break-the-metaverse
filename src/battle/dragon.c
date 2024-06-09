@@ -423,5 +423,7 @@ stats dragon_initialize(){
         .turn = 1,
     };
 
+    s.orb = NULL;
+
     return s;
 }

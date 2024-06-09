@@ -180,6 +180,25 @@ stats special_act(action act, stats s){
         printf("The dragon can't breath fire anymore !\n");
     }
 
+    else if (equal("magic", act.name, 0, 6)){
+        char* elements[5] = {"fire", "ice", "water", "light", "vegetal"};
+        int arr[5] = {4, 3, 5, 5, 7};
+        int i = 0;
+        while (!equal(elements[i], act.st.name, 0, arr[i])){
+            i++;
+        }
+
+        if (s.orb[0] < 0){
+            s.orb[0] = i;
+        }
+        else if (s.orb[1] < 0){
+            s.orb[1] = i;
+        }
+        else{
+            printf("The orb is filled for this turn !\n");
+        }
+    }
+
     else{
         printf("Unreconized state\n");
     }

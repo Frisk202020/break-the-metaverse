@@ -8,11 +8,13 @@
 /* Checks if the battle reaches the end (i-e one party goes down)*/
 bool end(stats s){
     if (s.enemy.HP <= 0){
-        printf("\033[0;32m The enemy is defeated !\033[0;32m\n");
-        return true;
+        if (s.orb == NULL){
+            printf("\033[0;32m The enemy is defeated !\033[0;32m\n");
+            return true;
+        }
     }
     else{
-        if (equal("Dragon", s.enemy.name, 0, 6)){
+        if (!equal("Sensei", s.enemy.name, 0, 6)){
             for (int i = 0; i < 5; i++){
                 if (s.team[i].HP > 0){
                     return false;
@@ -216,7 +218,12 @@ void print_state(stats s){
 
         if (s.orb != NULL){
             char* arr[6] = {"None", "Fire", "Ice", "Water", "Light", "Vegetal"};
-            printf("\n\033[0;33m Orb state : {%s, %s}\033[0;0m\n", arr[s.orb[0]+1], arr[s.orb[1]+1]);
+            if (s.orb[1] < 0){
+                printf("\n\033[0;33m Orb state : {%s, %s}\033[0;0m\n", arr[s.orb[0]+1], arr[s.orb[1]+1]);
+            }
+            else{
+                printf("\n\033[0;33m Orb state : {%s, %s} -> %s\033[0;0m\n", arr[s.orb[0]+1], arr[s.orb[1]+1], merge_magic(s.orb[0], s.orb[1]));
+            }
         }
         printf("\n");
     }
@@ -230,6 +237,11 @@ void free_all(stats s){
         free(s.team[i].actions);
     }
     free(s.team);
+
+    if (s.orb != NULL){
+        free(s.orb);
+        free(s.took);
+    }
 }
 
 void main(int argc, char *argv[]){
@@ -252,6 +264,11 @@ void main(int argc, char *argv[]){
         else if (equal(argv[1], "Spirit", 0, 6)){
             printf("Start of the battle against the spirits !\n");
             s = spirit_initialize();
+            int* took = (int*)malloc(3*sizeof(int));
+            for (int i = 0; i < 3; i++){
+                took[i] = -1;
+            }
+            s.took = took;
         }
         else{
             printf("Unknown\n");
@@ -267,6 +284,29 @@ void main(int argc, char *argv[]){
     assert_ennemy_stats(s.enemy);
     bool the_end = false;
     while (!end(s) || the_end){
+        if (s.orb != NULL){
+            if (s.enemy.HP <= 0){
+                if (s.nb_spirit == 3){
+                    printf("\033[0;32mThe spirits are defeated !\033[0;32m\n");
+                    free_all(s);
+                    return;
+                }
+                else{
+                    char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
+                    int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
+                    int i = 0;
+                    while(!equal(state_names[i], s.enemy.st.name, 0, name_lengths[i])){
+                        i++;
+                    }
+                    s.took[s.nb_spirit] = i;
+                    s.nb_spirit++;
+                    free(s.enemy.actions);
+                    s = choose_spirit(s);
+                    printf("%d\n", s.nb_spirit);
+                }
+            } 
+        }
+
         s = reset_state(s);
         print_state(s);
         write_state(s);

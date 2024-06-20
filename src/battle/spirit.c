@@ -10,6 +10,15 @@ char* merge_magic(int i, int j){
     char* five[5] = {"poison", "darkness",  "plant", "lila", "vegetal"};
     char** magic[5] = {one, two, three, four, five};
 
+    if (j < 0){
+        if (i < 0){
+            return "None";
+        }
+        else{
+            return magic[i][i];
+        }
+    }
+
     return magic[i][j];
 }
 
@@ -17,49 +26,123 @@ character create_spirit(char* name, int name_length, state st){
     character Spirit = {
         .name = name,
         .name_length = name_length,
-        .maxHP = 20,
-        .HP = 20,
+        .maxHP = 50,
+        .HP = 50,
         .POW = 0,
         .DEF = 100,
         .st = st,
-        .actions = malloc(1*sizeof(action)),
-        .NOA = 1,
+        .actions = malloc(2*sizeof(action)),
+        .NOA = 2,
     };
 
-    action attack = {
-        .name = "attack",
-        .name_length = 6,
-        .POW = 30,
+    action attack_indiv = {
+        .name = "solo attack",
+        .name_length = 11,
+        .POW = 50,
         .heal = 0,
         .st = Spirit.st,
         .aim = 'i',
         .type = 'g',
-        .superguard = false,
+        .superguard = true,
+        .odd = 0,
+    };
+
+    action attack_all = {
+        .name = "multi attack",
+        .name_length = 11,
+        .POW = 50,
+        .heal = 0,
+        .st = Spirit.st,
+        .aim = 'a',
+        .type = 'g',
+        .superguard = true,
         .odd = 100,
     };
 
-    Spirit.actions[0] = attack;
+    Spirit.actions[0] = attack_indiv;
+    Spirit.actions[1] = attack_all;
     return Spirit;
 }
 
-stats choose_spirit(stats s, int* took, int took_len){
+stats choose_spirit(stats s){
     char* choices[12] = {"fire spirit", "ice spirit", "water spirit", "light spirit", "vegetal spirit", "gluton spirit", "dark shell", "knight", "solid shell", "dark spirit", "climate spirit", "sensei"};
     int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
     char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
     int state_lengths[12] = {4, 3, 5, 5, 7, 6, 4, 5, 5, 6, 7, 6};
-    int state_durations[12] = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
-    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "feu", "fume", "burst", "poison", "scuplture", "beam", "plant", "lila"};
     int r = rand()%12;
-    while (In(took, took_len, r)){
-        r = rand()%12;
+
+    if (s.took != NULL){
+        while (In(s.took, 3, r)){
+            r = rand()%12;
+        }
     }
     state new_state = {
         .name = state_names[r],
-        .end = state_durations[r],
+        .end = 1000,
     };
     character new_spirit = create_spirit(choices[r], name_lengths[r], new_state);
     s.enemy = new_spirit;
+    printf("%d %s\n",s.enemy.HP, s.enemy.name);
 
+    return s;
+}
+
+stats check_weakness(stats s){
+    char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
+    int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
+    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "fire", "fume", "burst", "poison", "sculpture", "beam", "plant", "lila"};
+    int weaknesses_length[12] = {5, 4, 4, 8, 4, 4, 5, 6, 9, 4, 5, 4};
+
+    int i = 0;
+    while(!equal(state_names[i], s.enemy.st.name, 0, name_lengths[i])){
+        i++;
+    }
+    if (equal(weaknesses[i], merge_magic(s.orb[0], s.orb[1]), 0, weaknesses_length[i])){
+        bool ok = false;
+        while (!ok){
+            char* prompt = (char*)malloc(100*sizeof(char));
+            printf("This is the weakness of the spirit : players may inflict damage. How many points did they get ? ");
+            fgets(prompt, 100, stdin);
+            if (!belongs(prompt[0], "0123456789", 10)){
+                printf("invalid prompt !\n");
+            }
+            else{
+                ok = true; 
+                s.enemy.HP -= convert(prompt[0], prompt[1]);
+            }
+            free(prompt);
+        }
+    }
+    if (equal("heal", merge_magic(s.orb[0], s.orb[1]), 0, 4)){
+        bool ok = false;
+        while (!ok){
+            char* prompt = (char*)malloc(100*sizeof(char));
+            printf("Id of the character to heal (0, 1, 2, 3, 4) ? ");
+            fgets(prompt, 100, stdin);
+
+            if (!belongs(prompt[0], "01234", 10)){
+                printf("invalid prompt or index out of bounds !\n");
+            }
+            else{
+                ok = true; 
+                int id = convert(prompt[0], 'a');
+                ok = false;
+                while (!ok){
+                    printf("HP to heal (30 faces dice) ? ");
+                    fgets(prompt, 100, stdin);
+
+                    if (!belongs(prompt[0], "0123456789", 10)){
+                        printf("invalid prompt !\n");
+                    }
+                    else{
+                        ok = true; 
+                        s.team[id].HP += convert(prompt[0], prompt[1]);
+                    }
+                }
+            }
+            free(prompt);
+        }
+    }
     return s;
 }
 
@@ -262,11 +345,11 @@ stats spirit_initialize(){
         magic.st.name = s.team[i].st.name;
         s.team[i].actions[1] = magic;
     }
-
-    s = choose_spirit(s, NULL, 0);
+    s = choose_spirit(s);
 
     s.orb = malloc(2*sizeof(int));
     s.orb[0] = -1;
     s.orb[1] = -1;
+    s.nb_spirit = 1;
     return s;
 }

@@ -44,6 +44,8 @@ typedef struct{
     character enemy;
     int turn;
     int* orb; //used for spirit fight
+    int nb_spirit;
+    int* took;
 }stats;
 
 //from utilities.c
@@ -64,8 +66,9 @@ state smell_scale(int choice);
 //from spirit.c
 char* merge_magic(int i, int j);
 character create_spirit(char* name, int name_length, state st);
-stats choose_spirit(stats s, int* took, int took_len);
+stats choose_spirit(stats s);
 stats spirit_initialize();
+stats check_weakness(stats s);
 
 //from attack.c
 int dice_range(character ch, int result);

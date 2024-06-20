@@ -369,7 +369,23 @@ stats enemy_attack(stats s){
 
         if (Action.POW > 0){
             if (Action.aim == 'a'){
-                for (int i = 0; i < 5; i++){
+                if (s.orb != NULL){
+                    bool ok = false;
+                    while (!ok){
+                        char* prompt = (char*)malloc(100*sizeof(char));
+                        printf("Attack power of the spirit ? ");
+                        fgets(prompt, 100, stdin);
+                        if (!belongs(prompt[0], "0123456789", 10)){
+                            printf("invalid prompt !\n");
+                        }
+                        else{
+                            ok = true; 
+                            Action.POW = convert(prompt[0], prompt[1]);
+                        }
+                        free(prompt);
+                    }
+                }
+        for (int i = 0; i < 5; i++){
                     if (equal(s.team[i].st.name, "focus", 0, 5)){
                         printf("Focus failed\n");
                         s.team[i].st.name = "normal";
@@ -399,7 +415,12 @@ stats enemy_attack(stats s){
                             }
                         }
                         if (!protect){
-                            s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                            if (s.orb == NULL){
+                                s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                            }
+                            else{
+                                s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*Action.POW)+1;
+                            }
                         }
                     }
                 }
@@ -409,7 +430,7 @@ stats enemy_attack(stats s){
                 character* target = &(s.team[0]);
                 crew Alive;
 
-                if (equal("normal", s.enemy.st.name, 0, 6)){
+                if (equal("normal", s.enemy.st.name, 0, 6) || s.orb != NULL){
                     Alive = alive(s);
                     int targetID = rand()%Alive.N;
                     target = (Alive.team[targetID]);
@@ -431,6 +452,7 @@ stats enemy_attack(stats s){
                         printf("The target is %s !\n", target->name);
                     }
                 }
+
                 else{
                     for (int i = 0; i < 5; i++){
                         if (equal(s.team[i].name, s.enemy.st.name, 0, s.team[i].name_length)){
@@ -448,15 +470,40 @@ stats enemy_attack(stats s){
 
                 if (Action.superguard){
                     char* prompt = (char*)malloc(100*sizeof(char));
-                    printf("Attack dodged (y/N)? ");
+                    printf("Does the character tries to superguard (y/N) ? ");
                     fgets(prompt, 100, stdin);
-                    if (equal("y", prompt, 0, 1)){
-                        dodge = true;
+                    if (prompt[0] == 'y'){
+                        printf("Attack dodged (y/N)? ");
+                        fgets(prompt, 100, stdin);
+                        if (equal("y", prompt, 0, 1)){
+                            dodge = true;
+                        }
+                        else{
+                            target->DEF = -100;
+                        }
                     }
                     free(prompt);
                 }
+                
                 if (!dodge){
                     if (!shield){
+                        if (s.orb != NULL){
+                            bool ok = false;
+                            while (!ok){
+                                char* prompt = (char*)malloc(100*sizeof(char));
+                                printf("Attack power of the spirit ? ");
+                                fgets(prompt, 100, stdin);
+                                if (!belongs(prompt[0], "0123456789", 10)){
+                                    printf("invalid prompt !\n");
+                                }
+                                else{
+                                    ok = true; 
+                                    Action.POW = convert(prompt[0], prompt[1]);
+                                }
+                                free(prompt);
+                            }
+                        }
+
                         if (equal("clone", target->st.name, 0, 5)){
                             char* picks[3] = {"left", "middle", "right"};
                             char* pick = picks[rand()%3];
@@ -471,7 +518,12 @@ stats enemy_attack(stats s){
                             free(ans);
                         }
                         else{
-                            target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 80, 30));
+                            if (s.orb == NULL){
+                                target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 80, 30));
+                            }
+                            else{
+                                target->HP -= Int(0.01*(100 - target->DEF)*Action.POW) + 1;
+                            }
                         }
                     }
                 }
@@ -492,6 +544,10 @@ stats enemy_attack(stats s){
                 s.team[i].st.name = "focus success";
                 s.team[i].st.end = s.turn + 2;
             }
+        }
+
+        if (s.orb != NULL){
+            s = check_weakness(s);
         }
 
         return s;

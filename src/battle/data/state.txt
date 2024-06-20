@@ -1,8 +1,8 @@
-light spirit
-44 1 0 fire -1
-100 1 0 ice -1
-100 1 0 water -1
-100 1 0 light -1
-100 1 0 vegetal -1
-20 light 5
-3
+Dragon
+250 50 0 normal -1
+120 20 0 normal -1
+350 10 0 normal -1
+150 30 0 normal -1
+80 60 0 normal -1
+1000 normal -1
+1

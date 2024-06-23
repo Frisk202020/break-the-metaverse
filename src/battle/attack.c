@@ -442,6 +442,7 @@ stats enemy_attack(stats s){
 
                     if (target->DEF == 100){
                         printf("The target is %s, but they're protected !\n", target->name);
+                        shield = true;
                     }
         
                     else if (equal(target->st.name, "focus", 0, 5)){
@@ -470,8 +471,13 @@ stats enemy_attack(stats s){
 
                 if (Action.superguard){
                     char* prompt = (char*)malloc(100*sizeof(char));
-                    printf("Does the character tries to superguard (y/N) ? ");
-                    fgets(prompt, 100, stdin);
+                    if (equal(s.enemy.name, "Sensei", 0, 6)){
+                        prompt[0] = 'y';
+                    }
+                    else{
+                        printf("Does the character tries to superguard (y/N) ? ");
+                        fgets(prompt, 100, stdin);
+                    }
                     if (prompt[0] == 'y'){
                         printf("Attack dodged (y/N)? ");
                         fgets(prompt, 100, stdin);
@@ -534,6 +540,7 @@ stats enemy_attack(stats s){
         } 
 
         if (Action.heal > 0 && !dodge && !shield){
+            printf("%d %d\n", dodge, shield);
             int recover = entropy(Action.heal, 100, 100);
             printf("\033[0;35m The enemy recovers %d hearts ! \033[0;0m\n", recover);
             s.enemy.HP += recover;

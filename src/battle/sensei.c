@@ -252,7 +252,7 @@ stats sensei_initialize(){
     action vertical = {
         .name = "vertical swing",
         .name_length = 14,
-        .POW = 5,
+        .POW = 8,
         .heal = 0,
         .st = {
             .name = "normal",
@@ -265,7 +265,7 @@ stats sensei_initialize(){
     action horizontal = {
         .name = "horizontal swing",
         .name_length = 17,
-        .POW = 5,
+        .POW = 8,
         .heal = 0,
         .st = {
             .name = "normal",
@@ -278,7 +278,7 @@ stats sensei_initialize(){
     action kamehameha = {
         .name = "kamehameha",
         .name_length = 10,
-        .POW = 20,
+        .POW = 10,
         .heal = 0,
         .st = {
             .name = "normal",

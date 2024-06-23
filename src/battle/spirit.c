@@ -44,7 +44,7 @@ character create_spirit(char* name, int name_length, state st){
         .aim = 'i',
         .type = 'g',
         .superguard = true,
-        .odd = 0,
+        .odd = 60,
     };
 
     action attack_all = {
@@ -56,7 +56,7 @@ character create_spirit(char* name, int name_length, state st){
         .aim = 'a',
         .type = 'g',
         .superguard = true,
-        .odd = 100,
+        .odd = 40,
     };
 
     Spirit.actions[0] = attack_indiv;
@@ -82,7 +82,6 @@ stats choose_spirit(stats s){
     };
     character new_spirit = create_spirit(choices[r], name_lengths[r], new_state);
     s.enemy = new_spirit;
-    printf("%d %s\n",s.enemy.HP, s.enemy.name);
 
     return s;
 }
@@ -90,7 +89,7 @@ stats choose_spirit(stats s){
 stats check_weakness(stats s){
     char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
     int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
-    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "fire", "fume", "burst", "poison", "sculpture", "beam", "plant", "lila"};
+    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "fire", "plant", "burst", "poison", "sculpture", "beam", "fume", "lila"};
     int weaknesses_length[12] = {5, 4, 4, 8, 4, 4, 5, 6, 9, 4, 5, 4};
 
     int i = 0;

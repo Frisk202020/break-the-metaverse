@@ -55,6 +55,7 @@ bool equal(char* s, char* prompt, int d, int e);
 bool belongs(char c, char* s, int N);
 bool In(int* array, int N, int pick);
 int convert(char tenth, char unit);
+int convert1000(char* prompt);
 
 //from dragon.c
 stats dragon_initialize();

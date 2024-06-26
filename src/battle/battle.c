@@ -162,7 +162,7 @@ void print_state(stats s){
         printf("\033[0;37m");
         printf("\n*** turn %d ***\n", s.turn);
         int gardes[5] = {18, 8, 12, 16, 10};
-        char* belts[5] = {"\033[0;30m", "\033[0;32m", "\033[0;34m", "\033[0;33m", "\033[0;36m"};
+        char* belts[5] = {"\033[0;37m", "\033[0;32m", "\033[0;34m", "\033[0;33m", "\033[0;36m"};
         
         printf("\033[0;31m \nBoss : \033[0;35m ♥ %d  ", s.enemy.HP); 
         life_bar(s.enemy);
@@ -428,6 +428,59 @@ void main(int argc, char *argv[]){
             free(prompt);
             free_all(s);
             return;
+        }
+        else if (equal("damage", prompt, 0, 6)){
+            for (int i = 0; i < 5; i++){
+                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                    char* val = (char*)malloc(4*sizeof(char));
+                    for (int k = 0; k < 4; k++){
+                        val[k] = prompt[8+s.team[i].name_length+k];
+                    }
+                    s.team[i].HP -= convert1000(val);
+                    free(val);
+                }
+            }
+            if (equal(s.enemy.name, prompt, 7, 7+s.enemy.name_length)){
+                char* val = (char*)malloc(4*sizeof(char));
+                for (int k = 0; k < 4; k++){
+                    val[k] = prompt[8+s.enemy.name_length+k];
+                }
+                s.enemy.HP -= convert1000(val);
+                free(val); 
+            }
+        }
+        else if (equal("heal", prompt, 0, 4)){
+            for (int i = 0; i < 5; i++){
+                if (equal(s.team[i].name, prompt, 5, 5+s.team[i].name_length)){
+                    char* val = (char*)malloc(4*sizeof(char));
+                    for (int k = 0; k < 4; k++){
+                        val[k] = prompt[6+s.team[i].name_length+k];
+                    }
+                    printf("%d\n", convert1000(val));
+                    s.team[i].HP += convert1000(val);
+                    free(val);
+                }
+            }
+            if (equal(s.enemy.name, prompt, 5, 5+s.enemy.name_length)){
+                char* val = (char*)malloc(4*sizeof(char));
+                for (int k = 0; k < 4; k++){
+                    val[k] = prompt[6+s.enemy.name_length+k];
+                }
+                s.enemy.HP += convert1000(val);
+                free(val); 
+            }
+        }
+        else if (equal("revive", prompt, 0, 6)){
+            for (int i = 0; i < 5; i++){
+                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                    if (s.team[i].HP == 0){
+                        s.team[i].HP = s.team[i].maxHP;
+                    }
+                    else{
+                        printf("The character isn't knocked down !\n");
+                    }
+                }
+            }
         }
         else{
             printf("Unreconized prompt\n");

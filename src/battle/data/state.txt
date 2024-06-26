@@ -1,8 +1,8 @@
-dark spirit
-100 1 0 fire -1
-100 1 0 ice -1
-100 1 0 water -1
-52 1 -100 light -1
-100 1 0 vegetal -1
-46 shadow 1000
-4
+Dragon
+250 50 0 normal -1
+120 20 0 normal -1
+350 10 0 normal -1
+150 30 0 normal -1
+80 60 0 normal -1
+1000 normal -1
+1

@@ -416,7 +416,17 @@ stats enemy_attack(stats s){
                         }
                         if (!protect){
                             if (s.orb == NULL){
-                                s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                                char* ans = (char*)malloc(100*sizeof(char));
+                                if (equal(s.enemy.name, "Sensei", 0, 6)){
+                                    printf("Did %s blocked the attack (y/N) ? ", s.team[i].name);
+                                    fgets(ans, 100, stdin);
+                                }
+                                else{
+                                    ans[0] = 'y';
+                                }
+                                if (ans[0] != 'y'){
+                                    s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
+                                }
                             }
                             else{
                                 s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*Action.POW)+1;

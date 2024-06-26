@@ -89,7 +89,7 @@ stats choose_spirit(stats s){
 stats check_weakness(stats s){
     char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
     int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
-    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "fire", "plant", "burst", "poison", "sculpture", "beam", "fume", "lila"};
+    char* weaknesses[12] = {"water", "fire", "fire", "darkness", "darkness", "plant", "burst", "poison", "sculpture", "beam", "fume", "lila"};
     int weaknesses_length[12] = {5, 4, 4, 8, 4, 4, 5, 6, 9, 4, 5, 4};
 
     int i = 0;

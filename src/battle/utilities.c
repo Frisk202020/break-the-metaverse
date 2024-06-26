@@ -69,3 +69,17 @@ int convert(char tenth, char unit){
     n += (tenth - 48);
     return n;
 }
+
+int convert1000(char* prompt){
+    if (!belongs(prompt[2], "0123456789", 10)){
+        return convert(prompt[0], prompt[1]);
+    }
+    else if (!belongs(prompt[3], "0123456789", 10)){
+        int a = 100*convert(prompt[0], '&');
+        int b = convert(prompt[1], prompt[2]);
+        return a + b;
+    }
+    else{
+        return 100*convert(prompt[0], prompt[1]) + convert(prompt[2], prompt[3]);
+    }
+}

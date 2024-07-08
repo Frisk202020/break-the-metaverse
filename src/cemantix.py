@@ -137,7 +137,11 @@ def lifebar(N: int):
 
 
 def software():
-    print("Decipher trial software - by Dipper")
+    print("*** Decipher trial software - by Dipper P ***")
+    print("\nEncrypted letters are white")
+    print("\033[93mRevealed characters are yellow")
+    print("\033[92mFound words are green")
+    input("\n\033[97mPress any key to start ")
     text = "Hi everyone !\nLet me introduce myself, I'm ClyDE Cipeher and I'm the one in charge of your decipher task. You may think it is complicated, and it is, so congrats if you made it this far ! Oh, you may wonder what's the purpose of this long, long, long text. Well, in order to unlock your piece of IP adress, you need to write this password on the chalkboard : QWERTY\n\nYeah, that's it, QWERTY. Why would I choose some complicated shit when most people reading this will not understand a pourcentage of what's written ? Anyway, thanks for your time, and good luck on your quest. I hope you try to reach BOTTOM TOWN for a good reason..."
     words = []
     indexes = []
@@ -162,12 +166,13 @@ def software():
     left = 10
 
     encrypt, d, D = cipher(text)
+    print("")
     print(encrypt)
     
     while(1 == 1):
         prompt = input("\n\n> ")
 
-        if (prompt == "end"):
+        if (prompt == "-end"):
             print("*break*")
             return
         elif (prompt[0:6] == "reveal"):

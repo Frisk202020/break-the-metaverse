@@ -25,4 +25,4 @@ adn:
 metadata:
 	$(CC) $(CFLAGS) -o result/metadata src/metadata.c $(LDFLAGS)
 battle:
-	$(CC) $(CFLAGS) -o battle src/battle/battle.c src/battle/attack.c src/battle/utilities.c src/battle/dragon.c src/battle/sensei.c src/battle/spirit.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o battle src/battle/battle.c src/battle/attack.c src/utilities.c src/battle/dragon.c src/battle/sensei.c src/battle/spirit.c $(LDFLAGS)

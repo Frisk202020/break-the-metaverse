@@ -4,5 +4,5 @@ Dragon
 350 10 0 normal -1
 150 30 0 normal -1
 80 60 0 normal -1
-1000 normal -1
+990 stun 2
 1

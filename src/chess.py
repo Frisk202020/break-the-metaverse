@@ -1,5 +1,6 @@
 from PIL import Image
 import random as r
+from palette import random_list, randomColor, corruption
 
 def random_color():
     return (r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
@@ -102,7 +103,7 @@ def generate_positions(N: int):
         if pos not in res:
             res.append(pos)
 
-    print(res)
+    #print(res)
     return res
 
 def numbers_config():
@@ -114,14 +115,33 @@ def numbers_config():
     for i in range(6, 8):
         M[i] = (M[i][0], M[i][1], 5)
     M[8] = (M[8][0], M[8][1], 9)
-    print(M)
+    #print(M)
     
     return M
 
+def glitch(im: Image.Image, size: int, min: int, max: int):
+    s = r.randint(min, max)
+    x = r.randint(s, size - s - 1)
+    y = r.randint(s, size - s - 1)
+
+    for i in range(-s, s):
+        for j in range(-s, s):
+            im.putpixel((x + i, y + j), randomColor())
+
+    return im
+
+def glitches(im: Image.Image):
+    min = 10
+    max = 150
+    for i in range(r.randint(10, 20)):
+        glitch(im, 800, min, max)
+
+    return im
+
 def main():
     # generate chessboard
-    names = ["start", "heart", "arrow", "numbers"]
-    configs = [start_config(), heart_config(), arrow_config(), numbers_config()]
+    names = ["start", "heart", "arrow", "numbers", "inverted", "glitch"]
+    configs = [start_config(), heart_config(), arrow_config(), numbers_config(), numbers_config(), start_config()]
 
     for i in range(len(configs)):
         im, W, B = generate_chess()
@@ -143,8 +163,13 @@ def main():
                     im = number(im, W, x)
                 whites += 1
 
-        print("Number of pawns ( room", i+1,") :", whites, "whites,", blacks, "blacks")
-        im.save("../data/"+names[i]+".jpg")
+        if (i == 4):
+            im = corruption(im, 800, 800, 0.5)        
+        if (i == 5):
+            im = glitches(im)
+
+        print("Number of pawns ( room", i,") :", whites, "whites,", blacks, "blacks")
+        im.save("../result/"+names[i]+".jpg")
         im.close()
 
     return

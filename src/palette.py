@@ -22,7 +22,7 @@ def palette():
                     img.putpixel((I,j), (250, 65, 52))
                 else:
                     img.putpixel((I, j), (255, 88, 77))
-    img.save("../data/palette.jpg")
+    img.save("../result/palette.jpg")
     return
 
 """
@@ -105,7 +105,7 @@ def sample(group: str, noise: float):
                 else:
                     img.putpixel((j, k), (255, 88, 77))
     
-    img.save("../data/sample.jpg")
+    img.save("../result/sample.jpg")
     return
 
 """
@@ -279,14 +279,14 @@ def cell_sample():
     #generating white globules
     N = globules(img, length)
 
-    img.save("../data/cell_"+str(N)+".jpg")
+    img.save("../result/cell_"+str(N)+".jpg")
     return
 
 def randomColor():
     return (r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
 
-def corruption(path: str, lx: int, ly: int, noise: float):
-    im = Image.open(path)
+def corruption(im: Image.Image, lx: int, ly: int, noise: float):
+    assert noise <= 1, "noise parameter is a ratio between 0 and 1"
     noiseX = random_list(int(lx*noise), 0, lx - 1)
     noiseY = random_list(int(ly*noise), 0, ly - 1)
 
@@ -294,8 +294,7 @@ def corruption(path: str, lx: int, ly: int, noise: float):
         for y in noiseY:
             im.putpixel((x, y), randomColor())
 
-    im.save("../data/corrupt.jpg")
-    return       
+    return im      
 
 
 def main():
@@ -305,12 +304,12 @@ def main():
     # sample('O', noise)
 
     #cell_sample()
-
-    corruption("../Table_cipher.jpg", 555, 291, 0.8)
+    #im = Image.open("../Table_cipher.jpg")
+    #im = corruption(555, 291, 0.8)
+    #im.save("data/corrupt_palette.jpg")
 
     return
 
-main()
 
 
 

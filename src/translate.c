@@ -1,4 +1,4 @@
-char undertog_to_normal(char input){
+char underdog_to_normal(char input){
     if (input == '9'){
         return '0';
     }

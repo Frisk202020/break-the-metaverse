@@ -285,14 +285,19 @@ def cell_sample():
 def randomColor():
     return (r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
 
-def corruption(im: Image.Image, lx: int, ly: int, noise: float):
+def corruption(im: Image.Image, lx: int, ly: int, noise: float, grey: bool = False):
     assert noise <= 1, "noise parameter is a ratio between 0 and 1"
     noiseX = random_list(int(lx*noise), 0, lx - 1)
     noiseY = random_list(int(ly*noise), 0, ly - 1)
 
     for x in noiseX:
         for y in noiseY:
-            im.putpixel((x, y), randomColor())
+            if (grey):
+                color = r.randint(0, 255)
+                im.putpixel((x, y), (color, color, color))
+            else:
+                im.putpixel((x, y), randomColor())
+            
 
     return im      
 

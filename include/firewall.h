@@ -39,6 +39,6 @@ int strcmp(const char* s1, const char* s2);
 /**
 * @brief simulates a Hacknet firewall with its solution "sol"
 */
-void firewall(int lines, char* sol, float cooldown);
+void firewall(int lines, char* sol, float cooldown, int timer);
 
 #endif

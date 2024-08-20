@@ -26,3 +26,12 @@ metadata:
 	$(CC) $(CFLAGS) -o result/metadata src/metadata.c $(LDFLAGS)
 battle:
 	$(CC) $(CFLAGS) -o battle src/battle/battle.c src/battle/attack.c src/utilities.c src/battle/dragon.c src/battle/sensei.c src/battle/spirit.c $(LDFLAGS)
+carnivorous: 
+	$(CC) $(CFLAGS) -o result/carnivorous src/dave_firewalls/carnivorous.c src/firewall.c $(LDFLAGS)
+dipper: 
+	$(CC) $(CFLAGS) -o result/dipper src/dave_firewalls/dipper.c src/firewall.c $(LDFLAGS)
+mabel: 
+	$(CC) $(CFLAGS) -o result/mabel src/dave_firewalls/mabel.c src/firewall.c $(LDFLAGS)
+boo: 
+	$(CC) $(CFLAGS) -o result/boo src/dave_firewalls/boo.c src/firewall.c $(LDFLAGS)
+dave: carnivorous dipper mabel boo

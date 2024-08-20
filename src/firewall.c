@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "firewall.h"
 
@@ -89,7 +90,7 @@ void analyze(char** wall, int lines, char* sol, int* left, state* s){
 }
 
 /* The firewall destroyer software*/
-void firewall(int lines, char* sol, float cooldown){
+void firewall(int lines, char* sol, float cooldown, int timer){
     /**
     * @param lines : lines of the firewall 
     */
@@ -113,10 +114,33 @@ void firewall(int lines, char* sol, float cooldown){
 
     bool end = false;
     int ind = 0;
+    time_t start = time(NULL);
     while (!end){
+        time_t current = time(NULL) - start;
+        if (timer > 0){
+            if (current < timer){
+                printf("\033[0;31mtime remaining : %ld seconds\033[0;0m\n", (timer - current));
+            }
+            else{
+                printf("\033[0;31mFirewall deactivation failed.\033[0;0m\n");
+                free(left);
+                free(s);
+                return;
+            }
+        }
         char* prompt = (char*)malloc(100*sizeof(char));
         printf("> ");
         fgets(prompt, 100, stdin);
+        current = time(NULL) - start;
+        if (timer > 0){
+            if (current >= timer){
+                printf("\033[0;31mFirewall deactivation failed.\033[0;0m\n");
+                free(left);
+                free(s);
+                free(prompt);
+                return;
+            }
+        }
         //décodage
         if (equal("analyze", prompt, 0, 7)){
             sleep(cooldown);

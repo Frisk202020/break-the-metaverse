@@ -338,6 +338,8 @@ stats spirit_initialize(){
     stats s = {
         .team = team,
         .turn = 1,
+        .other = NULL,
+        .nb_other = 0,
     };
 
     for (int i = 0; i < 5; i++){

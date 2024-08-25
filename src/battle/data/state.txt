@@ -1,8 +1,10 @@
-Dragon
-250 50 0 normal -1
-120 20 0 normal -1
-350 10 0 normal -1
-150 30 0 normal -1
-80 60 0 normal -1
-990 stun 2
-1
+Virus
+0 5 0 dead -1
+0 1 0 dead -1
+0 5 0 normal 5
+0 10 0 dead -1
+23 110 0 confuse 7
+1138 normal 4
+5 2
+-125 0 0 normal 3
+135 10 100 defense 8

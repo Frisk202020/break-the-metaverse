@@ -260,7 +260,7 @@ stats sensei_initialize(){
         },
         .aim = 'i',
         .superguard = true,
-        .odd = 0,
+        .odd = 40,
     };
     action horizontal = {
         .name = "horizontal swing",
@@ -273,7 +273,7 @@ stats sensei_initialize(){
         },
         .aim = 'i',
         .superguard = true,
-        .odd = 0,
+        .odd = 40,
     };
     action kamehameha = {
         .name = "kamehameha",
@@ -286,7 +286,7 @@ stats sensei_initialize(){
         },
         .aim = 'a',
         .superguard = true,
-        .odd = 100,
+        .odd = 20,
     };
 
     Sensei.actions[0] = horizontal;
@@ -297,6 +297,8 @@ stats sensei_initialize(){
         .team = team,
         .enemy = Sensei,
         .turn = 1,
+        .other = NULL,
+        .nb_other = 0,
     };
 
     s.orb = NULL;

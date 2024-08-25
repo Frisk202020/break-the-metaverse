@@ -42,6 +42,8 @@ typedef struct{
 typedef struct{
     character* team;
     character enemy;
+    character* other; //used for final battle
+    int nb_other;
     int turn;
     int* orb; //used for spirit fight
     int nb_spirit;
@@ -56,6 +58,7 @@ bool belongs(char c, char* s, int N);
 bool In(int* array, int N, int pick);
 int convert(char tenth, char unit);
 int convert1000(char* prompt);
+bool happening(int odd);
 
 //from dragon.c
 stats dragon_initialize();
@@ -71,6 +74,9 @@ stats choose_spirit(stats s);
 stats spirit_initialize();
 stats check_weakness(stats s);
 
+//from final.c
+stats final_initialize();
+
 //from attack.c
 int dice_range(character ch, int result);
 int attack(character ch, int dice);
@@ -79,8 +85,11 @@ stats special_act(action act, stats s);
 stats execute_action(stats s, action act, int ch_id, int act_id);
 void assert_ennemy_stats(character ch);
 action choose_enemy_action(action* acts);
-stats enemy_attack(stats s_p);
+stats enemy_attack(stats s, int ID);
 crew alive(stats s);
+stats action_when_many_enemies(stats s, action act);
+stats claim_SOUL(stats s);
+void print(character** array, int n);
 
 //from battle.c
 bool end(stats s);

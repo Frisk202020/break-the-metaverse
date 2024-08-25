@@ -8,9 +8,21 @@
 /* Checks if the battle reaches the end (i-e one party goes down)*/
 bool end(stats s){
     if (s.enemy.HP <= 0){
-        if (s.orb == NULL){
+        if (s.orb == NULL && s.other == NULL){
             printf("\033[0;32m The enemy is defeated !\033[0;32m\n");
             return true;
+        }
+        else if (s.orb == NULL){
+            bool done = true;
+            for (int i = 0; i < s.nb_other; i++){
+                if (s.other[i].HP > 0){
+                    done = false;
+                }
+            }
+            if (done){
+                printf("\033[0;32m Ennemies are defeated !\033[0;32m\n");
+                return true;
+            }
         }
     }
     else{
@@ -53,8 +65,32 @@ state affect_state(char* retrieve, int end){
     else if (equal(retrieve, "Derek", 0, 5)){
         st.name = "Derek";
     }
+    else if (equal(retrieve, "Flavie", 0, 6)){
+        st.name = "Flavie";
+    }
+    else if (equal(retrieve, "Haloise", 0, 7)){
+        st.name = "Haloise";
+    }
+    else if (equal(retrieve, "Xhara", 0, 5)){
+        st.name = "Xhara";
+    }
+    else if (equal(retrieve, "Clover", 0, 5)){
+        st.name = "Clover";
+    }
     else if (equal(retrieve, "danger", 0, 6)){
         st.name = "danger";
+    }
+    else if (equal(retrieve, "confuse", 0, 7)){
+        st.name = "confuse";
+    }
+    else if (equal(retrieve, "weakenned", 0, 9)){
+        st.name = "weakenned";
+    }
+    else if (equal(retrieve, "rage", 0, 4)){
+        st.name = "rage";
+    }
+    else if (equal(retrieve, "reflect", 0, 7)){
+        st.name = "reflect";
     }
     else {
         st.name = "?";
@@ -76,9 +112,16 @@ stats restore_state(stats s){
     else if (equal(battle, "Sensei", 0, 6)){
         s = sensei_initialize();
     }
+    else if (equal(battle, "Spirit", 0, 6)){
+        s = spirit_initialize();
+    }
+    else if (equal(battle, "Virus", 0, 5)){
+        s = final_initialize();
+    }
     free(battle);
 
     for (int i = 0; i < 5; i++){
+        printf("%d\n", i);
         character ch = s.team[i];
         char* retrieve = (char*)malloc(100*sizeof(char));
         int* end = (int*)malloc(sizeof(int));
@@ -90,12 +133,34 @@ stats restore_state(stats s){
     }
     character ch = s.enemy;
     char* retrieve = (char*)malloc(100*sizeof(char));
-    int end;
-    fscanf(file, "%d %s %d\n", &(ch.HP), retrieve, &(end));
-    ch.st = affect_state(retrieve, end);
+    int* end = (int*)malloc(sizeof(int));
+    fscanf(file, "%d %s %d\n", &(ch.HP), retrieve, end);
+    ch.st = affect_state(retrieve, *end);
     s.enemy = ch; 
-    fscanf(file, "%d\n", &(s.turn));
+
+    fscanf(file, "%d %d\n", &(s.turn), &(s.nb_other));
     free(retrieve);
+    free(end);
+    for (int i = 0; i < s.nb_other; i++){
+        character ch = s.other[i];
+        char* retrieve = (char*)malloc(100*sizeof(char));
+        int* end = (int*)malloc(sizeof(int));
+        fscanf(file, "%d %d %d %s %d\n", &(ch.HP), &(ch.POW), &(ch.DEF), retrieve, end);
+        ch.st = affect_state(retrieve, *end);
+        s.other[i] = ch;
+        free(retrieve);
+        free(end);
+        if (i == 1){
+            s.other[i].name = "Xhara";
+            s.other[i].name_length = 5;
+            s.other[i].maxHP = 150;
+            s.other[i].dice = 10;
+            s.other[i].actions = malloc(2*sizeof(action));
+            s.other[i].actions[0] = s.team[3].actions[1];
+            s.other[i].actions[1] = s.team[3].actions[2];
+            s.other[i].NOA = 2;
+        }
+    }
     fclose(file);
     return s;
 }
@@ -110,8 +175,14 @@ void write_state(stats s){
         fprintf(file, "%d %d %d %s %d\n", ch.HP, ch.POW, ch.DEF, ch.st.name, ch.st.end);
     }
     character ch = s.enemy;
-    fprintf(file, "%d %s %d\n%d\n", ch.HP, ch.st.name, ch.st.end, s.turn);
+    fprintf(file, "%d %s %d\n%d %d\n", ch.HP, ch.st.name, ch.st.end, s.turn, s.nb_other);
+
+    for (int i = 0; i < s.nb_other; i++){
+        character ch = s.other[i];
+        fprintf(file, "%d %d %d %s %d\n", ch.HP, ch.POW, ch.DEF, ch.st.name, ch.st.end);
+    }
     fclose(file);
+    return;
 }
 
 /* removes a state if the turn is right*/
@@ -120,11 +191,31 @@ stats reset_state(stats s){
         s.enemy.HP = s.enemy.maxHP;
     }
 
+    if (s.other != NULL){
+        for (int i = 0; i < s.nb_other; i++){
+            if (s.other[i].HP > s.other[i].maxHP){
+                s.other[i].HP = s.other[i].maxHP;
+            }
+            if (s.turn == s.other[i].st.end){
+                if (equal(s.other[i].st.name, "defense", 0, 7)){
+                    s.other[i].DEF = 0;
+                }
+                s.other[i].st.name = "normal";
+            }
+        }
+    }
+
     if (s.turn == s.enemy.st.end){
         s.enemy.st.name = "normal";
     }
     for (int i = 0; i < 5; i++){
         if (s.turn == s.team[i].st.end){
+            if (equal(s.team[i].st.name, "weakenned", 0, 9)){
+                s.team[i].POW *= 5;
+            }
+            if (equal(s.team[i].st.name, "confuse", 0, 7)){
+                s.team[i].POW = s.team[i].POW / 5;
+            }
             s.team[i].st.name = "normal";
             s.team[i].DEF = 0;
         }
@@ -189,6 +280,44 @@ void print_state(stats s){
             }
         }
         printf("\n");
+    }
+
+    else if (s.other != NULL){
+        printf("\033[0;37m");
+        printf("\n*** turn %d ***\n\033[0;31mENNEMIES\n", s.turn);
+        
+        printf("%s : \033[0;35m ♥ %d  ",s.enemy.name, s.enemy.HP); 
+        life_bar(s.enemy);
+        printf("\033[0;31m [%s]\n", s.enemy.st.name);
+
+        for (int i = 0; i < s.nb_other; i++){
+            printf("%s : \033[0;35m ♥ %d  ",s.other[i].name, s.other[i].HP); 
+            life_bar(s.other[i]);
+            printf("\033[0;31m [%s]\n", s.other[i].st.name);
+        }
+
+        printf("\033[0;34m\n\nTEAM\n");
+        for (int i = 0; i < 5; i++){
+            if (s.team[i].HP < 0){
+                s.team[i].HP = 0;
+            }
+            if (s.team[i].HP > s.team[i].maxHP){
+                s.team[i].HP = s.team[i].maxHP;
+            }
+            if (s.team[i].HP == 0){
+                if (equal(s.team[i].st.name, "dead", 0, 4)){
+                    printf("\033[0;34m %s : DEAD \033[0;0m\n", s.team[i].name);
+                }
+                else{
+                    printf("\033[0;34m %s : DOWN \033[0;0m\n", s.team[i].name);
+                }
+            }
+            else{
+                printf("\033[0;36m %s : \033[0;35m ♥ %d  ", s.team[i].name, s.team[i].HP);
+                life_bar(s.team[i]);
+                printf("\033[0;36m [%s] \033[0;0m\n", s.team[i].st.name);
+            }
+        }
     }
 
     else{
@@ -270,6 +399,10 @@ void main(int argc, char *argv[]){
             }
             s.took = took;
         }
+        else if (equal(argv[1], "Final", 0, 5)){
+            printf("Start of the final battle !\n");
+            s = final_initialize();
+        }
         else{
             printf("Unknown\n");
             return;
@@ -282,6 +415,9 @@ void main(int argc, char *argv[]){
     }
 
     assert_ennemy_stats(s.enemy);
+    for (int i = 0; i < s.nb_other; i++){
+        assert_ennemy_stats(s.other[i]);
+    }
     bool the_end = false;
     while (!end(s) || the_end){
         if (s.orb != NULL){
@@ -318,7 +454,7 @@ void main(int argc, char *argv[]){
         if (equal("attack", prompt, 0, 6)){
             bool done = false;
             for (int i = 0; i < 5; i++){
-                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
+                if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length) && (s.nb_other < 2 || (s.nb_other == 2 && i != 3))){
                     done = true;
                     if (s.team[i].HP <= 0){
                         printf("\033[0;31m You can't attack with a K-O character \033[0;0m\n");
@@ -351,13 +487,97 @@ void main(int argc, char *argv[]){
                             }
                             free(prompt);
                         }
+                        else if (s.other != NULL){
+                            character* target = (character*)malloc(sizeof(character));
+                            target = NULL;
+                            int target_id = -1;
+                            bool ok = false;
+                            if (equal(s.enemy.name, prompt, 15 + s.team[i].name_length, 15 + s.team[i].name_length + s.enemy.name_length)){
+                                target = &(s.enemy);
+                                ok = true;
+                            }
+                            else{
+                                for (int j = 0; j < s.nb_other; j++){
+                                    if (equal(s.other[j].name, prompt, 15 + s.team[i].name_length, 15 + s.team[i].name_length + s.other[j].name_length)){
+                                         target = &(s.other[j]);
+                                         target_id = j;
+                                         ok = true;
+                                    }
+                                }
+                            }
+                            if (!ok){
+                                printf("target not found !");
+                            }
+                            else{
+                                if (target_id == -1){
+                                    char d = prompt[16 + s.team[i].name_length + s.enemy.name_length];
+                                    char u = prompt[17 + s.team[i].name_length + s.enemy.name_length];
+                                    int dice = convert(d, u);
+                                    int att = attack(s.team[i], dice_range(s.team[i], dice));
+                                    bool attack_done = false;
+                                    if (equal(s.team[i].st.name, "confuse", 0, 7)){
+                                        if (happening(50)){
+                                            crew cibles = alive(s);
+                                            character* victime = cibles.team[rand()%cibles.N];
+                                            victime->HP -= att;
+                                            printf("%s got confused !\n", s.team[i].name);
+                                            attack_done = true;
+                                            free(cibles.team);
+                                        }
+                                    }
+                                    if(!attack_done){
+                                        printf("hi\n");
+                                        s.enemy.HP -= att;
+                                        if (equal(s.enemy.st.name, "reflect", 0, 7)){
+                                            s.team[i].HP -= att/2.;
+                                        }
+                                    }
+                                }
+                                else{
+                                    if (s.other[target_id].DEF == 100){
+                                        printf("Attack missed !\n");
+                                    }
+                                    else{
+                                        printf("id: %d def:%d\n", target_id, s.other[target_id].DEF);
+
+                                        char d = prompt[16 + s.team[i].name_length + s.other[target_id].name_length];
+                                        char u = prompt[17 + s.team[i].name_length + s.other[target_id].name_length];
+                                        int dice = convert(d, u);
+                                        int att = attack(s.team[i], dice_range(s.team[i], dice));
+                                        bool attack_done = false;
+                                        if (equal(s.team[i].st.name, "confuse", 0, 7)){
+                                            if (happening(50)){
+                                                crew CIBLES = alive(s);
+                                                character* VICTIME = CIBLES.team[rand()%CIBLES.N];
+                                                VICTIME ->HP -= att;
+                                                printf("%s got confused !\n", s.team[i].name);
+                                                attack_done = true;
+                                                free(CIBLES.team);
+                                            }
+                                        }
+                                        if(!attack_done){
+                                            printf("POW : %d\n", att);
+                                            s.other[target_id].HP -= att;
+                                        }
+                                        if (equal(s.other[target_id].st.name, "focus", 0, 5)){
+                                            printf("Focus failed !\n");
+                                            s.other[target_id].st.name = "normal";
+                                            s.other[target_id].st.end = -1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            if (equal(s.enemy.name, prompt, 7, 13) || equal("Spirit", prompt, 7, 13)){
+            if (equal(s.enemy.name, prompt, 7, 7 + s.enemy.name_length) || equal("Spirit", prompt, 7, 13)){
                 done = true;
-                s = enemy_attack(s);  
+                if (s.nb_other > 0){
+                    s = claim_SOUL(s);
+                }
+                s = enemy_attack(s, -1);  
 
                 // reset orb   
                 if (s.orb != NULL){
@@ -365,11 +585,44 @@ void main(int argc, char *argv[]){
                     s.orb[1] = -1;
                 }   
 
-                s.turn++;             
+                if (s.nb_other == 0){
+                    s.turn++;   
+                }          
+            }
+
+            for (int i = 0; i < s.nb_other; i++){
+                if (equal(s.other[i].name, prompt, 7, 7 + s.other[i].name_length)){
+                    if (equal(s.other[i].name, "Xhara", 0, 5)){
+                        if (equal(s.other[i].st.name, "stun", 0, 4)){
+                            printf("Xhara is stunned for this turn!\n");
+                            done = true;
+                        }
+                        else{
+                            for (int j = 0; j < 5; j++){
+                                if (equal(s.team[j].name, prompt, 20, 20 + s.team[j].name_length)){
+                                    done = true;
+                                    char d = prompt[21 + s.team[j].name_length];
+                                    char u = prompt[22 + s.team[j].name_length];
+                                    printf("%c%c\n", d, u);
+                                    int dice = convert(d, u);
+                                    printf("dice : %d\n", dice);
+                                    s.team[j].HP -= attack(s.other[i], dice);
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        done = true;
+                        s = enemy_attack(s, i); 
+                    }
+                    if (s.nb_other == 0){
+                        s.turn++;
+                    }
+                }
             }
             
             if (!done){
-                printf("Unreconized character\n");
+                printf("Target not found !\n");
             }
         }
 
@@ -379,21 +632,26 @@ void main(int argc, char *argv[]){
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
                     done = true;
-                    if (s.team[i].HP <= 0){
+                    if (s.team[i].HP <= 0 && ((s.nb_other < 2) || (s.nb_other == 2  && i != 3))){
                         printf("\033[0;31m You can't act with a K-O character \033[0;0m\n");
                     }
                     else if (equal("protect", prompt, 8+s.team[i].name_length, 15+s.team[i].name_length)){
-                        for (int j = 0; j < 5; j++){
-                            if (equal(s.team[j].name, prompt, 16+s.team[i].name_length, 16+s.team[i].name_length+s.team[j].name_length)){
-                                if (equal("vulnerable", s.team[j].st.name, 0, 10)){
-                                    printf("can't protect the character because they're already protecting someone");
-                                }
-                                else{
-                                    s.team[j].st.name = s.team[i].name;
-                                    s.team[j].st.end = s.turn + 1;
-                                    s.team[i].st.name = "vulnerable";
-                                    s.team[i].DEF = -100;
-                                    s.team[i].st.end = s.turn + 1;
+                        if (s.nb_other == 2 && i == 3){
+                            printf("Action not available\n");
+                        }
+                        else{
+                            for (int j = 0; j < 5; j++){
+                                if (equal(s.team[j].name, prompt, 16+s.team[i].name_length, 16+s.team[i].name_length+s.team[j].name_length)){
+                                    if (equal("vulnerable", s.team[j].st.name, 0, 10)){
+                                        printf("can't protect the character because they're already protecting someone");
+                                    }
+                                    else{
+                                        s.team[j].st.name = s.team[i].name;
+                                        s.team[j].st.end = s.turn + 1;
+                                        s.team[i].st.name = "vulnerable";
+                                        s.team[i].DEF = -100;
+                                        s.team[i].st.end = s.turn + 1;
+                                    }
                                 }
                             }
                         }
@@ -429,7 +687,49 @@ void main(int argc, char *argv[]){
             free_all(s);
             return;
         }
+        else if (equal("betray", prompt, 0, 6)){
+            if (s.nb_other == 0){
+                printf("Xhara can't betray the team for this fight !\n");
+            }
+            else if (s.nb_other == 2){
+                printf("Already done.\n");
+            }
+            else{
+                s.nb_other = 2;
+                character Xhara = s.team[3];
+                s.team[3].st.name = "dead";
+                s.team[3].st.end = -1; 
+
+                s.other[1] = Xhara;
+                
+                s.team[3].HP = 0;
+            }
+        }
+        else if (equal("upgrade", prompt, 0, 7)){
+            for (int i = 0; i < 5; i++){
+                if (i == 3){
+                    s.team[i].POW *= 5;
+                    s.team[i].NOA = 3;
+                    if (s.nb_other == 2){
+                        s.other[1].POW *= 5;
+                        s.other[1].NOA = 3;
+                    }
+                }
+                else{
+                    s.team[i].POW *= 5;
+                    s.team[i].NOA = 4;
+                }
+            }
+        }
+        else if (equal("turn", prompt, 0, 4)){
+            s.turn++;
+            if (s.nb_other == 2 && equal(s.other[1].st.name, "focus", 0, 5)){
+                s.other[1].st.name = "focus success";
+                s.other[1].st.end = s.turn + 2;
+            }
+        }
         else if (equal("damage", prompt, 0, 6)){
+            bool done = false;
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
                     char* val = (char*)malloc(4*sizeof(char));
@@ -438,18 +738,41 @@ void main(int argc, char *argv[]){
                     }
                     s.team[i].HP -= convert1000(val);
                     free(val);
+                    if (!(i == 3 && s.nb_other == 2)){
+                        done = true;
+                    }
                 }
             }
-            if (equal(s.enemy.name, prompt, 7, 7+s.enemy.name_length)){
-                char* val = (char*)malloc(4*sizeof(char));
-                for (int k = 0; k < 4; k++){
-                    val[k] = prompt[8+s.enemy.name_length+k];
+            if (!done){
+                if (equal(s.enemy.name, prompt, 7, 7+s.enemy.name_length)){
+                    char* val = (char*)malloc(4*sizeof(char));
+                    for (int k = 0; k < 4; k++){
+                        val[k] = prompt[8+s.enemy.name_length+k];
+                    }
+                    s.enemy.HP -= convert1000(val);
+                    free(val); 
+                    done = true;
                 }
-                s.enemy.HP -= convert1000(val);
-                free(val); 
+                else{
+                    for (int i = 0; i < s.nb_other; i++){
+                        if (equal(s.other[i].name, prompt, 7, 7+s.other[i].name_length)){
+                            char* val = (char*)malloc(4*sizeof(char));
+                            for (int k = 0; k < 4; k++){
+                                val[k] = prompt[8+s.other[i].name_length+k];
+                            }
+                            s.other[i].HP -= convert1000(val);
+                            free(val); 
+                            done = true;
+                        }
+                    }
+                }
+            }
+            if (!done){
+                printf("\033[0;31mCharacter not found !\033[0;0m\n");
             }
         }
         else if (equal("heal", prompt, 0, 4)){
+            bool done = false;
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 5, 5+s.team[i].name_length)){
                     char* val = (char*)malloc(4*sizeof(char));
@@ -459,25 +782,76 @@ void main(int argc, char *argv[]){
                     printf("%d\n", convert1000(val));
                     s.team[i].HP += convert1000(val);
                     free(val);
+                    if (!(i == 3 && s.nb_other == 2)){
+                        done = true;
+                    }
                 }
             }
-            if (equal(s.enemy.name, prompt, 5, 5+s.enemy.name_length)){
-                char* val = (char*)malloc(4*sizeof(char));
-                for (int k = 0; k < 4; k++){
-                    val[k] = prompt[6+s.enemy.name_length+k];
+            if (!done){
+                if (equal(s.enemy.name, prompt, 5, 5+s.enemy.name_length)){
+                    char* val = (char*)malloc(4*sizeof(char));
+                    for (int k = 0; k < 4; k++){
+                        val[k] = prompt[6+s.enemy.name_length+k];
+                    }
+                    s.enemy.HP += convert1000(val);
+                    free(val); 
+                    done = true;
                 }
-                s.enemy.HP += convert1000(val);
-                free(val); 
+                else{
+                    for (int i = 0; i < s.nb_other; i++){
+                        if (equal(s.other[i].name, prompt, 5, 5+s.other[i].name_length)){
+                            char* val = (char*)malloc(4*sizeof(char));
+                            for (int k = 0; k < 4; k++){
+                                val[k] = prompt[6+s.other[i].name_length+k];
+                            }
+                            s.other[i].HP += convert1000(val);
+                            free(val); 
+                            done = true;
+                        }
+                    }
+                }
+            }
+            if (!done){
+                printf("\033[0;31mCharacter not found !\033[0;0m\n");
             }
         }
         else if (equal("revive", prompt, 0, 6)){
+            bool done = false;
             for (int i = 0; i < 5; i++){
                 if (equal(s.team[i].name, prompt, 7, 7+s.team[i].name_length)){
-                    if (s.team[i].HP == 0){
-                        s.team[i].HP = s.team[i].maxHP;
+                    if (!(i == 3 && s.nb_other == 2)){
+                        printf("hi\n");
+                        if (s.team[i].HP == 0){
+                            s.team[i].HP = s.team[i].maxHP;
+                        }
+                        else{
+                            printf("The character isn't knocked down !\n");
+                        }
+                        done = true;
+                    }
+                }
+            }
+            if (!done){
+                if (equal(s.enemy.name, prompt, 7, 7 + s.enemy.name_length)){
+                    done = true;
+                    if (s.enemy.HP == 0){
+                        s.enemy.HP = s.enemy.maxHP;
                     }
                     else{
                         printf("The character isn't knocked down !\n");
+                    }
+                }
+                else{
+                    for (int i = 0; i < s.nb_other; i++){
+                        if (equal(s.other[i].name, prompt, 7, 7 + s.other[i].name_length)){
+                            done = true;
+                            if (s.other[i].HP <= 0){
+                                s.other[i].HP = s.other[i].maxHP;
+                            }
+                            else{
+                                printf("The character isn't knocked down !\n");
+                            }
+                        }
                     }
                 }
             }

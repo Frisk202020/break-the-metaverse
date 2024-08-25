@@ -150,33 +150,64 @@ bool action_success(action act){
 }
 
 stats special_act(action act, stats s){
+    character target;
+    int ID;
+    if (s.nb_other == 0){
+        target = s.enemy;
+        ID = -1;
+    }
+    else{
+        char* prompt = (char*)malloc(100*sizeof(char));
+        printf("Who is the target of the action ? ");
+        bool done = false;
+        fgets(prompt, 100, stdin);
+        if (equal(s.enemy.name, prompt, 0, s.enemy.name_length)){
+            target = s.enemy;
+            ID = -1;
+            done = true;
+        }
+        else{
+            for (int i = 0; i < s.nb_other; i++){
+                if (equal(s.other[i].name, prompt, 0, s.other[i].name_length)){
+                    target = s.other[i];
+                    ID = i;
+                    done = true;
+                }
+            }
+        }
+        if (!done){
+            printf("Target not found !\n");
+            return s;
+        }
+    }
     if (equal("stun", act.st.name, 0, 4)){
-        s.enemy.st.name = "stun";
-        s.enemy.st.end = s.turn + act.st.end;
+        target.st.name = "stun";
+        target.st.end = s.turn + act.st.end;
+        target.HP -= act.POW;
         printf("\033[0;32m The enemy can't attack for the following turn \033[0;0m\n");
     }
 
     else if (equal("provoke", act.st.name, 0, 7)){
-        s.enemy.st.name = "Derek";
-        s.enemy.st.end = s.turn + act.st.end;
+        target.st.name = "Derek";
+        target.st.end = s.turn + act.st.end;
         printf("\033[0;32m The enemy will focus Derek for 2 turns \033[0;0m\n");
     }
     
     else if (equal("corrupt", act.st.name, 0, 7)){
-        if (s.enemy.NOA < 4){
+        if (target.NOA < 4){
             printf("The enemy has already drank the potion\n");
             return s;
         }
         action* new_actions = (action*)malloc(3*sizeof(action));
         for (int i = 0; i < 3; i++){
-            new_actions[i] = s.enemy.actions[i+1];
+            new_actions[i] = target.actions[i+1];
         }
-        free(s.enemy.actions);
-        s.enemy.actions = new_actions;
-        s.enemy.actions[0].odd = 50;
-        s.enemy.actions[1].odd = 45;
-        s.enemy.actions[2].odd = 5;
-        s.enemy.NOA -= 1;
+        free(target.actions);
+        target.actions = new_actions;
+        target.actions[0].odd = 50;
+        target.actions[1].odd = 45;
+        target.actions[2].odd = 5;
+        target.NOA -= 1;
         printf("The dragon can't breath fire anymore !\n");
     }
 
@@ -202,13 +233,48 @@ stats special_act(action act, stats s){
     else{
         printf("Unreconized state\n");
     }
+    
+    if (ID == -1){
+        s.enemy = target;
+    }
+    else{
+        s.other[ID] = target;
+    }
+    return s;
+}
+
+stats action_when_many_enemies(stats s, action act){
+    char* prompt = (char*)malloc(100*sizeof(char));
+    printf("Who is the target of the action ? ");
+    bool done = false;
+    fgets(prompt, 100, stdin);
+    if (equal(s.enemy.name, prompt, 0, s.enemy.name_length)){
+        s.enemy.HP -= act.POW;
+        done = true;
+    }
+    else{
+        for (int i = 0; i < s.nb_other; i++){
+            if (equal(s.other[i].name, prompt, 0, s.other[i].name_length)){
+                s.other[i].HP -= act.POW;
+                done = true;
+            }
+        }
+    }
+    if (!done){
+        printf("Target not found !\n");
+    }
     return s;
 }
 
 stats execute_action(stats s, action act, int ch_id, int act_id){
     if (act.type == 'g'){
-        if (act.POW > 0){
-            s.enemy.HP -= act.POW;
+        if (act.POW > 0 && !equal(act.st.name, "stun", 0, 4)){
+            if (s.nb_other == 0){
+                s.enemy.HP -= act.POW;
+            }
+            else{
+                s = action_when_many_enemies(s, act);
+            }
             if (equal(act.st.name, "danger", 0, 6)){
                 int pick = rand()%100;
                 s.team[ch_id].HP -= Int(act.POW * pick / 100.);
@@ -219,10 +285,28 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
         if (act.heal > 0){
             if (equal("defense", act.st.name, 0, 7)){
                 if (ch_id < 5){
-                    s.team[ch_id].st.name = "defense";
-                    s.team[ch_id].st.end = s.turn + act.st.end;
-                    s.team[ch_id].DEF += act.heal;
-                    printf("\033[0;32m %s has high defense for %d turns ! \033[0;0m\n", s.team[ch_id].name, act.st.end);
+                    if (ch_id == 3 && s.nb_other == 2){
+                        s.other[1].st.name = "defense";
+                        s.other[1].st.end = s.turn + act.st.end;
+                        if (act.heal == 100){
+                            s.other[1].DEF = 100;
+                        }
+                        else{
+                            s.other[1].DEF += act.heal;
+                        }
+                        printf("\033[0;32m %s has %d defense for %d turns ! \033[0;0m\n", s.other[1].name, s.other[1].DEF, act.st.end);
+                    }
+                    else{
+                        s.team[ch_id].st.name = "defense";
+                        s.team[ch_id].st.end = s.turn + act.st.end;
+                        if (act.heal == 100){
+                            s.team[ch_id].DEF = 100;
+                        }
+                        else{
+                            s.team[ch_id].DEF += act.heal;
+                        }
+                        printf("\033[0;32m %s has %d defense for %d turns ! \033[0;0m\n", s.team[ch_id].name, s.team[ch_id].DEF, act.st.end);
+                    }
                 }
                 else{
                     for (int i = 0; i < 5; i++){
@@ -241,6 +325,35 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
             printf("\033[0;32m Clover creates 2 clones that stand for 3 turns \033[0;0m\n");
         }
 
+        else if (equal("revive", act.st.name, 0, 6)){
+            bool healed = false;
+            char* entry = (char*)malloc(100*sizeof(char));
+            while (!healed){
+                printf("Who should you revive ?\n");
+                fgets(entry, 100, stdin);
+                for (int i = 0; i < 5; i++){
+                    if (equal(s.team[i].name, entry, 0, s.team[i].name_length)){
+                        if (s.team[i].HP > 0){
+                            printf("This character isn't knocked down !\n");
+                        }
+                        else if (s.nb_other == 2 && i == 3){
+                            printf("Can't revive Xhara while he's in betrayal state.\n");
+                        }
+                        else if (equal(s.team[i].st.name, "dead", 0, 4)){
+                            printf("Can't revive a character whose SOUL has been taken.\n");
+                        }
+                        else{
+                            s.team[i].HP = s.team[i].maxHP;
+                            healed = true;
+                        }
+                    }
+                }
+                if (equal("none", entry, 0, 4)){
+                    healed = true;
+                }
+            }
+        }
+
         else if (!equal("normal", act.st.name, 0, 6) && !equal("defense", act.st.name, 0, 7) && !equal("danger", act.st.name, 0, 6)){    
             s = special_act(act, s);
         }
@@ -250,7 +363,12 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
             printf("\033[0;32m Executing %s... \033[0;0m\n", act.name);
 
             if (act.POW > 0 && !equal(act.st.name, "boost", 0, 5)){
-                s.enemy.HP -= act.POW;
+                if (s.nb_other == 0){
+                    s.enemy.HP -= act.POW;
+                }
+                else{
+                    s = action_when_many_enemies(s, act);
+                }
             }
 
             else if (equal(act.st.name, "boost", 0, 5)){
@@ -258,8 +376,14 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
             }
 
             else if (equal("focus", act.st.name, 0, 5)){
-                s.team[ch_id].st.name = "focus";
-                s.team[ch_id].st.end = -1;
+                if (s.nb_other == 2){
+                    s.other[1].st.name = "focus";
+                    s.other[1].st.end = -1;
+                }
+                else{
+                    s.team[ch_id].st.name = "focus";
+                    s.team[ch_id].st.end = -1;
+                }
             }
             else if (equal("smell", act.st.name, 0, 5)){
                 char* prompt = (char*)malloc(100*sizeof(char));
@@ -289,7 +413,12 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
         if (equal("y", prompt, 0, 1)){
             printf("\033[0;32m Success ! \033[0;0m\n");
             if (act.POW > 0){
-                s.enemy.HP -= act.POW;
+                if (s.nb_other == 0){
+                    s.enemy.HP -= act.POW;
+                }
+                else{
+                    s = action_when_many_enemies(s, act);
+                }
             }
             else if (!equal("normal", act.st.name, 0, 6)){    
                 s = special_act(act, s);
@@ -304,6 +433,9 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
 }
 
 void assert_ennemy_stats(character ch){
+    if (equal(ch.name, "Xhara", 0, 5)){
+        return;
+    }
     action* test = ch.actions;
     int sum = 0;
     for (int i = 0; i < ch.NOA; i++){
@@ -359,11 +491,19 @@ action choose_enemy_action(action* acts){
     return acts[pick];
 }
 
-stats enemy_attack(stats s){
-    if (!equal(s.enemy.st.name, "stun", 0, 4)){
-        assert_ennemy_stats(s.enemy);
-        action Action = choose_enemy_action(s.enemy.actions);
-        printf("The enemy attacks with %s !\n", Action.name);
+stats enemy_attack(stats s, int ID){
+    character Enemy;
+    if (ID == -1){
+        Enemy = s.enemy;
+    }
+    else{
+        Enemy = s.other[ID];
+    }
+    
+    if (!equal(Enemy.st.name, "stun", 0, 4) && !equal(Enemy.st.name, "rest", 0, 4)){
+        assert_ennemy_stats(Enemy);
+        action Action = choose_enemy_action(Enemy.actions);
+        printf("%s attacks with %s !\n", Enemy.name, Action.name);
         bool dodge = false;
         bool shield = false;
 
@@ -385,7 +525,7 @@ stats enemy_attack(stats s){
                         free(prompt);
                     }
                 }
-        for (int i = 0; i < 5; i++){
+                for (int i = 0; i < 5; i++){
                     if (equal(s.team[i].st.name, "focus", 0, 5)){
                         printf("Focus failed\n");
                         s.team[i].st.name = "normal";
@@ -417,12 +557,12 @@ stats enemy_attack(stats s){
                         if (!protect){
                             if (s.orb == NULL){
                                 char* ans = (char*)malloc(100*sizeof(char));
-                                if (equal(s.enemy.name, "Sensei", 0, 6)){
+                                if (equal(Enemy.name, "Sensei", 0, 6)){
                                     printf("Did %s blocked the attack (y/N) ? ", s.team[i].name);
                                     fgets(ans, 100, stdin);
                                 }
                                 else{
-                                    ans[0] = 'y';
+                                    ans[0] = 'n';
                                 }
                                 if (ans[0] != 'y'){
                                     s.team[i].HP -= Int(0.01*(100 - s.team[i].DEF)*entropy(Action.POW, 100, 40));
@@ -440,7 +580,7 @@ stats enemy_attack(stats s){
                 character* target = &(s.team[0]);
                 crew Alive;
 
-                if (equal("normal", s.enemy.st.name, 0, 6) || s.orb != NULL){
+                if (equal("normal", Enemy.st.name, 0, 6) || s.orb != NULL){
                     Alive = alive(s);
                     int targetID = rand()%Alive.N;
                     target = (Alive.team[targetID]);
@@ -466,14 +606,14 @@ stats enemy_attack(stats s){
 
                 else{
                     for (int i = 0; i < 5; i++){
-                        if (equal(s.team[i].name, s.enemy.st.name, 0, s.team[i].name_length)){
+                        if (equal(s.team[i].name, Enemy.st.name, 0, s.team[i].name_length)){
                             target = (&(s.team[i]));
                             if (target->DEF == 100){
-                                printf("\033[0;32m The enemy focuses %s, but they're protected !\033[0;0m\n", target->name);
+                                printf("\033[0;32m The enemy targets %s, but they're protected !\033[0;0m\n", target->name);
                                 shield = true;
                             }
                             else{
-                                printf("The enemy focuses %s !\n", target->name);
+                                printf("%s focuses %s !\n", Enemy.name, target->name);
                             }
                         }  
                     }
@@ -481,7 +621,7 @@ stats enemy_attack(stats s){
 
                 if (Action.superguard){
                     char* prompt = (char*)malloc(100*sizeof(char));
-                    if (equal(s.enemy.name, "Sensei", 0, 6)){
+                    if (equal(Enemy.name, "Sensei", 0, 6)){
                         prompt[0] = 'y';
                     }
                     else{
@@ -536,6 +676,14 @@ stats enemy_attack(stats s){
                         else{
                             if (s.orb == NULL){
                                 target->HP -= Int(0.01*(100 - target->DEF)*entropy(Action.POW, 80, 30));
+                                if (equal(Action.st.name, "weaken", 0, 6)){
+                                    target->st.name = "weakenned";
+                                    target->st.end = s.turn + 3;
+                                    target->POW =  target->POW / 5;
+                                    if (target->POW == 0){
+                                        target->POW++;
+                                    }
+                                }
                             }
                             else{
                                 target->HP -= Int(0.01*(100 - target->DEF)*Action.POW) + 1;
@@ -543,17 +691,83 @@ stats enemy_attack(stats s){
                         }
                     }
                 }
-                if (equal("normal", s.enemy.st.name, 0, 6)){
+                if (equal("normal", Enemy.st.name, 0, 6)){
                     free(Alive.team);
                 }
             }
         } 
 
         if (Action.heal > 0 && !dodge && !shield){
-            printf("%d %d\n", dodge, shield);
             int recover = entropy(Action.heal, 100, 100);
-            printf("\033[0;35m The enemy recovers %d hearts ! \033[0;0m\n", recover);
-            s.enemy.HP += recover;
+            if (equal(Action.st.name, "Virus", 0, 5)){
+                printf("\033[0;35mThe Virus recovers %d hearts ! \033[0;0m\n", recover);
+                s.enemy.HP += recover;
+            }
+            else{
+                printf("\033[0;35m%s recovers %d hearts ! \033[0;0m\n", Enemy.name, recover);
+                Enemy.HP += recover;
+            }
+        }
+
+        if (Action.POW == -1){
+            if (equal(Action.name, "revolution", 0, 10)){
+                double ratio = 0;
+                for (int i = 0; i < 5; i++){
+                    int add = 100*s.team[i].HP / s.team[i].maxHP;
+                    ratio += add / 100.;
+                    printf("%f\n", ratio);
+                }
+                ratio = ratio / 5.;
+                for (int i = 0; i < 5; i++){
+                    if (s.team[i].HP > 0){
+                        s.team[i].HP = ratio*s.team[i].maxHP;
+                    }
+                }
+            }
+        }
+
+        if (equal(Action.st.name, "rage", 0, 4) || equal(Action.st.name, "reflect", 0, 7)){
+            s.enemy.st.name = Action.st.name;
+            s.enemy.st.end = Action.st.end;
+        }
+
+        if (equal(Action.st.name, "target", 0, 6)){
+            character* target;
+            crew Alive = alive(s);
+            int targetID = rand()%Alive.N;
+            target = (Alive.team[targetID]);
+            for (int i = 0; i < 5; i++){
+                if (target->st.name == s.team[i].name){
+                    target = &(s.team[i]);
+                }
+            }
+            s.enemy.st.name = target->name;
+            s.enemy.st.end = s.turn + 2;
+        }
+
+        if (equal(Action.st.name, "confuse", 0, 7)){
+            bool found_target = false;
+            character* target;
+            for (int i = 0; i < 5; i++){
+                if (equal(s.enemy.st.name, s.team[i].name, 0, s.team[i].name_length) && s.team[i].HP > 0){
+                    target = &(s.team[i]);
+                    found_target = true;
+                }
+            }
+            if (!found_target){
+                crew Alive = alive(s);
+                int targetID = rand()%Alive.N;
+                target = (Alive.team[targetID]);
+                for (int i = 0; i < 5; i++){
+                    if (target->st.name == s.team[i].name){
+                        target = &(s.team[i]);
+                    }
+                }
+            }
+
+            target->st.name = "confuse";
+            target->st.end = s.turn + Action.st.end;
+            target->POW *= 5;
         }
 
         for (int i = 0; i < 5; i++){
@@ -563,14 +777,31 @@ stats enemy_attack(stats s){
             }
         }
 
+        if (s.nb_other == 2){
+            if (equal(s.other[1].st.name, "focus", 0, 5)){
+                s.other[1].st.name = "focus success";
+                s.other[1].st.end = s.turn + 2;
+            }
+        }
+
         if (s.orb != NULL){
             s = check_weakness(s);
         }
 
+        if (ID == -1){
+            s.enemy = Enemy;
+        }
+        else{
+            if (ID == 0){
+                Enemy.st.name = "rest";
+                Enemy.st.end = s.turn + 2;
+            }
+            s.other[ID] = Enemy; 
+        }
         return s;
     }
     else{
-        printf("\033[0;31m The enemy recovers \033[0;0m\n");
+        printf("\033[0;31m %s recovers \033[0;0m\n", Enemy.name);
     }
 }
 
@@ -601,6 +832,22 @@ crew alive(stats s){
     return ans;
 }
 
+stats claim_SOUL(stats s){
+    for (int i = 0; i < 5; i++){
+        if (s.team[i].HP <= 0 && !equal(s.team[i].st.name, "dead", 0, 4)){
+            s.enemy.HP += 100;
+            printf("The Virus took %s's SOUL and became stronger !\n", s.team[i].name);
+            s.team[i].st.name = "dead";
+            s.team[i].st.end = -1;
+
+            s.enemy.actions[0].POW *= 1.5;
+            s.enemy.actions[0].heal *= 1.5;
+            s.enemy.actions[3].POW *= 1.5;
+        }
+    }
+    return s;
+}
+
 /* 
 
 ***Code pour tester dice_range***
@@ -615,3 +862,9 @@ void main(int argc, char *argv[]){
 }
 
 */
+void print(character** array, int n){
+    for (int i = 0; i < n; i++){
+        printf("%s\n", array[i]->name);
+    }
+    return;
+}

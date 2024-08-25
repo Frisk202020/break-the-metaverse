@@ -24,6 +24,7 @@ bool equal(char* s, char* prompt, int d, int e){
     for (int i = d; i < e; i++){
         ans[i-d] = prompt[i];
     }
+    //printf("%s %s\n", ans, s);
     if (strcmp(s, ans) == 0){
         free(ans);
         return true;
@@ -82,4 +83,22 @@ int convert1000(char* prompt){
     else{
         return 100*convert(prompt[0], prompt[1]) + convert(prompt[2], prompt[3]);
     }
+}
+
+bool happening(int odd){
+    bool* arr = (bool*)malloc(100*sizeof(bool));
+    int j = 0;
+    for (int i = 0; i < 100; i++){
+        if (j < odd){
+            arr[i] = true;
+            j++;
+        }
+        else{
+            arr[i] = false;
+        }
+    }
+    bool pick = arr[rand()%100];
+    free(arr);
+    printf("outcome : %d\n", pick);
+    return pick;
 }

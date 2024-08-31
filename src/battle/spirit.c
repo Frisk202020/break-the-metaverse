@@ -2,6 +2,14 @@
 #include <stdlib.h>
 #include "battle.h"
 
+state NULL_STATE(){
+    state ans = {
+        .name = NULL,
+        .end = 0,
+    };
+    return ans;
+}
+
 char* merge_magic(int i, int j){
     char* one[5] = {"fire", "water", "fume", "burst", "poison"};
     char* two[5] = {"water", "ice", "sculpture", "beam", "darkness"};
@@ -64,23 +72,29 @@ character create_spirit(char* name, int name_length, state st){
     return Spirit;
 }
 
-stats choose_spirit(stats s){
-    char* choices[12] = {"fire spirit", "ice spirit", "water spirit", "light spirit", "vegetal spirit", "gluton spirit", "dark shell", "knight", "solid shell", "dark spirit", "climate spirit", "sensei"};
-    int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
-    char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
-    int state_lengths[12] = {4, 3, 5, 5, 7, 6, 4, 5, 5, 6, 7, 6};
-    int r = rand()%12;
+stats choose_spirit(stats s, char* spirit, int name_length, state new_state){
+    character new_spirit;
+    if (spirit == NULL){
+        char* choices[12] = {"fire spirit", "ice spirit", "water spirit", "light spirit", "vegetal spirit", "gluton spirit", "dark shell", "knight", "solid shell", "dark spirit", "climate spirit", "sensei"};
+        int name_lengths[12] = {11, 10, 12, 12, 14, 13, 11, 6, 11, 11, 14, 6};
+        char* state_names[12] = {"fire", "ice", "water", "light", "vegetal", "gluton", "dark", "human", "stone", "shadow", "climate", "sensei"};
+        int state_lengths[12] = {4, 3, 5, 5, 7, 6, 4, 5, 5, 6, 7, 6};
+        int r = rand()%12;
 
-    if (s.took != NULL){
-        while (In(s.took, 3, r)){
-            r = rand()%12;
+        if (s.took != NULL){
+            while (In(s.took, 3, r)){
+                r = rand()%12;
+            }
         }
+        state new_state = {
+            .name = state_names[r],
+            .end = 1000,
+        };
+        new_spirit = create_spirit(choices[r], name_lengths[r], new_state);
     }
-    state new_state = {
-        .name = state_names[r],
-        .end = 1000,
-    };
-    character new_spirit = create_spirit(choices[r], name_lengths[r], new_state);
+    else{
+        new_spirit = create_spirit(spirit, name_length, new_state);
+    }
     s.enemy = new_spirit;
 
     return s;
@@ -145,7 +159,7 @@ stats check_weakness(stats s){
     return s;
 }
 
-stats spirit_initialize(){
+stats spirit_initialize(char* spirit, int name_length, state new_state){
 
     character Derek = { 
         .name = "Derek",
@@ -346,7 +360,7 @@ stats spirit_initialize(){
         magic.st.name = s.team[i].st.name;
         s.team[i].actions[1] = magic;
     }
-    s = choose_spirit(s);
+    s = choose_spirit(s, spirit, name_length, new_state);
 
     s.orb = malloc(2*sizeof(int));
     s.orb[0] = -1;

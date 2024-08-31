@@ -372,7 +372,8 @@ stats execute_action(stats s, action act, int ch_id, int act_id){
             }
 
             else if (equal(act.st.name, "boost", 0, 5)){
-                s.team[ch_id].POW += act.POW;
+                s.team[ch_id].POW *= 1.5;
+                printf("%s has a %d POW now !\n", s.team[ch_id].name, s.team[ch_id].POW);
             }
 
             else if (equal("focus", act.st.name, 0, 5)){
@@ -713,11 +714,17 @@ stats enemy_attack(stats s, int ID){
             if (equal(Action.name, "revolution", 0, 10)){
                 double ratio = 0;
                 for (int i = 0; i < 5; i++){
-                    int add = 100*s.team[i].HP / s.team[i].maxHP;
-                    ratio += add / 100.;
-                    printf("%f\n", ratio);
+                    if (!(i == 3 && s.nb_other == 2)){
+                        int add = 100*s.team[i].HP / s.team[i].maxHP;
+                        ratio += add / 100.;
+                    }
                 }
-                ratio = ratio / 5.;
+                if (s.nb_other == 1){
+                    ratio = ratio / 5.;
+                }
+                else{
+                    ratio = ratio / 4.;
+                }
                 for (int i = 0; i < 5; i++){
                     if (s.team[i].HP > 0){
                         s.team[i].HP = ratio*s.team[i].maxHP;
@@ -764,10 +771,47 @@ stats enemy_attack(stats s, int ID){
                     }
                 }
             }
+            printf("The Virus targets %s !\n", target->name);
 
-            target->st.name = "confuse";
-            target->st.end = s.turn + Action.st.end;
-            target->POW *= 5;
+            bool can_confuse = false;
+            if (equal(target->st.name, "clone", 0, 5)){
+                int pick = rand()%3;
+                if (pick == 0){
+                    printf("The Virus attacks the left clone : is it the right one (y/N) ? ");
+                    char* ans = (char*)malloc(100*sizeof(char));
+                    fgets(ans, 100, stdin);
+                    if (ans[0] == 'y'){
+                        can_confuse = true;
+                    }
+                    free(ans);
+                }
+                else if (pick == 1){
+                    printf("The Virus attacks the middle clone : is it the right one (y/N) ? ");
+                    char* ans = (char*)malloc(100*sizeof(char));
+                    fgets(ans, 100, stdin);
+                    if (ans[0] == 'y'){
+                        can_confuse = true;
+                    }
+                    free(ans);
+                }
+                else{
+                    printf("The Virus attacks the right clone : is it the right one (y/N) ? ");
+                    char* ans = (char*)malloc(100*sizeof(char));
+                    fgets(ans, 100, stdin);
+                    if (ans[0] == 'y'){
+                        can_confuse = true;
+                    }
+                    free(ans);
+                }
+            }
+            else{
+                can_confuse = true;
+            }
+            if (can_confuse){
+                target->st.name = "confuse";
+                target->st.end = s.turn + Action.st.end;
+                target->POW *= 5;
+            }
         }
 
         for (int i = 0; i < 5; i++){
@@ -845,6 +889,18 @@ stats claim_SOUL(stats s){
             s.enemy.actions[3].POW *= 1.5;
         }
     }
+    if (s.nb_other == 2){
+        if (s.other[1].HP <= 0 && !equal(s.other[1].st.name, "dead", 0, 4)){
+            s.enemy.HP += 100;
+            printf("The Virus took %s's SOUL and became stronger !\n", s.other[1].name);
+            s.other[1].st.name = "dead";
+            s.other[1].st.end = -1;
+
+            s.enemy.actions[0].POW *= 1.5;
+            s.enemy.actions[0].heal *= 1.5;
+            s.enemy.actions[3].POW *= 1.5;
+        }
+    }
     return s;
 }
 
@@ -862,9 +918,3 @@ void main(int argc, char *argv[]){
 }
 
 */
-void print(character** array, int n){
-    for (int i = 0; i < n; i++){
-        printf("%s\n", array[i]->name);
-    }
-    return;
-}

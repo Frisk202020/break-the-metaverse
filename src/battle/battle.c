@@ -80,6 +80,42 @@ state affect_state(char* retrieve, int end){
     else if (equal(retrieve, "danger", 0, 6)){
         st.name = "danger";
     }
+    else if (equal(retrieve, "fire", 0, 4)){
+        st.name = "fire";
+    }
+    else if (equal(retrieve, "ice", 0, 3)){
+        st.name = "ice";
+    }
+    else if (equal(retrieve, "water", 0, 5)){
+        st.name = "water";
+    }
+    else if (equal(retrieve, "light", 0, 5)){
+        st.name = "light";
+    }
+    else if (equal(retrieve, "vegetal", 0, 7)){
+        st.name = "vegetal";
+    }
+    else if (equal(retrieve, "gluton", 0, 6)){
+        st.name = "gluton";
+    }
+    else if (equal(retrieve, "dark", 0, 4)){
+        st.name = "dark";
+    }
+    else if (equal(retrieve, "human", 0, 5)){
+        st.name = "human";
+    }
+    else if (equal(retrieve, "stone", 0, 5)){
+        st.name = "stone";
+    }
+    else if (equal(retrieve, "shadow", 0, 6)){
+        st.name = "shadow";
+    }
+    else if (equal(retrieve, "climate", 0, 7)){
+        st.name = "climate";
+    }
+    else if (equal(retrieve, "sensei", 0, 6)){
+        st.name = "sensei";
+    }
     else if (equal(retrieve, "confuse", 0, 7)){
         st.name = "confuse";
     }
@@ -92,9 +128,11 @@ state affect_state(char* retrieve, int end){
     else if (equal(retrieve, "reflect", 0, 7)){
         st.name = "reflect";
     }
+    else if (equal(retrieve, "vulnerable", 0, 10)){
+        st.name = "vulnerable";
+    }
     else {
         st.name = "?";
-        printf("%c%c%c", retrieve[0], retrieve[1], retrieve[2]);
     }
 
     return st;
@@ -112,16 +150,72 @@ stats restore_state(stats s){
     else if (equal(battle, "Sensei", 0, 6)){
         s = sensei_initialize();
     }
-    else if (equal(battle, "Spirit", 0, 6)){
-        s = spirit_initialize();
-    }
     else if (equal(battle, "Virus", 0, 5)){
         s = final_initialize();
     }
-    free(battle);
+    else if (equal(battle, "knight", 0, 6) || equal(battle, "sensei", 0, 6)){
+        s = spirit_initialize(battle, check_string_length(battle), NULL_STATE());
+    }
+    else{
+        free(battle);
+        fclose(file);
+        FILE* file2 = fopen("src/battle/data/state.txt", "r");
+        char* element = (char*)malloc(10*sizeof(char));
+        char* enemy = (char*)malloc(10*sizeof(char));
+        char** strings = (char**)malloc(2*sizeof(char*));
+        strings[0] = element;
+        strings[1] = enemy;
+        int* lengths = (int*)malloc(2*sizeof(int));
+        int N = 2;
+        fscanf(file2, "%s %s\n", element, enemy);
+        lengths[0] = check_string_length(element);
+        lengths[1] = check_string_length(enemy);
+        if (equal(enemy, "spirit", 0, 6) || equal(enemy, "shell", 0, 5)){
+            s = spirit_initialize(merge_strings(strings, N, lengths), lengths[0] + lengths[1] + 1, NULL_STATE());
+            free(enemy);
+            free(element);
+        }
+        else{
+            free(enemy);
+            free(element);
+            printf("Unreconized battle !\n");
+            stats null = {
+                .team = NULL,
+            };
+            return null;
+        }
+        for (int i = 0; i < 5; i++){
+            character ch = s.team[i];
+            char* retrieve = (char*)malloc(100*sizeof(char));
+            int* end = (int*)malloc(sizeof(int));
+            fscanf(file2, "%d %d %d %s %d\n", &(ch.HP), &(ch.POW), &(ch.DEF), retrieve, end);
+            ch.st = affect_state(retrieve, *end);
+            s.team[i] = ch;
+            free(retrieve);
+            free(end);
+        }
+        character ch = s.enemy;
+        char* retrieve = (char*)malloc(100*sizeof(char));
+        int* end = (int*)malloc(sizeof(int));
+        fscanf(file2, "%d %s %d\n", &(ch.HP), retrieve, end);
+        ch.st = affect_state(retrieve, *end);
+        s.enemy = ch; 
 
+        fscanf(file2, "%d %d\n", &(s.turn), &(s.nb_other));
+        free(retrieve);
+        free(end);
+
+        int* took = (int*)malloc(3*sizeof(int));
+        fscanf(file2, "%d %d %d %d", &(took[0]), &(took[1]), &(took[2]), &(s.nb_spirit));
+        s.took = took;
+
+        fscanf(file2, "%d %d", &(s.orb[0]), &(s.orb[1]));
+
+        fclose(file2);
+        
+        return s;
+    }
     for (int i = 0; i < 5; i++){
-        printf("%d\n", i);
         character ch = s.team[i];
         char* retrieve = (char*)malloc(100*sizeof(char));
         int* end = (int*)malloc(sizeof(int));
@@ -161,6 +255,12 @@ stats restore_state(stats s){
             s.other[i].NOA = 2;
         }
     }
+    if (s.orb != NULL){
+        int* took = (int*)malloc(3*sizeof(int));
+        fscanf(file, "%d %d %d %d", &(took[0]), &(took[1]), &(took[2]), &(s.nb_spirit));
+        s.took = took;
+        fscanf(file, "%d %d", &(s.orb[0]), &(s.orb[1]));
+    }
     fclose(file);
     return s;
 }
@@ -180,6 +280,10 @@ void write_state(stats s){
     for (int i = 0; i < s.nb_other; i++){
         character ch = s.other[i];
         fprintf(file, "%d %d %d %s %d\n", ch.HP, ch.POW, ch.DEF, ch.st.name, ch.st.end);
+    }
+
+    if (s.orb != NULL){
+        fprintf(file, "%d %d %d %d\n%d %d\n", s.took[0], s.took[1], s.took[2], s.nb_spirit, s.orb[0], s.orb[1]);
     }
     fclose(file);
     return;
@@ -291,9 +395,19 @@ void print_state(stats s){
         printf("\033[0;31m [%s]\n", s.enemy.st.name);
 
         for (int i = 0; i < s.nb_other; i++){
-            printf("%s : \033[0;35m ♥ %d  ",s.other[i].name, s.other[i].HP); 
-            life_bar(s.other[i]);
-            printf("\033[0;31m [%s]\n", s.other[i].st.name);
+            if (s.other[i].HP <= 0){
+                if (equal(s.other[i].st.name, "dead", 0, 4)){
+                    printf("\033[0;31m%s : DEAD \033[0;0m\n", s.other[i].name);
+                }
+                else{
+                    printf("\033[0;31m%s : DOWN \033[0;0m\n", s.other[i].name);
+                }
+            }
+            else{
+                printf("%s : \033[0;35m ♥ %d  ",s.other[i].name, s.other[i].HP); 
+                life_bar(s.other[i]);
+                printf("\033[0;31m [%s]\n", s.other[i].st.name);
+            }
         }
 
         printf("\033[0;34m\n\nTEAM\n");
@@ -381,6 +495,11 @@ void main(int argc, char *argv[]){
         if (equal(argv[1], "restore", 0, 7)){
             printf("Restoring state...\n");
             s = restore_state(s);
+            if (s.team == NULL){
+                printf("\033[0;31mABORT\n");
+                return;
+            }
+            
         }
         else if (equal(argv[1], "Dragon", 0, 6)){
             printf("Start of the battle against the dragon !\n");
@@ -392,7 +511,7 @@ void main(int argc, char *argv[]){
         }
         else if (equal(argv[1], "Spirit", 0, 6)){
             printf("Start of the battle against the spirits !\n");
-            s = spirit_initialize();
+            s = spirit_initialize(NULL, 0, NULL_STATE());
             int* took = (int*)malloc(3*sizeof(int));
             for (int i = 0; i < 3; i++){
                 took[i] = -1;
@@ -419,6 +538,7 @@ void main(int argc, char *argv[]){
         assert_ennemy_stats(s.other[i]);
     }
     bool the_end = false;
+    char* last = (char*)malloc(100*sizeof(char));
     while (!end(s) || the_end){
         if (s.orb != NULL){
             if (s.enemy.HP <= 0){
@@ -437,8 +557,8 @@ void main(int argc, char *argv[]){
                     s.took[s.nb_spirit] = i;
                     s.nb_spirit++;
                     free(s.enemy.actions);
-                    s = choose_spirit(s);
-                    printf("%d\n", s.nb_spirit);
+                    s = choose_spirit(s, NULL, 0, NULL_STATE());
+                    printf("Spirit n° %d\n", s.nb_spirit);
                 }
             } 
         }
@@ -450,6 +570,17 @@ void main(int argc, char *argv[]){
         char* prompt = (char*)malloc(100*sizeof(char));
         printf("> ");
         fgets(prompt, 100, stdin);
+
+        if (equal("last", prompt, 0, 4)){
+            for (int i = 0; i < 100; i++){
+                prompt[i] = last[i];
+            }
+        }
+        else{
+            for (int i = 0; i < 100; i++){
+                last[i] = prompt[i];
+            }
+        }
 
         if (equal("attack", prompt, 0, 6)){
             bool done = false;
@@ -526,7 +657,6 @@ void main(int argc, char *argv[]){
                                         }
                                     }
                                     if(!attack_done){
-                                        printf("hi\n");
                                         s.enemy.HP -= att;
                                         if (equal(s.enemy.st.name, "reflect", 0, 7)){
                                             s.team[i].HP -= att/2.;
@@ -603,10 +733,28 @@ void main(int argc, char *argv[]){
                                     done = true;
                                     char d = prompt[21 + s.team[j].name_length];
                                     char u = prompt[22 + s.team[j].name_length];
-                                    printf("%c%c\n", d, u);
                                     int dice = convert(d, u);
-                                    printf("dice : %d\n", dice);
-                                    s.team[j].HP -= attack(s.other[i], dice);
+                                    bool attack_done = false;
+                                    for (int k = 0; k < 5; k++){
+                                        if (equal(s.team[j].st.name, s.team[k].name, 0, s.team[k].name_length)){
+                                            s.team[k].HP -= 1.5*attack(s.other[i], dice);
+                                            attack_done = true;
+                                        }
+                                    }
+                                    if (!attack_done){
+                                        if (equal(s.team[j].st.name, "clone", 0, 5)){
+                                            printf("Did Xhara target the genuine Clover (y/N) ? ");
+                                            char* ans = (char*)malloc(100*sizeof(char));
+                                            fgets(ans, 100, stdin);
+                                            if (ans[0] == 'y'){
+                                                s.team[j].HP -= attack(s.other[i], dice);
+                                            }
+                                            free(ans);
+                                        }
+                                        else{
+                                            s.team[j].HP -= attack(s.other[i], dice);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -716,17 +864,14 @@ void main(int argc, char *argv[]){
                     }
                 }
                 else{
-                    s.team[i].POW *= 5;
+                    s.team[i].POW *= 10;
                     s.team[i].NOA = 4;
                 }
             }
+            printf("\033[0;32m Upgrade done !\n");
         }
         else if (equal("turn", prompt, 0, 4)){
             s.turn++;
-            if (s.nb_other == 2 && equal(s.other[1].st.name, "focus", 0, 5)){
-                s.other[1].st.name = "focus success";
-                s.other[1].st.end = s.turn + 2;
-            }
         }
         else if (equal("damage", prompt, 0, 6)){
             bool done = false;
@@ -748,6 +893,15 @@ void main(int argc, char *argv[]){
                     char* val = (char*)malloc(4*sizeof(char));
                     for (int k = 0; k < 4; k++){
                         val[k] = prompt[8+s.enemy.name_length+k];
+                    }
+                    s.enemy.HP -= convert1000(val);
+                    free(val); 
+                    done = true;
+                }
+                else if (equal("enemy", prompt, 7, 12)){
+                    char* val = (char*)malloc(4*sizeof(char));
+                    for (int k = 0; k < 4; k++){
+                        val[k] = prompt[13+k];
                     }
                     s.enemy.HP -= convert1000(val);
                     free(val); 

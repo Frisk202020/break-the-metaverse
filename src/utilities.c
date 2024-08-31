@@ -102,3 +102,32 @@ bool happening(int odd){
     printf("outcome : %d\n", pick);
     return pick;
 }
+
+int check_string_length(char* string){
+    int N = 0;
+    while (belongs(string[N], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 62)){
+        N++;
+    }
+    return N;
+}
+
+char* merge_strings(char** strings, int N, int* lengths){
+    char* ans = (char*)malloc(100*sizeof(char));
+    int ind = 0;
+    for (int i = 0; i < N; i++){
+        for (int j = 0; j < lengths[i]; j++){
+            if (ind < 100){
+                ans[ind] = strings[i][j];
+                ind++;
+            }
+            else{
+                printf("Can't generate more characters in the anwser string, ABORT\n");
+                return ans;
+            }
+        }
+        ans[ind] = ' ';
+        ind++;
+    }
+
+    return ans;
+}

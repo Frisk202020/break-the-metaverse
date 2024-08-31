@@ -1,10 +1,10 @@
 Virus
-0 5 0 dead -1
-0 1 0 dead -1
-0 5 0 normal 5
-0 10 0 dead -1
-23 110 0 confuse 7
-1138 normal 4
-5 2
--125 0 0 normal 3
-135 10 100 defense 8
+250 10 0 normal -1
+120 3 0 normal -1
+350 1 0 normal -1
+0 2 0 ? -1
+80 6 0 normal -1
+1500 normal -1
+1 2
+300 0 0 normal -1
+150 2 0 normal -1

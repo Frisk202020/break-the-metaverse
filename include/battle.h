@@ -59,6 +59,8 @@ bool In(int* array, int N, int pick);
 int convert(char tenth, char unit);
 int convert1000(char* prompt);
 bool happening(int odd);
+int check_string_length(char* string);
+char* merge_strings(char** strings, int N, int* lengths);
 
 //from dragon.c
 stats dragon_initialize();
@@ -68,10 +70,11 @@ stats sensei_initialize();
 state smell_scale(int choice);
 
 //from spirit.c
+state NULL_STATE();
 char* merge_magic(int i, int j);
 character create_spirit(char* name, int name_length, state st);
-stats choose_spirit(stats s);
-stats spirit_initialize();
+stats choose_spirit(stats s, char* name, int name_length, state st);
+stats spirit_initialize(char* spirit, int name_length, state new_state);
 stats check_weakness(stats s);
 
 //from final.c
@@ -89,7 +92,6 @@ stats enemy_attack(stats s, int ID);
 crew alive(stats s);
 stats action_when_many_enemies(stats s, action act);
 stats claim_SOUL(stats s);
-void print(character** array, int n);
 
 //from battle.c
 bool end(stats s);

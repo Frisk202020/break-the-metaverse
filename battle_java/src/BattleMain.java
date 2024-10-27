@@ -1,6 +1,6 @@
 public class BattleMain {
     public static void main(String[] args) {
-        Battle Dragon = new Battle("Sensei");
+        Battle Dragon = new Battle("Final");
         System.out.println(Dragon.toString());
     }
 }

@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Random;
 
 import action.ActionLibrary;
 import entity.*;
@@ -9,12 +10,14 @@ public class Battle {
     private int turn;
     private HashMap<String, Entity> team;
     private HashMap<String, Enemy> enemies;
+    private Random seed;
 
     public Battle(String name){
         this.name = name;
         turn = 1;
         team = new HashMap<>();
         enemies = new HashMap<>();
+        seed = new Random();
 
         if (name.equals("Dragon")){
             PlayerDice Derek = new PlayerDice("Derek", 250, 50, 6);
@@ -60,6 +63,56 @@ public class Battle {
 
             addEntity(Derek, Flavie, Haloise, Clover, Xhara, Sensei);
         }
+
+        else if (name.equals("Spirit")){
+            PlayerSpirit Derek = new PlayerSpirit("Derek", "fire");
+            Derek.addActions(ActionLibrary.TASER, ActionLibrary.MAGIC);
+
+            PlayerSpirit Flavie = new PlayerSpirit("Flavie", "ice");
+            Flavie.addActions(ActionLibrary.HACK, ActionLibrary.MAGIC);
+
+            PlayerSpirit Haloise = new PlayerSpirit("Haloise", "water");
+            Haloise.addActions(ActionLibrary.ENCYCLOPEDIA, ActionLibrary.MAGIC);
+
+            PlayerSpirit Clover = new PlayerSpirit("Clover", "light");
+            Clover.addActions(ActionLibrary.CLONE, ActionLibrary.MAGIC);
+            
+            PlayerSpirit Xhara = new PlayerSpirit("Xhara", "vegetal");
+            Xhara.addActions(ActionLibrary.BETRAYAL, ActionLibrary.MAGIC);
+            
+            for (int i = 0; i < 3; i++){
+                Spirit s = Spirit.chooseSpirit(seed);
+                enemies.put(s.getName(), s);
+            }
+            addEntity(Derek, Flavie, Haloise, Clover, Xhara);
+        }
+        else if (name.equals("Final")){
+            PlayerDice Derek = new PlayerDice("Derek", 250, 50, 6);
+            Derek.addActions(ActionLibrary.TASER, ActionLibrary.SWORD, ActionLibrary.PROVOKE, ActionLibrary.PROTECT);
+            
+            PlayerDice Flavie = new PlayerDice("Flavie", 120, 20, 30);
+            Flavie.addActions(ActionLibrary.HACK, ActionLibrary.SHIELD, ActionLibrary.POTION, ActionLibrary.PROTECT);
+
+            PlayerDice Haloise = new PlayerDice("Haloise", 350, 10, 10);
+            Haloise.addActions(ActionLibrary.ENCYCLOPEDIA, ActionLibrary.HAMMER, ActionLibrary.STONE, ActionLibrary.PROTECT);
+
+            PlayerDice Clover = new PlayerDice("Clover", 80, 60, 4);
+            Clover.addActions(ActionLibrary.CLONE, ActionLibrary.KNIFE, ActionLibrary.GOLD, ActionLibrary.PROTECT);
+
+            PlayerDice Xhara = new PlayerDice("Xhara", 150, 30, 20);
+            Xhara.addActions(ActionLibrary.RETREAT, ActionLibrary.FOCUS, ActionLibrary.PROTECT);
+
+            Enemy Virus = new Enemy("Virus", 1500);
+            Virus.addActions(ActionLibrary.DRAIN, ActionLibrary.CONFUSE, ActionLibrary.REVOLUTION, ActionLibrary.CLAWVIRUS, ActionLibrary.SOUL);
+
+            Enemy H0PE = new Enemy("H0PE", 300);
+            H0PE.addActions(ActionLibrary.HEAL, ActionLibrary.ENRAGE, ActionLibrary.TARGET, ActionLibrary.REFLECT);
+            
+            addEntity(Derek, Flavie, Haloise, Clover, Xhara, Virus, H0PE);
+        }
+        else{
+            throw new IllegalArgumentException(Color.RED.get() + "Unrecognized battle : ABORT" + Color.YELLOW.get());
+        }
     }
 
     private void addEntity(Entity... chs){
@@ -76,12 +129,12 @@ public class Battle {
 
     @Override
     public String toString(){
-        String result = Color.WHITE.get() + "***turn " + turn + " ***\n\n";
+        String result = Color.WHITE.get() + "***turn " + turn + " ***\n\n" + Color.RED.get() + "ENEMIES\n";
         for (Enemy e : enemies.values()){
             result += e.toString();
         }
 
-        result += "\n";
+        result = result + "\n" + Color.CYAN.get() + "TEAM\n";
 
         for (Entity e : team.values()) {
             result += e.toString();

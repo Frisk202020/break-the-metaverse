@@ -9,10 +9,7 @@ public class Enemy extends Entity {
 
     @Override
     public String toString(){
-        if (name.equals("Dragon")){
-            return Color.RED.get() + " " + name + " : " + Color.PURPLE.get() +" ♥ " + hp + " " + lifeBar() + Color.RED.get() + " " + st.toString() + "\n";
-        }
-        return "";
+        return name + " : " + Color.PURPLE.get() +" ♥ " + hp + " " + lifeBar() + Color.RED.get() + " " + st.toString() + "\n";
     }
 
     public int attack(){

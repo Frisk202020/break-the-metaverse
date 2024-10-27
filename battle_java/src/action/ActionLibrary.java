@@ -34,7 +34,21 @@ public enum ActionLibrary{
 
     VERTICAL (new ActionE("vertical", 8, 0, 'i', 40, true)),
     HORIZONTAL (new ActionE("horizontal", 8, 0, 'i', 40, true)),
-    KAMEHAMEHA (new ActionE("kamehameha", 10, 0, 'a', 20, true));
+    KAMEHAMEHA (new ActionE("kamehameha", 10, 0, 'a', 20, true)),
+
+    MAGIC (new ActionL("magic", 0, 0, 'e', 100)),
+    INDIV (new ActionE("aim attack", 50, 0, 'i', 60, true)),
+    MULTI (new ActionE("spread attack", 50, 0, 'i', 40, true)),
+
+    DRAIN (new ActionE("drain", 30, 50, 'i', 20, StateLibrary.WEAKEN)),
+    CONFUSE (new ActionE("confuse", 0, 0, 'i', 15, StateLibrary.CONFUSE)),
+    REVOLUTION (new ActionE("revolution", -1, 0, 'a', 15)),
+    CLAWVIRUS (new ActionE("claw", 50, 0, 'i', 50, true)),
+    SOUL (new ActionE("SOUL", 0, 100, 'i', 0)),
+    HEAL (new ActionE("heal", 0, 150, 'i', 25, StateLibrary.VIRUS)),
+    ENRAGE (new ActionE("enrage", 0, 0, 'i', 25, StateLibrary.RAGE)),
+    TARGET (new ActionE("target", 0, 0, 'i', 25, StateLibrary.TARGET)),
+    REFLECT (new ActionE("reflect", 0, 0, 'i', 25, StateLibrary.REFLECT));
 
     private Action act;
 

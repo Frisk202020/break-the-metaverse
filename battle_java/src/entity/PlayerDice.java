@@ -16,7 +16,7 @@ public class PlayerDice extends Entity {
 
     @Override
     public String toString(){
-        return Color.CYAN.get() + " " + name + " : " + Color.PURPLE.get() + "♥ " + hp + " " + lifeBar() + Color.CYAN.get() + " " + st.toString() + "\n";
+        return name + " : " + Color.PURPLE.get() + "♥ " + hp + " " + lifeBar() + Color.CYAN.get() + " " + st.toString() + "\n";
     }
 
     public int attack(){

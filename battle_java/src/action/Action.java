@@ -8,7 +8,6 @@ public class Action {
     protected int heal;
     protected State st;
     protected char aim;
-    protected boolean superguard;
 
     public Action(String name, int pow, int heal, char aim) {
         this.name = name;

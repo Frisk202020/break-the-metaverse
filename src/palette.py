@@ -303,17 +303,27 @@ def corruption(im: Image.Image, lx: int, ly: int, noise: float, grey: bool = Fal
 
 
 def main():
-    # palette()
+    #WARNING : make sure to launch this program within the src folder !!
 
-    # noise = 0.1
-    # sample('O', noise)
+    
+    #blood samples generation : uncomment the following paragraph to execute
 
-    #cell_sample()
-    #im = Image.open("../Table_cipher.jpg")
-    #im = corruption(555, 291, 0.8)
-    #im.save("data/corrupt_palette.jpg")
+    
+    noise = 0.4 #Should be between 0 and 1
+    group = 'O' #Allowed values : O, A, B
+    sample(group, noise) #image at result/sample.jpg 
+    
+
+    """
+    cell_sample() #image at result/cellN.jpg, where N is the number of white globules to find
+    """
+
+    #palette()
 
     return
+
+main()
+
 
 
 

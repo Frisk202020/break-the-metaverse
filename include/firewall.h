@@ -8,6 +8,7 @@
 
 typedef struct{
     bool checked;
+    bool done;
     int position;
     char value;
 }state;
@@ -39,6 +40,6 @@ int strcmp(const char* s1, const char* s2);
 /**
 * @brief simulates a Hacknet firewall with its solution "sol"
 */
-void firewall(int lines, char* sol, float cooldown, int timer);
+bool firewall(int lines, char* sol, float cooldown, int timer);
 
 #endif

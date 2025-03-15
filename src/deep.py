@@ -3,7 +3,7 @@ import random as r
 from palette import random_list, randomColor, corruption
 
 def generate():
-    og = Image.open("../data/rick.jpg")
+    og = Image.open("../data/Fay.jpg")
     dim = og.size
     Nx = dim[0]//10
     Ny = dim[1]//10
@@ -64,7 +64,7 @@ def write(l: list):
 
 
 def reveal(im: Image.Image, n: int, corrupted: list):
-    rick = Image.open("../data/rick.jpg")
+    rick = Image.open("../data/Fay.jpg")
 
     for i in range(min(n, len(corrupted))):
         pieceInd = r.randint(0, len(corrupted) - 1)

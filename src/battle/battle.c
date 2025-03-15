@@ -853,6 +853,18 @@ void main(int argc, char *argv[]){
                 s.team[3].HP = 0;
             }
         }
+        else if (equal("buff", prompt, 0, 4)){
+            if (s.nb_other < 2){
+                s.team[3].maxHP *= 1.5;
+                s.team[3].POW *= 1.5;
+                s.team[3].HP = s.team[3].maxHP;
+            }
+            else{
+                s.other[1].maxHP *= 1.5;
+                s.other[1].POW *= 1.5;
+                s.other[1].HP = s.other[1].maxHP;
+            }
+        }
         else if (equal("upgrade", prompt, 0, 7)){
             for (int i = 0; i < 5; i++){
                 if (i == 3){
@@ -1011,7 +1023,7 @@ void main(int argc, char *argv[]){
             }
         }
         else{
-            printf("Unreconized prompt\n");
+            printf("Unrecognized prompt\n");
         }
         free(prompt);
     }

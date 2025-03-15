@@ -33,6 +33,17 @@ bool done(state* s, int lines){
     return true;
 }
 
+char toString(int n){
+    char* ans = "0123456789";
+    int num[10] = {0,1,2,3,4,5,6,7,8,9};
+    for (int i = 0; i < 10; i++){
+        if (n == num[i]){
+            return ans[i];
+        }
+    }
+    return '&';
+}
+
 /* Checks if strings s and prompt[e : d] are equal. */
 bool equal(char* s, char* prompt, int d, int e){
     char* ans = (char*)malloc((e-d+1)*sizeof(char));
@@ -50,6 +61,10 @@ bool equal(char* s, char* prompt, int d, int e){
 
 /* analyze command of the software : reveals a character of the firewall*/
 void analyze(char** wall, int lines, char* sol, int* left, state* s){
+    if (*left == 0){
+        printf("\033[0;31mYou already analyzed every line of the firewall !\033[0;0m\n");
+        return;
+    }
     if (!done(s, lines)){
         int* pos = (int*)malloc(*left*sizeof(int));
         int ind = 0;
@@ -66,12 +81,12 @@ void analyze(char** wall, int lines, char* sol, int* left, state* s){
     
         for (int i = 0; i < lines; i++){
             for (int j = 0; j < lines; j++){
-                if (s[i].checked){
+                if (s[i].checked && !s[i].done){
                     if (j == s[i].position){
                         wall[i][j] = s[i].value;
                     }
                     else{
-                        wall[i][j] = '0';
+                        wall[i][j] = toString(rand()%10);
                     }
                 }
                 else{
@@ -81,6 +96,7 @@ void analyze(char** wall, int lines, char* sol, int* left, state* s){
                 }
             }
         }
+        s[chosen].done = true;
         free(pos);
         print_matrix(wall, lines);
     }
@@ -90,7 +106,7 @@ void analyze(char** wall, int lines, char* sol, int* left, state* s){
 }
 
 /* The firewall destroyer software*/
-void firewall(int lines, char* sol, float cooldown, int timer){
+bool firewall(int lines, char* sol, float cooldown, int timer){
     /**
     * @param lines : lines of the firewall 
     */
@@ -108,6 +124,7 @@ void firewall(int lines, char* sol, float cooldown, int timer){
     state* s = (state*)malloc(lines*sizeof(state));
     for (int i = 0; i < lines; i++){
         s[i].checked = false;
+        s[i].done = false;
         s[i].value = sol[i]; 
         s[i].position = rand()%lines; 
     }
@@ -125,7 +142,7 @@ void firewall(int lines, char* sol, float cooldown, int timer){
                 printf("\033[0;31mFirewall deactivation failed.\033[0;0m\n");
                 free(left);
                 free(s);
-                return;
+                return false;
             }
         }
         char* prompt = (char*)malloc(100*sizeof(char));
@@ -138,7 +155,7 @@ void firewall(int lines, char* sol, float cooldown, int timer){
                 free(left);
                 free(s);
                 free(prompt);
-                return;
+                return false;
             }
         }
         //décodage
@@ -161,17 +178,12 @@ void firewall(int lines, char* sol, float cooldown, int timer){
                 printf("incorrect solution\n");
             }
         }
-
-        else if (equal("done", prompt, 0, 4)){
-            end = true;
-            free(left);
-            free(s);
-        }
         else{
-            printf("unreconized\n");
+            printf("Unrecognized\n");
         }
 
         free(prompt);
     }
     free_matrix(wall, lines);
+    return true;
 }

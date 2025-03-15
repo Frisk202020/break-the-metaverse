@@ -10,7 +10,7 @@ LDFLAGS = -lm
 
 clean:
 	- rm -f *.o
-	- find . -maxdepth 1 -executable -type f \( ! -name "Makefile" \) -delete
+	- find . -maxdepth 2 -executable -type f \( ! -name "Makefile" \) -delete
 
 country: 
 	$(CC) $(CFLAGS) -o result/country src/country.c src/firewall.c $(LDFLAGS)
@@ -34,4 +34,8 @@ mabel:
 	$(CC) $(CFLAGS) -o result/mabel src/dave_firewalls/mabel.c src/firewall.c $(LDFLAGS)
 boo: 
 	$(CC) $(CFLAGS) -o result/boo src/dave_firewalls/boo.c src/firewall.c $(LDFLAGS)
-dave: carnivorous dipper mabel boo
+
+
+TopHome: country adn 
+MiddleHome: battle
+BottomHome: carnivorous dipper mabel boo

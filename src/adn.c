@@ -59,7 +59,7 @@ int convert(char tenth, char unit){
 
 /* The software Flavie will use. Available prompts are listed on her manual*/
 void software(){
-    printf("DNA Analyzer - by Flavie Bit\n");
+    printf("DNA Analyzer - by ADNosk Corporation\n");
 
     srand(time(NULL));
     int N = rand()%10;
@@ -86,7 +86,7 @@ void software(){
                 current++;    
                 initialized = true;
             }
-            else if (equal("end", prompt, 0, 3)){
+            else if (equal("exit", prompt, 0, 4)){
                 end = true;
             }
             else{
@@ -121,11 +121,8 @@ void software(){
                         printf("Success !\n");
                         end = true;
                     }
-                    else if (n < N){
-                        printf("Failed to match the DNA. try a higher n input\n");
-                    }
                     else{
-                        printf("Failed to match the DNA. try a lower n input\n");
+                        printf("Failed to match the DNA.\n");
                     }
                 }
                 else{

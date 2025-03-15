@@ -1,0 +1,4 @@
+REMINDER :
+    Current active processes are located in the sys folder
+    Current inactive processes are located in bin folder
+    

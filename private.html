@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="icon" type="image/png" href="../assets/favicon.png">
+        <link rel="stylesheet" href="css/index.css">
+        <title>CloverNet Private ChatRoom</title>
+    </head>
+    <body>
+        <h1>Clover Private ChatRoom</h1>
+        <h2>The chatroom can only be accessed by Clover's spying team</h2>
+        <hr>
+        <br>
+        <h3>Website Ambience</h3>
+        <ul style="background-color: rgb(190, 165, 239); border:2px solid;">
+            <!-- You can create a list within a list -->
+            <!-- You can make ordered list (1,2,3instead of dots) with <o></o> -->
+            <!-- You can make a description list which is a hashmap
+                Keys are words to define : use <dt></dt> tag to prompt a key 
+                Values are the definitions : use <dd></dd> tag to prompt values
+            -->
+            <li>
+                <u>Main Ambience</u> 
+                <br>
+                <audio controls loop>
+                    <source src="../assets/music/clovernet_ambience.mp3" type="audio/mp3">
+                    <source src="../assets/music/clovernet_ambience.wav" type="audio/wav"> <!-- In case web browser doesn't support mp3 format-->
+                </audio>
+            </li>
+            <li>
+                <u>Alternative Ambience</u>
+                <br>
+                <audio controls loop>
+                    <source src="../assets/music/clovernet_tech.mp3" type="audio/mp3">
+                </audio>
+            </li>
+            <li>
+                <u>Chill Ambience</u>
+                <br>
+                <audio controls loop>
+                    <source src="../assets/music/clovernet_chill.mp3" type="audio/mp3">
+                </audio>
+            </li>
+        </ul>
+        <h3>Connect to your workspace</h3>
+        <!-- THIS IS A  COMMENT -->
+
+     
+        <a href="database/clarence.html"
+        target="_blank"
+        title="Goes to Clarence's workspace">
+            <!-- You can also add GIFs -->
+            <img src="../assets/profile_pictures/clarence.jpg"
+            height="100" width="100"
+            alt="Clarence profile picture"
+            title="Clarence profile picture"
+            class="profile">
+        </a>
+
+        <form action="index.php" method="POST">
+        <!-- <label for="username">username</label> -->
+            <input type="text" id="username" placeholder="username" minlength="3" class="formtest" required>
+            <input type="password" id="password" placeholder="password" minlength="3" " class="formtest" required>
+            <input type="submit" value="Connect to Workspace">
+        </form>
+    
+         <br>
+         <!--
+         <br>
+         <br>
+
+         <a href="mailto:clementhemesecond@gmail.com"
+            title="Mail to Clarence">
+            mail
+         </a>
+        -->
+
+    </body>
+</html>

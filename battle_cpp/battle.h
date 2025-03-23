@@ -48,6 +48,7 @@ class Action {
         char get_type() const;
         bool is_superguardable() const;
         void upgrade(const int pow_buff, const int heal_buff);
+        void ban();
 };
 
 class Character {
@@ -60,9 +61,9 @@ class Character {
         State state;
         State smell;
         int dice;
-        std::vector<Action> actions;
+        std::unordered_map<std::string, Action> actions;
         
-        Character(const std::string &name, const int max_hp, const int pow, const int def, const State &state, const State &smell, const int dice, const std::vector<Action> &actions);
+        Character(const std::string &name, const int max_hp, const int pow, const int def, const State &state, const State &smell, const int dice, const std::unordered_map<std::string, Action> &actions);
         int dice_range(const int result) const;
 
     public:
@@ -81,12 +82,22 @@ class Character {
         static Character initialize_clover_sensei();
         static Character initialize_sensei();
 
+        static Character initialize_derek_final();
+        static Character initialize_flavie_final();
+        static Character initialize_haloise_final();
+        static Character initialize_xhara_final();
+        static Character initialize_clover_final();
+        static Character initialize_final();
+        static Character initialize_h0pe();
+        
+
         std::string get_name() const;
         int get_hp() const;
         int get_max_hp() const;
         int get_pow() const;
         State get_state() const;
-        int attack(const int result) const;
+        int attack_power(const int result) const;
+        Action get_action(const std::string &act) const;
         int get_number_of_actions() const;
         Action choose_enemy_action() const;
         void print_life_bar() const;
@@ -95,7 +106,7 @@ class Character {
         void print_character_as_magician() const;
 
         void set_state(const State &state);
-        void state_back_to_normal();
+        void state_back_to_normal(const int turn);
         void boost(const double multiplier);
         void set_def(const int def);
         void damage(const int damage);
@@ -103,7 +114,10 @@ class Character {
         void set_hp_to_max();
         void revive();
         void remove_firebreath();
-        void upgrade_action(const int id, const int pow_buff, const int heal_buff);
+        void upgrade_action(const std::string act, const int pow_buff, const int heal_buff);
+        void ban_action(const std::string &name);
+
+        void __debug__manage_hp(int hp);
 };
 
 class Stats {
@@ -127,13 +141,21 @@ class Stats {
         void update_task(Character &ch);
 
     public:
+        Stats();    
         bool is_end() const;
         void print_state() const;
         void update_stats();
-        Stats dragon_initializer();
-        void execute_action(const Action &act, Character &thrower, Character &target);
-        void enemy_attack(Character &enemy);
+        static Stats dragon_initializer();
+
+        void execute_action(const std::string &act, const std::string &thrower, const std::string &target);
+        void default_enemy_attack();
+        void enemy_attack(const std::string &enemy);
         void claim_souls();
+
+        void attack_dragon_battle(const std::string &attacker, const int dice_score);
+        void __debug__increment_turn();
+        void __debug__manage_hp(std::string ch, int increment);
+        void __debug__revive(std::string ch);
 };
 
 //from utilities.cpp
@@ -141,6 +163,7 @@ int entropy(const int value, const int min, const int var);
 bool happening(const int odd);
 int parse_int(const std::string &s);
 int ask_for_superguard(const std::string &name);
+std::vector<std::string> split(std::string s, std::string splitter);
 
 /*
 //from sensei.c

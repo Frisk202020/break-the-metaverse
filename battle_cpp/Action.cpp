@@ -13,6 +13,7 @@ char Action::get_range() const {return aim;}
 char Action::get_type() const {return type;}
 bool Action::is_superguardable() const {return superguard;}
 void Action::upgrade(const int pow_buff, const int heal_buff) {pow *= pow_buff; heal *= heal_buff;} 
+void Action::ban() { type = 'l'; odd = 0; }
 
 Action::Action() {
     name = "default";
@@ -56,7 +57,7 @@ std::unordered_map<std::string, Action> Action::action_library = {
     {"potion", Action("potion", 0, 0, State("corrupt", INT8_MAX), 'e', 'g', false, 100)},
     {"encyclopedia", Action("encyclopedia", 0, 0, State(), 'e', 'g', false, 100)},
     {"stone", Action("stone", 0, 50, State("defense", 3), 'i', 'g', false, 100)},
-    {"hammer", Action("hammer", 300, 0, State("danger", 1), 'i', 'g', false, 100)},
+    {"hammer", Action("hammer", 300, 0, State("danger", 1), 'e', 'g', false, 100)},
     {"betrayal", Action("betrayal", 0, 0, State(), 'e', 'g', false, 100)},
     {"retreat", Action("retreat", 0, 100, State("defense", 3), 'i', 'g', false, 100)},
     {"focus", Action("focus", 0, 0, State("focus", 1), 'i', 'l', false, 100)},
@@ -64,7 +65,7 @@ std::unordered_map<std::string, Action> Action::action_library = {
     {"knife", Action("knife", 300, 0, State(), 'e', 'r', false, 100)},
     {"gold", Action("gold", 40, 0, State("boost", -1), 'i', 'l', false, 60)},
     {"firebreath", Action("firebreath", 50, 0, State(), 'a', 'l', false, 40)},
-    {"stomp", Action("stomp", 70, 0, State(), 'i', 'l', false, 35)},
+    {"stomp", Action("stomp", 70, 0, State(), 'i', 'l', true, 35)},
     {"bite", Action("bite", 30, 100, State(), 'i', 'l', false, 20)},
     {"claw", Action("claw", 1000, 0, State(), 'i', 'l', false, 5)},
     {"protect", Action("protect", 0, 0, State("vulnerable", 1), 'i', 'l', false, 100)},

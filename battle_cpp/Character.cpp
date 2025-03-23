@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+void Character::__debug__manage_hp(int hp) {this->hp += hp;}
+
 void Character::print_life_bar() const {
     int N = 20 * hp / max_hp;
     printf("\033[0;32m");
@@ -22,12 +24,14 @@ void Character::print_character(const bool is_enemy) const {
         return;
     }
 
-    printf("\033[0;31m \nBoss : \033[0;35m ♥ %d  ", hp); 
-    this->print_life_bar();
     if (hp <= 0 ) {
-        if (state.get_name() == "dead") {printf("\033[0;31m%s : DEAD \033[0;0m\n", name.c_str());}
-        else {printf("\033[0;31m%s : DOWN \033[0;0m\n", name.c_str());}
-    } else {printf("\033[0;31m [%s] \033[0;0m\n\n", state.get_name().c_str());}
+        if (state.get_name() == "dead") {printf("\033[0;34m%s : DEAD \033[0;0m\n", name.c_str());}
+        else {printf("\033[0;34m%s : DOWN \033[0;0m\n", name.c_str());}
+    } else {
+        printf("\033[0;34m%s : \033[0;35m ♥ %d  ", name.c_str(), hp); 
+        this->print_life_bar();
+        printf("\033[0;34m [%s] \033[0;0m\n", state.get_name().c_str());
+    }
 }
 void Character::print_character_as_student() const {}
 void Character::print_character_as_magician() const {}
@@ -38,40 +42,53 @@ int Character::get_max_hp() const {return max_hp;}
 int Character::get_pow() const {return pow;}
 State Character::get_state() const {return state;}
 void Character::set_state(const State &state) {this->state = state;}
-void Character::state_back_to_normal() {
+void Character::state_back_to_normal(int turn) {
     if (state.get_name() == "defense") {def = 0;}
     else if (state.get_name() == "weakened") {pow *= 5;}
     else if (state.get_name() == "confuse") {pow /= 5;}
+    else if (state.get_name() == "focus") {pow *= 3; state = State("focused", turn + 2); return;}
+    else if (state.get_name() == "focused") {pow /= 3;}
 
     state = State();
 }
 void Character::set_def(const int def) {this->def = def;}
 void Character::boost(const double multipier) {pow *= multipier;}
-void Character::damage(const int damage) {hp -= damage;}
+void Character::damage(const int damage) {
+    if (state.get_name() == "focus") {state = State();}
+    hp -= (damage * (100 - def)/100);
+}
 void Character::set_hp_to_zero() {hp = 0;}
 void Character::set_hp_to_max() {hp = max_hp;}
 void Character::revive() {hp = max_hp; state = State();}
-int Character::get_number_of_actions() const {return actions.size();}
-void Character::upgrade_action(const int id, const int pow_buff, const int heal_buff) {
-    if (id < (int) actions.size()) {actions[id].upgrade(pow_buff, heal_buff);}
-    else {std::cout << "Invalid action id";}
+Action Character::get_action(const std::string &act) const {
+    if (!actions.contains(act)) { throw std::invalid_argument("Can't find action"); }
+    return actions.at(act);
 }
+int Character::get_number_of_actions() const {return actions.size();}
+void Character::upgrade_action(const std::string act, const int pow_buff, const int heal_buff) {
+    if (actions.contains(act)) { actions[act].upgrade(pow_buff, heal_buff); return; }
+    std::cout << "Can't find the action to upgrade";
+}
+void Character::ban_action(const std::string &name) {
+    if (!actions.contains(name)) { std::cout << "Can't find the 'g' action to ban"; }
+    actions[name].ban();
+} 
 void Character::remove_firebreath() {
-    if (name == "Dragon") {actions.pop_back();} // firebreath implemented to be the last element of the actions vector
-    printf("033[0;32m Can't remove an action for this enemy \033[0;0m");
+    if (name == "Dragon") { actions.erase("firebreath"); return; } 
+    printf("\033[0;32m Can't remove an action for this enemy \033[0;0m");
 }
 
 Action Character::choose_enemy_action() const {
-    std::vector<int> v; v.reserve(100);
-    for (int act_id = 0; act_id < (int) actions.size(); act_id++) {
-        for (int i = 0; i < actions[act_id].get_odd(); i++){
-            v.push_back(act_id);
-        }    
+    std::vector<std::string> v; v.reserve(100);
+    for (auto &kv: actions) {
+        for (int i = 0; i < kv.second.get_odd(); i++) {
+            v.push_back(kv.first);
+        }
     }
 
     if (v.size() > 100) {std::cout << "Warning: enemy may not have been initialized correctly (sum of act odds > 100%) !\n";}
-    int ind = v[rand() % v.size()];
-    return actions[ind];
+    int ind = rand() % v.size();
+    return actions.at(v[ind]);
 }
 
 int Character::dice_range(int result) const {
@@ -111,9 +128,10 @@ int Character::dice_range(int result) const {
     return 0; // never reached
 }
 
-int Character::attack(int result) const {
+int Character::attack_power(int result) const {
     if (state.get_name() == "focus success") {return 3 * pow;}
 
+    std::cout << "result: " << result << '\n';
     switch (this->dice_range(result)) {
         case 0: return entropy(pow, 10, 10);
         case 1: return entropy(pow, 20, 30);
@@ -132,10 +150,10 @@ Character::Character() {
     state = State();
     smell = State();
     dice = 0;
-    actions = std::vector<Action>();
+    actions = std::unordered_map<std::string, Action>();
 }
 
-Character::Character(const std::string &name, const int max_hp, const int pow, const int def, const State &state, const State &smell, const int dice, const std::vector<Action> &actions) {
+Character::Character(const std::string &name, const int max_hp, const int pow, const int def, const State &state, const State &smell, const int dice, const std::unordered_map<std::string, Action> &actions) {
     this->name = name;
     this->max_hp = max_hp;
     this->hp = max_hp;
@@ -153,7 +171,11 @@ Character Character::initialize_derek_dragon() {
     int pow = 50;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("taser"), Action::get_action_from_library("sword"), Action::get_action_from_library("provoke")};
+    std::unordered_map<std::string, Action> actions = {
+        { "taser", Action::get_action_from_library("taser") }, 
+        {"sword", Action::get_action_from_library("sword") }, 
+        { "provoke", Action::get_action_from_library("provoke") },
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -164,7 +186,11 @@ Character Character::initialize_flavie_dragon() {
     int pow = 20;
     int def = 0;
     int dice = 30;
-    std::vector<Action> actions = {Action::get_action_from_library("hack"), Action::get_action_from_library("shield"), Action::get_action_from_library("potion")};
+    std::unordered_map<std::string, Action> actions = {
+        { "hack", Action::get_action_from_library("hack") }, 
+        {"shield", Action::get_action_from_library("shield") }, 
+        { "potion", Action::get_action_from_library("potion") },
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -175,7 +201,11 @@ Character Character::initialize_haloise_dragon() {
     int pow = 10;
     int def = 0;
     int dice = 10;
-    std::vector<Action> actions = {Action::get_action_from_library("encyclopedia"), Action::get_action_from_library("stone"), Action::get_action_from_library("hammer")};
+    std::unordered_map<std::string, Action> actions = {
+        { "encyclopedia", Action::get_action_from_library("encyclopedia") }, 
+        {"stone", Action::get_action_from_library("stone") }, 
+        { "hammer", Action::get_action_from_library("hammer") },
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -186,7 +216,11 @@ Character Character::initialize_xhara_dragon() {
     int pow = 30;
     int def = 0;
     int dice = 20;
-    std::vector<Action> actions = {Action::get_action_from_library("betrayal"), Action::get_action_from_library("retreat"), Action::get_action_from_library("focus")};
+    std::unordered_map<std::string, Action> actions = {
+        { "betrayal", Action::get_action_from_library("betrayal") }, 
+        {"retreat", Action::get_action_from_library("retreat") }, 
+        { "focus", Action::get_action_from_library("focus") },
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -197,7 +231,11 @@ Character Character::initialize_clover_dragon() {
     int pow = 60;
     int def = 0;
     int dice = 4;
-    std::vector<Action> actions = {Action::get_action_from_library("clone"), Action::get_action_from_library("knife"), Action::get_action_from_library("gold")};
+    std::unordered_map<std::string, Action> actions = {
+        { "clone", Action::get_action_from_library("clone") }, 
+        {"knife", Action::get_action_from_library("knife") }, 
+        { "gold", Action::get_action_from_library("gold") },
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -208,11 +246,17 @@ Character Character::initialize_dragon() {
     int pow = 0;
     int def = 0;
     int dice = 0;
-    std::vector<Action> actions = {Action::get_action_from_library("stomp"), Action::get_action_from_library("bite"), Action::get_action_from_library("claw"), Action::get_action_from_library("firebreath")};
+    std::unordered_map<std::string, Action> actions = {
+        { "stomp", Action::get_action_from_library("stomp") }, 
+        {"bite", Action::get_action_from_library("bite") }, 
+        { "claw", Action::get_action_from_library("claw") },
+        { "firebreath", Action::get_action_from_library("firebreath") }
+    };
 
-    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+    return Character (name, max_hp, pow, def, State("Clover", -1), State(), dice, actions); 
 }
 
+/*
 Character Character::initialize_derek_sensei() {
     std::string name = "Derek";
     int max_hp = 20;
@@ -279,3 +323,14 @@ Character Character::initialize_sensei() {
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
 
+Character Character::initialize_derek_final() {
+    std::string name = "Derek";
+    int max_hp = 250;
+    int pow = 50;
+    int def = 0;
+    int dice = 6;
+    std::vector<Action> actions = {Action::get_action_from_library("taser"), Action::get_action_from_library("protect")};
+
+    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+}
+*/

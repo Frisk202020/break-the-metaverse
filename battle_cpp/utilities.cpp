@@ -1,6 +1,20 @@
 #include <iostream>
 #include <array>
 #include <cmath>
+#include <vector>
+
+std::vector<std::string> split(std::string s, std::string splitter){
+    std::vector<std::string> ans = {};
+    size_t pos;
+    while ((pos = s.find(splitter)) != std::string::npos){
+        ans.push_back(s.substr(0, pos));
+        s = s.substr(pos + splitter.length());
+    }
+    ans.push_back(s);
+    ans.shrink_to_fit();
+    
+    return ans;
+}
 
 int ask_for_superguard(const std::string &name) {
     std::string prompt;
@@ -17,13 +31,13 @@ int ask_for_superguard(const std::string &name) {
 
 int entropy(const int value, const int min, const int var){
     double ratio = (min + rand()%var) / 100.;
-    return ((int) ratio * value);
+    return ((int) (ratio * value));
 }
 
 int parse_int(const std::string &s) {
-    int res;
+    int res = 0;
     for (int i = 0; i < (int) s.length(); i++) {
-        char c = s[i] - '0';
+        int c = (int) s[i] - (int) '0';
         if (c >= 0 && c < 9) {res += (int) c * pow(10, s.length() - i - 1);}
         else {throw std::invalid_argument("Error parsing integer");}
     }

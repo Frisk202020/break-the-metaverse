@@ -785,7 +785,7 @@ void main(int argc, char *argv[]){
                     }
                     else if (equal("protect", prompt, 8+s.team[i].name_length, 15+s.team[i].name_length)){
                         if (s.nb_other == 2 && i == 3){
-                            printf("Action not available\n");
+                            printf("Action not available\n");  // Just remove action from vector when betray
                         }
                         else{
                             for (int j = 0; j < 5; j++){

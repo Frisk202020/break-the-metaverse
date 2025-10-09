@@ -87,7 +87,7 @@ class Character {
         static Character initialize_haloise_final();
         static Character initialize_xhara_final();
         static Character initialize_clover_final();
-        static Character initialize_final();
+        static Character initialize_virus();
         static Character initialize_h0pe();
         
 
@@ -101,7 +101,7 @@ class Character {
         int get_number_of_actions() const;
         Action choose_enemy_action() const;
         void print_life_bar() const;
-        void print_character(const bool is_enemy) const;
+        void print_character(const bool is_enemy, const std::string &color) const;
         void print_character_as_student() const;
         void print_character_as_magician() const;
 
@@ -146,6 +146,7 @@ class Stats {
         void print_state() const;
         void update_stats();
         static Stats dragon_initializer();
+        static Stats sensei_initializer();
 
         void execute_action(const std::string &act, const std::string &thrower, const std::string &target);
         void default_enemy_attack();
@@ -164,6 +165,7 @@ bool happening(const int odd);
 int parse_int(const std::string &s);
 int ask_for_superguard(const std::string &name);
 std::vector<std::string> split(std::string s, std::string splitter);
+const char* get_color(const std::string &input);
 
 /*
 //from sensei.c

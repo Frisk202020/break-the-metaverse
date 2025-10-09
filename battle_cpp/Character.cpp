@@ -15,7 +15,7 @@ void Character::print_life_bar() const {
         printf("|");
     }
 }
-void Character::print_character(const bool is_enemy) const {
+void Character::print_character(const bool is_enemy, const std::string &color) const {
     if (is_enemy) {
         printf("\033[0;31m \nBoss : \033[0;35m ♥ %d  ", hp); 
         this->print_life_bar();
@@ -28,6 +28,12 @@ void Character::print_character(const bool is_enemy) const {
         if (state.get_name() == "dead") {printf("\033[0;34m%s : DEAD \033[0;0m\n", name.c_str());}
         else {printf("\033[0;34m%s : DOWN \033[0;0m\n", name.c_str());}
     } else {
+        if (color != "") {
+            printf("%s%s : \033[0;35m GRADE: %0.2f / 20  ", get_color(color), name.c_str(), (200. + hp - max_hp) / 10.); 
+            this->print_life_bar();
+            printf("%s [%s] \033[0;0m\n", get_color(color), state.get_name().c_str());
+            return;
+        }
         printf("\033[0;34m%s : \033[0;35m ♥ %d  ", name.c_str(), hp); 
         this->print_life_bar();
         printf("\033[0;34m [%s] \033[0;0m\n", state.get_name().c_str());
@@ -256,58 +262,78 @@ Character Character::initialize_dragon() {
     return Character (name, max_hp, pow, def, State("Clover", -1), State(), dice, actions); 
 }
 
-/*
+
 Character Character::initialize_derek_sensei() {
     std::string name = "Derek";
     int max_hp = 20;
     int pow = 1;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("taser"), Action::get_action_from_library("protect"), Action::get_action_from_library("smell")};
+    std::unordered_map<std::string, Action> actions = {
+        { "taser", Action::get_action_from_library("taser") }, 
+        {"protect", Action::get_action_from_library("protect") }, 
+        { "smell", Action::get_action_from_library("smell") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
 
 Character Character::initialize_flavie_sensei() {
     std::string name = "Flavie";
-    int max_hp = 20;
+    int max_hp = 120;
     int pow = 1;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("hack"), Action::get_action_from_library("protect"), Action::get_action_from_library("smell")};
+    std::unordered_map<std::string, Action> actions = {
+        { "hack", Action::get_action_from_library("hack") }, 
+        {"protect", Action::get_action_from_library("protect") }, 
+        { "smell", Action::get_action_from_library("smell") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
 
 Character Character::initialize_haloise_sensei() {
     std::string name = "Haloise";
-    int max_hp = 20;
+    int max_hp = 80;
     int pow = 1;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("encyclodia"), Action::get_action_from_library("protect"), Action::get_action_from_library("smell")};
+    std::unordered_map<std::string, Action> actions = {
+        { "encyclopedia", Action::get_action_from_library("encyclopedia") }, 
+        {"protect", Action::get_action_from_library("protect") }, 
+        { "smell", Action::get_action_from_library("smell") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
 
 Character Character::initialize_clover_sensei() {
     std::string name = "Clover";
-    int max_hp = 20;
+    int max_hp = 100;
     int pow = 1;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("clone"), Action::get_action_from_library("protect"), Action::get_action_from_library("smell")};
+    std::unordered_map<std::string, Action> actions = {
+        { "betrayal", Action::get_action_from_library("betrayal") }, 
+        {"protect", Action::get_action_from_library("protect") }, 
+        { "smell", Action::get_action_from_library("smell") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
 
 Character Character::initialize_xhara_sensei() {
     std::string name = "Xhara";
-    int max_hp = 20;
+    int max_hp = 40;
     int pow = 1;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("retreat"), Action::get_action_from_library("protect"), Action::get_action_from_library("smell")};
+    std::unordered_map<std::string, Action> actions = {
+        { "clone", Action::get_action_from_library("clone") }, 
+        {"protect", Action::get_action_from_library("protect") }, 
+        { "smell", Action::get_action_from_library("smell") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -318,7 +344,11 @@ Character Character::initialize_sensei() {
     int pow = 0;
     int def = 0;
     int dice = 0;
-    std::vector<Action> actions = {Action::get_action_from_library("vertical"), Action::get_action_from_library("horizontal"), Action::get_action_from_library("kamehameha")};
+    std::unordered_map<std::string, Action> actions = {
+        { "vertical", Action::get_action_from_library("vertical") }, 
+        {"horizontal", Action::get_action_from_library("horizontal") }, 
+        { "kamehameha", Action::get_action_from_library("kamehameha") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
@@ -326,11 +356,94 @@ Character Character::initialize_sensei() {
 Character Character::initialize_derek_final() {
     std::string name = "Derek";
     int max_hp = 250;
-    int pow = 50;
+    int pow = 10;
     int def = 0;
     int dice = 6;
-    std::vector<Action> actions = {Action::get_action_from_library("taser"), Action::get_action_from_library("protect")};
+    std::unordered_map<std::string, Action> actions = {
+        { "taser", Action::get_action_from_library("taser") }, 
+        {"protect", Action::get_action_from_library("protect") }
+    };
+    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+}
+
+
+Character Character::initialize_flavie_final() {
+    std::string name = "Flavie";
+    int max_hp = 120;
+    int pow = 4;
+    int def = 0;
+    int dice = 30;
+    std::unordered_map<std::string, Action> actions = {
+        { "hack", Action::get_action_from_library("hack") }, 
+        {"protect", Action::get_action_from_library("protect") }
+    };
 
     return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
 }
-*/
+
+Character Character::initialize_haloise_final() {
+    std::string name = "Haloïse";
+    int max_hp = 350;
+    int pow = 2;
+    int def = 0;
+    int dice = 10;
+    std::unordered_map<std::string, Action> actions = {
+        { "encyclopedia", Action::get_action_from_library("encyclopedia") }, 
+        {"protect", Action::get_action_from_library("protect") }
+    };
+
+    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+}
+
+Character Character::initialize_xhara_final() {
+    std::string name = "Xhara";
+    int max_hp = 150;
+    int pow = 6;
+    int def = 0;
+    int dice = 20;
+    std::unordered_map<std::string, Action> actions = {
+        {"protect", Action::get_action_from_library("protect") }
+    };
+
+    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+}
+
+Character Character::initialize_clover_final() {
+    std::string name = "Clover";
+    int max_hp = 80;
+    int pow = 12;
+    int def = 0;
+    int dice = 4;
+    std::unordered_map<std::string, Action> actions = {
+        { "clone", Action::get_action_from_library("clone") }, 
+        {"protect", Action::get_action_from_library("protect") }
+    };
+
+    return Character (name, max_hp, pow, def, State(), State(), dice, actions); 
+}
+
+Character Character::initialize_virus() {
+    std::string name = "Virus";
+    int max_hp = 1500;
+    std::unordered_map<std::string, Action> actions = {
+        { "drain", Action::get_action_from_library("drain") },
+        { "confuse", Action::get_action_from_library("confuse") },
+        { "revolution", Action::get_action_from_library("revolution") },
+        { "claw", Action::get_action_from_library("claw") }
+    };
+
+    return Character (name, max_hp, 0, 0, State(), State(), 0, actions);
+}
+
+Character Character::initialize_h0pe() {
+    std::string name = "H0PE";
+    int max_hp = 300;
+    std::unordered_map<std::string, Action> actions = {
+        { "heal", Action::get_action_from_library("heal") },
+        { "enrage", Action::get_action_from_library("enrage") },
+        { "target", Action::get_action_from_library("target") },
+        { "reflect", Action::get_action_from_library("reflect") }
+    };
+
+    return Character (name, max_hp, 0, 0, State(), State(), 0, actions);
+}

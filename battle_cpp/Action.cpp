@@ -71,8 +71,17 @@ std::unordered_map<std::string, Action> Action::action_library = {
     {"protect", Action("protect", 0, 0, State("vulnerable", 1), 'i', 'l', false, 100)},
     {"smell", Action("smell", 0, 0, State("smell", 1), 'i', 'l', false, 100)},
     {"vertical", Action("vertical swing", 8, 0, State(), 'i', 'l', true, 40)},
-    {"hoizontal", Action("horizontal swing", 8, 0, State(), 'i', 'l', true, 40)},
-    {"smell", Action("kaméhaméha", 10, 0, State(), 'i', 'l', true, 20)},
+    {"horizontal", Action("horizontal swing", 8, 0, State(), 'i', 'l', true, 40)},
+    {"kamehameha", Action("kamehameha", 10, 0, State(), 'i', 'l', true, 20)},
+    {"drain", Action("drain", 30, 50, State("weaken", 3), 'i', 'l', false, 20)},
+    {"confuse", Action("confuse", 0, 0, State("confuse", 2), 'i', 'l', false, 15)},
+    {"revolution", Action("revolution", -1, 0, State(), 'a', 'l', false, 15)},
+    {"claw", Action("claw", 50, 0, State(), 'i', 'l', true, 50)},
+    {"SOUL", Action("SOUL", 0, 100, State(), 'i', 'l', false, 0)},
+    {"heal", Action("heal", 0, 150, State("Virus", -1), 'i', 'l', false, 25)},
+    {"enrage", Action("enrage", 0, 0, State("rage", 3), 'i', 'l', false, 25)},
+    {"target", Action("target", 0, 0, State("target", 2), 'i', 'l', false, 25)},
+    {"reflect", Action("reflect", 0, 0, State("reflect", 5), 'i', 'l', false, 25)},
 };
 
 Action Action::get_action_from_library(const std::string request){    
@@ -80,7 +89,7 @@ Action Action::get_action_from_library(const std::string request){
         return Action(action_library[request]);
     }
 
-    std::cout << "Returned default action";
+    std::cout << "Returned default action from " << request << '\n';
     return Action();
 }
 

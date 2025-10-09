@@ -52,3 +52,18 @@ bool happening(const int odd){
 
     return arr[rand()%100];
 }
+
+// Private function (not declared in the header)
+const char* color_library(const std::string &input) {
+    if (input == "red") { return "\033[31m"; }
+    if (input == "green") { return "\033[32m"; }
+    if (input == "yellow") { return "\033[33m"; }
+    if (input == "blue") { return "\033[34m"; }
+    if (input == "purple") { return "\033[35m"; }
+    if (input == "cyan") { return "\033[36m"; }
+    return "\033[0m";
+}
+
+const char* get_color(const std::string &input) {
+    return color_library(input);
+}

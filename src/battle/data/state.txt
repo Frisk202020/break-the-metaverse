@@ -1,9 +1,8 @@
-Virus
-250 10 0 normal -1
-120 3 0 normal -1
-350 1 0 normal -1
-150 2 0 normal -1
-80 6 0 normal -1
-1500 normal -1
-1 1
-300 0 0 normal -1
+Dragon
+250 50 0 normal -1
+120 20 0 normal -1
+350 10 0 normal -1
+150 30 0 normal -1
+80 60 0 normal -1
+1000 normal -1
+1 0

@@ -257,6 +257,7 @@ int main(int argc, char** argv) {
     if (to_launch == "Dragon") {
         battle = Stats::dragon_initializer();
     } else if (to_launch == "Sensei") {
+        battle = Stats::sensei_initializer();
         battle_id = 1;
     } else if (to_launch == "Spirit") {
         battle_id = 2;
@@ -265,7 +266,7 @@ int main(int argc, char** argv) {
     } else {
         std::cout << "Unrecognized battle -- ABORT\n"; return 0;
     }
-    std::cout << battle_id << '\n';
+
     bool end = false;
     std::string prompt;
     do {

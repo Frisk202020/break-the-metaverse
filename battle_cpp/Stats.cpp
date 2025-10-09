@@ -35,13 +35,23 @@ void Stats::print_state() const {
     printf("\033[0;37m");
     printf("\n*** turn %d ***\n", turn);
     if (enemies.contains("Dragon")) {
-        enemies.at("Dragon").print_character(true);
+        enemies.at("Dragon").print_character(true, "");
         for (auto &kv: team) {
-            kv.second.print_character(false);
+            kv.second.print_character(false, "");
         }
-    } 
-    if (enemies.contains("Sensei")) {
-
+    } else if (enemies.contains("Sensei")) {
+        std::unordered_map<std::string, std::string> colors = {
+            {"Derek", "black"},
+            {"Flavie", "green"},
+            {"Haloise", "blue"},
+            {"Xhara", "yellow"},
+            {"Clover", "cyan"}
+        };
+        enemies.at("Sensei").print_character(true, "");
+        int i = 0;
+        for (auto &kv: colors) {
+            team.at(kv.first).print_character(false, kv.second);
+        }
     }
     else {
 
@@ -314,14 +324,14 @@ void Stats::execute_action(const std::string &act_str, const std::string &throwe
 
 Stats::Stats() {}
 
-Stats::Stats(const Character &derek, const Character &flavie, const Character &haloise, const Character &xhara, const Character &clover, const Character &dragon) {
+Stats::Stats(const Character &derek, const Character &flavie, const Character &haloise, const Character &xhara, const Character &clover, const Character &enemy) {
     team["Derek"] = derek;
     team["Flavie"] = flavie;
     team["Haloise"] = haloise;
     team["Xhara"] = xhara;
     team["Clover"] = clover;
-    enemies["Dragon"] = dragon;
-    default_enemy = "Dragon";
+    enemies[std::string (enemy.get_name())] = enemy;
+    default_enemy = std::string (enemy.get_name());
     turn = 1;
     orb = nullptr;
     nb_spirit = 0;
@@ -336,6 +346,18 @@ Stats Stats::dragon_initializer() {
         Character::initialize_xhara_dragon(),
         Character::initialize_clover_dragon(),
         Character::initialize_dragon()
+    );
+}
+
+Stats Stats::sensei_initializer() {
+    return Stats
+    (
+        Character::initialize_derek_sensei(),
+        Character::initialize_flavie_sensei(),
+        Character::initialize_haloise_sensei(),
+        Character::initialize_xhara_sensei(),
+        Character::initialize_clover_sensei(),
+        Character::initialize_sensei()
     );
 }
 

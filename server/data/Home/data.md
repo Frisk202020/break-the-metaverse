@@ -1,0 +1,11 @@
+Home$d
+>doc$d
+>>flavie.pdf
+>sys$d
+>>dark.sys$c:dark
+>>light.sys$c:light
+>>bootcfg.dll
+>>netcfgx.dll
+>>os-config.sys
+>outside$d
+>>H0PE_mail.html

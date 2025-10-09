@@ -1,3 +1,5 @@
 result/*
 !result/.gitkeep
 battle
+src/battleApp/.vscode
+src/battleApp/bin

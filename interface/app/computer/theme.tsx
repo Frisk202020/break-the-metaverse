@@ -32,11 +32,11 @@ class Theme {
     }
 }
 
-const DEFAULT = new Theme("#faf4d4", "#2923d8", "#6964f8");
 const THEMES_OBJECTS = [
-    DEFAULT,
+    new Theme("#faf4d4", "#2923d8", "#6964f8"),
     new Theme("#1b1a1a", "#0c7f0c", "#355935"), 
 ];
+const DEFAULT = THEMES_OBJECTS[1];
 
 export const THEMES = THEMES_OBJECTS.map((x, i)=>x.getElm(i));
 export function apply_default_theme() {

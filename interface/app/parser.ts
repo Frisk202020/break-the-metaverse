@@ -1,5 +1,3 @@
-import { readFileSync } from "fs";
-
 export enum FileType {
     TXT,
     IMG,
@@ -21,6 +19,7 @@ export interface CpmFile {
     name: string,
     files: CpmFile[],
     directories: Directory[],
+    parent: Directory | null
 }
 
 export default function parser(data: any): Directory {
@@ -47,8 +46,10 @@ export default function parser(data: any): Directory {
         }
     }
 
-    return {
+    const self = {
         name: data.name,
-        files, directories
+        files, directories, parent: null
     };
+    self.directories.forEach((x)=>x.parent = self);
+    return self;
 }

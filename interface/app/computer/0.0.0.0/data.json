@@ -17,6 +17,10 @@
                         "type": "img",
                         "path": "img.png"
                     }
+                },
+                {
+                    "name": "Deeper",
+                    "files": []
                 }
             ]
         },

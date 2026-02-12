@@ -1,0 +1,39 @@
+{
+    "name": "Home",
+    "files": [
+        {
+            "name": "Docs",
+            "files": [
+                {
+                    "name": "Hello world",
+                    "attributes": {
+                        "type": "txt",
+                        "path": "hello.txt"
+                    }
+                },
+                {
+                    "name": "Hello",
+                    "attributes": {
+                        "type": "img",
+                        "path": "img.png"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Bin",
+            "files": []
+        },
+        {
+            "name": "Sys",
+            "files": [
+                {
+                    "name": "Os",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                }
+            ]
+        }
+    ]
+}

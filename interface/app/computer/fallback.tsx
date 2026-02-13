@@ -1,6 +1,8 @@
-export default function Fallback() {
+import { HOME_IP, Setter } from "./util";
+
+export default function Fallback(args: {src: string | null, setIp: Setter<string>}) {
     return <div>
         <p>Connection failed...</p>
-        <a href="?ip=0.0.0.0">Go back to home</a>
+        <button onClick={()=>args.setIp(args.src ? args.src : HOME_IP)}>Go back to home</button>
     </div>;
 }

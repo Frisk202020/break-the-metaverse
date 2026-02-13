@@ -1,12 +1,16 @@
 export enum FileType {
     TXT,
     IMG,
-    SYS
+    SYS,
+    THM,
+    PDF
 } function parse_type(x: any): FileType {
     switch(x) {
         case "txt": return FileType.TXT;
         case "img": return FileType.IMG;
         case "sys": return FileType.SYS;
+        case "thm": return FileType.THM;
+        case "pdf": return FileType.PDF;
         default: throw new Error("Parsing failed: Invalid type");
     }
 }

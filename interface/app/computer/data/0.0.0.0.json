@@ -1,0 +1,63 @@
+{
+    "name": "Home",
+    "files": [
+        {
+            "name": "Docs",
+            "files": [
+                {
+                    "name": "Hello world",
+                    "attributes": {
+                        "type": "txt",
+                        "path": "hello.txt"
+                    }
+                },
+                {
+                    "name": "Flower",
+                    "attributes": {
+                        "type": "img",
+                        "path": "coucou.png"
+                    }
+                },
+                {
+                    "name": "Lore",
+                    "attributes": {
+                        "type": "pdf",
+                        "path": "lore.pdf"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Bin",
+            "files": []
+        },
+        {
+            "name": "Sys",
+            "files": [
+                {
+                    "name": "Os",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "Themes",
+                    "files": [
+                        {
+                            "name": "light",
+                            "attributes": {
+                                "type": "thm"
+                            }
+                        },
+                        {
+                            "name": "dark",
+                            "attributes": {
+                                "type": "thm"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

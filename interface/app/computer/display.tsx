@@ -1,29 +1,25 @@
 "use client";
 
-import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react"
+import { JSX, useEffect, useState } from "react"
 import { type CpmFile, type Directory, FileType } from "../parser";
 
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
+import { DirectorySetter, Setter } from "./util";
+import { dir_action, file_action, return_action } from "./action";
 
-type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo";
+type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract";
 function icon(name: Icon) {
     return <span className="material-symbols-outlined">{name}</span>
 }
 
-type Setter<T> = Dispatch<SetStateAction<T>>;
-interface DirectorySetter {
-    path: string[],
-    path_setter: Setter<string[]>,
-    dir: Directory,
-    dir_setter: Setter<Directory>
-}
-
-export default function Display(args: {data: Directory}) {
-    const [path, path_setter] = useState(["0.0.0.0"]);
+export default function Display(args: {data: Directory, ip: string}) {
+    const [path, path_setter] = useState([args.ip]);
     const [dir, dir_setter] = useState(args.data);
     const setter: DirectorySetter = { path, path_setter, dir, dir_setter };
+
     const [themeEnabled, setThemeState] = useState(false);
+    const [loadedText, setText] = useState("");
 
     useEffect(()=>apply_default_theme(), []);
 
@@ -31,32 +27,29 @@ export default function Display(args: {data: Directory}) {
         <div id="nav">
             <div id="nav-inner">{path.join("/")}</div>
         </div>
-        <div id="files-container">
-            {render_dir(dir, setter)}
+        <div id="main-container">
+            {loadedText.length > 0 ? <p id="txt">{loadedText}</p> : render_dir(dir, setter, args.ip, setText)}
         </div>
-        <div id="theme">
-            <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0}}>
-                {THEMES}
-            </div>
+        <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0}}>
+            {THEMES}
+        </div>
+        <div id="buttons">
             <div id="theme-btn" onClick={()=>setThemeState(!themeEnabled)} className={themeEnabled ? "pressed" : ""}>
                 {icon("brush")}
             </div>
-        </div>
-        <div id="return" onClick={()=>{
-            if (!dir.parent) { return; }
-
-            setter.dir_setter(dir.parent);
-            setter.path.pop()
-            setter.path_setter(setter.path);
-        }} style={{opacity: dir.parent ? 1 : 0}}>
-            {icon("undo")}
+            <div>
+                {icon("captive_portal")}
+            </div>
+            <div id="return" onClick={()=>return_action(dir, setter, loadedText, setText)} style={{opacity: dir.parent ? 1 : 0}}>
+                {icon("undo")}
+            </div>
         </div>
     </div>;   
 }
 
-function render_dir(x: Directory, setter: DirectorySetter) {
+function render_dir(x: Directory, setter: DirectorySetter, ip: string, txt_setter: Setter<string>) {
     const dirs = x.directories.map((x,i)=>dir_elm(x,i,setter));
-    const files = x.files.map(file_elm);
+    const files = x.files.map((x,i)=>file_elm(x,i,ip,txt_setter));
 
     return <div id="files">
         {dirs}
@@ -65,18 +58,12 @@ function render_dir(x: Directory, setter: DirectorySetter) {
 }
 
 function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
-    return <div className="file" key={"d"+i} onClick={()=>{
-        const new_path = setter.path;
-        new_path.push(x.name);
-
-        setter.path_setter(new_path);
-        setter.dir_setter(x);
-    }}>
+    return <div className="file" key={"d"+i} onClick={()=>dir_action(x, setter)}>
         {icon("folder")}
         <p>{x.name}</p>
     </div>;
-} function file_elm(x: CpmFile, i: number) {
-    return <div className="file" key={"f"+i}>
+} function file_elm(x: CpmFile, i: number, ip:string, txt_setter: Setter<string>) {
+    return <div className="file" key={"f"+i} onClick={()=>file_action(x, ip, txt_setter)}>
         {file_icon(x.type)}
         <p>{x.name}</p>
     </div>
@@ -85,5 +72,7 @@ function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
         case FileType.TXT: return icon("text_snippet");
         case FileType.IMG: return icon("image");
         case FileType.SYS: return icon("settings");
+        case FileType.THM: return icon("brush");
+        case FileType.PDF: return icon("contract");
     }
 }

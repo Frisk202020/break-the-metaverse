@@ -1,10 +1,10 @@
 import { CpmFile, Directory, FileType } from "../parser";
-import { apply_theme } from "./theme";
+import { apply_theme, ThemeClass } from "./theme";
 import { DirectorySetter, Setter } from "./util";
 
-export function return_action(dir: Directory, setter: DirectorySetter, txt: string, txt_setter: Setter<string>) {
+export function return_action(dir: Directory, setter: DirectorySetter, txt: string[], txt_setter: Setter<string[]>) {
     if (txt.length > 0) {
-        txt_setter("");
+        txt_setter([]);
         return;
     }
 
@@ -23,10 +23,15 @@ export function dir_action(x: Directory, setter: DirectorySetter) {
     setter.dir_setter(x);
 }
 
-export function file_action(x: CpmFile, ip: string, txt_setter: Setter<string>) {
-    const path = `/${ip}/${x.path}`;
+export interface SharedActionArgs {
+    ip: string, 
+    txt_setter: Setter<string[]>, 
+    themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>
+}
+export function file_action(x: CpmFile, args: SharedActionArgs) {
+    const path = `/${args.ip}/${x.path}`;
     switch(x.type) {
-        case FileType.THM: return apply_theme(x.name);
+        case FileType.THM: return apply_theme(x.name, args.themes, args.setThemes);
         case FileType.TXT: 
             return fetch(path)
                 .then((res)=>{
@@ -35,21 +40,21 @@ export function file_action(x: CpmFile, ip: string, txt_setter: Setter<string>) 
                     }
                     return res.text();
                 })
-                .then((x)=>txt_setter(x));
+                .then((x)=>args.txt_setter(x.split("\n")));
         case FileType.IMG:
         case FileType.PDF:
             window.open(path);
     }
 }
 
-export function form_action(x: FormData, setIp: Setter<string>, txt_setter: Setter<string>, enabler: Setter<boolean>) {
+export function form_action(x: FormData, setIp: Setter<string>, txt_setter: Setter<string[]>, enabler: Setter<boolean>) {
     const ip = parse_ip(x);
     enabler(false);
 
     if (ip) {
         setIp(ip);
     } else {
-        txt_setter("Failed to connect: Invalid IP");
+        txt_setter(["Failed to connect: Invalid IP"]);
     }
 } function parse_ip(x: FormData): string | null {
     const segments = [];

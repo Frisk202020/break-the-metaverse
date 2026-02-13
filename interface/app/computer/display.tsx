@@ -6,9 +6,9 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
 import { DirectorySetter, Setter } from "./util";
-import { dir_action, file_action, form_action, return_action } from "./action";
+import { dir_action, file_action, form_action, return_action, SharedActionArgs } from "./action";
 
-type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract";
+type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract" | "planet";
 function icon(name: Icon) {
     return <span className="material-symbols-outlined">{name}</span>
 }
@@ -18,14 +18,17 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
     const [dir, dir_setter] = useState(args.data);
     const setter: DirectorySetter = { path, path_setter, dir, dir_setter };
 
-    const [themeEnabled, setThemeState] = useState(false);
+    const [themeEnabled, setThemeState] = useState(false); 
+    const [themes, setThemes] = useState(THEMES)
+    const themes_elm = Array.from(themes).map((x,i)=>x.getElm(i));
+
     const [formEnabled, setFormState] = useState(false);
-    const [loadedText, setText] = useState("");
+    const [loadedText, setText] = useState<string[]>([]);
 
     useEffect(()=>apply_default_theme(), []);
     useEffect(()=>{
         dir_setter(args.data);
-        setText("");
+        setText([]);
         path_setter([args.ip]);
     }, [args.data]);
 
@@ -34,12 +37,14 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <div id="nav-inner">{path.join("/")}</div>
         </div>
         <div id="main-container">
-            {loadedText.length > 0 ? <p id="txt">{loadedText}</p> : render_dir(dir, setter, args.ip, setText)}
+            {loadedText.length > 0 ? loadedText.map((x,i)=><p id="txt" key={"txt." + i}>{x}</p>) : render_dir(dir, setter, {
+                ip: args.ip, txt_setter: setText, themes, setThemes
+            })}
         </div>
-        <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0}}>
-            {THEMES}
+        <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0, pointerEvents: themeEnabled ? "auto" : "none"}}>
+            {themes_elm}
         </div>
-        <div id="connect" style={{opacity: formEnabled ? 1 : 0}}>
+        <div id="connect" style={{opacity: formEnabled ? 1 : 0, pointerEvents: formEnabled ? "auto" : "none"}}>
             <p>Connect to another computer</p>
             <form>
                 <div>
@@ -62,9 +67,9 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
     </div>;   
 }
 
-function render_dir(x: Directory, setter: DirectorySetter, ip: string, txt_setter: Setter<string>) {
+function render_dir(x: Directory, setter: DirectorySetter, args: SharedActionArgs) {
     const dirs = x.directories.map((x,i)=>dir_elm(x,i,setter));
-    const files = x.files.map((x,i)=>file_elm(x,i,ip,txt_setter));
+    const files = x.files.map((x,i)=>file_elm(x,i,args));
 
     return <div id="files">
         {dirs}
@@ -77,8 +82,8 @@ function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
         {icon("folder")}
         <p>{x.name}</p>
     </div>;
-} function file_elm(x: CpmFile, i: number, ip:string, txt_setter: Setter<string>) {
-    return <div className="file" key={"f"+i} onClick={()=>file_action(x, ip, txt_setter)}>
+} function file_elm(x: CpmFile, i:number, args: SharedActionArgs) {
+    return <div className="file" key={"f"+i} onClick={()=>file_action(x, args)}>
         {file_icon(x.type)}
         <p>{x.name}</p>
     </div>
@@ -89,5 +94,6 @@ function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
         case FileType.SYS: return icon("settings");
         case FileType.THM: return icon("brush");
         case FileType.PDF: return icon("contract");
+        case FileType.MT: return icon("planet");
     }
 }

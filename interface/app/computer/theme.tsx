@@ -1,7 +1,9 @@
+import { Setter } from "./util";
+
 interface Property {
     name: string, value: string
 } 
-
+export type ThemeClass = Theme;
 class Theme {
     #color: string;
     #properties: Property[];
@@ -32,21 +34,27 @@ class Theme {
     }
 }
 
+const LIGHT = new Theme("#faf4d4", "#2923d8", "#6964f8"); 
+const DARK = new Theme("#1b1a1a", "#0c7f0c", "#355935");
 const THEME_MAP = new Map([
-    ["light", new Theme("#faf4d4", "#2923d8", "#6964f8")],
-    ["dark", new Theme("#1b1a1a", "#0c7f0c", "#355935")]
+    ["light", LIGHT],
+    ["dark", DARK],
+    ["void", new Theme("#000000", "#ffffff", "#636363")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
 
-export const THEMES = Array.from(
-    THEME_MAP.values().map((x, i)=>x.getElm(i))
-);
+export const THEMES = new Set([LIGHT, DARK]);
 export function apply_default_theme() {
     DEFAULT.apply();
 }
-export function apply_theme(name: string) {
+export function apply_theme(name: string, themes: Set<Theme>, themes_setter: Setter<Set<Theme>>) {
     const t = THEME_MAP.get(name);
     if (t === undefined) { throw new Error("Invalid theme"); }
 
+    if (!themes.has(t)) {
+        const new_set = new Set(themes);
+        new_set.add(t);
+        themes_setter(new_set);
+    }
     t.apply();
 }

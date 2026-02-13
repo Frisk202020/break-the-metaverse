@@ -5,24 +5,17 @@
             "name": "Docs",
             "files": [
                 {
-                    "name": "Hello world",
+                    "name": "Reminder",
                     "attributes": {
                         "type": "txt",
-                        "path": "hello.txt"
+                        "path": "remind.md"
                     }
                 },
                 {
-                    "name": "Flower",
-                    "attributes": {
-                        "type": "img",
-                        "path": "coucou.png"
-                    }
-                },
-                {
-                    "name": "Lore",
+                    "name": "Flavie",
                     "attributes": {
                         "type": "pdf",
-                        "path": "lore.pdf"
+                        "path": "flavie.pdf"
                     }
                 }
             ]
@@ -35,7 +28,13 @@
             "name": "Sys",
             "files": [
                 {
-                    "name": "Os",
+                    "name": "os.config",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "boot.cfg",
                     "attributes": {
                         "type": "sys"
                     }

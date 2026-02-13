@@ -1,0 +1,55 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "docs",
+            "files": [
+                {
+                    "name": "readme",
+                    "attributes": {
+                        "type": "txt",
+                        "path": "readme.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "data",
+            "files": [
+                {
+                    "name": "metaverse",
+                    "attributes": {
+                        "type": "mt"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "bin",
+            "files": []
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os-cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "void",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -3,7 +3,8 @@ export enum FileType {
     IMG,
     SYS,
     THM,
-    PDF
+    PDF,
+    MT
 } function parse_type(x: any): FileType {
     switch(x) {
         case "txt": return FileType.TXT;
@@ -11,6 +12,7 @@ export enum FileType {
         case "sys": return FileType.SYS;
         case "thm": return FileType.THM;
         case "pdf": return FileType.PDF;
+        case "mt": return FileType.MT;
         default: throw new Error("Parsing failed: Invalid type");
     }
 }
@@ -31,7 +33,8 @@ export default function parser(data: any): Directory {
         throw new Error("Parsing failed: missing dir name");
     }
     if (!(data.files instanceof Array)) {
-        throw new Error("Parsing failed : not a directory");
+        console.log(data);
+        throw new Error("Parsing failed : not a directory - " + data.toString());
     }
 
     const files = Array<CpmFile>();

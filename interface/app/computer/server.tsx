@@ -4,7 +4,7 @@ import Computer from "./computer";
 
 const IPS = [
     "0.0.0.0",
-    "1.1.1.1"
+    "0.0.0.1"
 ];
 
 export default function Server() {

@@ -1,5 +1,5 @@
 /*
-https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=brush,captive_portal,contract,folder,image,settings,text_snippet,undo
+https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=brush,captive_portal,contract,folder,image,planet,settings,text_snippet,undo
 */
 
 :root {
@@ -12,7 +12,7 @@ https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FIL
   font-family: 'Material Symbols Outlined';
   font-style: normal;
   font-weight: 100 700;
-  src: url(https://fonts.gstatic.com/l/font?kit=kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsL7EbI5fGngqMogWKQ_htYOQ_jG3gKFxXl78aaY4Pk97G3-l7ep4QphxPUXioEN&skey=b8dc2088854b122f&v=v314) format('woff2');
+  src: url(https://fonts.gstatic.com/l/font?kit=kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsL7EbI5fGngqMogWKQ_htYOQ_jG3gKFxXl58aaY4PE97G2rwrvwhKyhlJMeH4FNtDE&skey=b8dc2088854b122f&v=v314) format('woff2');
 }
 
 .material-symbols-outlined {
@@ -35,6 +35,10 @@ https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FIL
   font-family: "main";
   font-style: normal;
   src: url(/font.otf);
+} @font-face {
+  font-family: "rich";
+  font-style: normal;
+  src: url(/text.ttf);
 }
 
 body {
@@ -137,6 +141,8 @@ body {
   word-wrap: break-word;
   text-align: center;
   margin: 5vh;
+  font-family: "rich";
+  font-size: 20px;
 }
 
 #connect {

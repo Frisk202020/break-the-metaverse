@@ -41,3 +41,23 @@ export function file_action(x: CpmFile, ip: string, txt_setter: Setter<string>) 
             window.open(path);
     }
 }
+
+export function form_action(x: FormData, setIp: Setter<string>, txt_setter: Setter<string>, enabler: Setter<boolean>) {
+    const ip = parse_ip(x);
+    enabler(false);
+
+    if (ip) {
+        setIp(ip);
+    } else {
+        txt_setter("Failed to connect: Invalid IP");
+    }
+} function parse_ip(x: FormData): string | null {
+    const segments = [];
+    for (const name of ["0", "1", "2", "3"]) {
+        const value = x.get(name);
+        if (!value) { return null; }
+        segments.push(value);
+    }
+
+    return segments.join(".");
+}

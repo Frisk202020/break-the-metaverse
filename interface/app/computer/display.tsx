@@ -6,22 +6,28 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
 import { DirectorySetter, Setter } from "./util";
-import { dir_action, file_action, return_action } from "./action";
+import { dir_action, file_action, form_action, return_action } from "./action";
 
 type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract";
 function icon(name: Icon) {
     return <span className="material-symbols-outlined">{name}</span>
 }
 
-export default function Display(args: {data: Directory, ip: string}) {
+export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>}) {
     const [path, path_setter] = useState([args.ip]);
     const [dir, dir_setter] = useState(args.data);
     const setter: DirectorySetter = { path, path_setter, dir, dir_setter };
 
     const [themeEnabled, setThemeState] = useState(false);
+    const [formEnabled, setFormState] = useState(false);
     const [loadedText, setText] = useState("");
 
     useEffect(()=>apply_default_theme(), []);
+    useEffect(()=>{
+        dir_setter(args.data);
+        setText("");
+        path_setter([args.ip]);
+    }, [args.data]);
 
     return <div id="main">
         <div id="nav">
@@ -33,11 +39,20 @@ export default function Display(args: {data: Directory, ip: string}) {
         <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0}}>
             {THEMES}
         </div>
+        <div id="connect" style={{opacity: formEnabled ? 1 : 0}}>
+            <p>Connect to another computer</p>
+            <form>
+                <div>
+                    {[0,1,2,3].map((x)=><input type="number" min="0" max="255" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
+                </div>
+                <input type="submit" formAction={(x)=>form_action(x, args.setIp, setText, setFormState)} value="Ok"></input>
+            </form>
+        </div>
         <div id="buttons">
-            <div id="theme-btn" onClick={()=>setThemeState(!themeEnabled)} className={themeEnabled ? "pressed" : ""}>
+            <div id="theme-btn" onClick={()=>{setThemeState(!themeEnabled); setFormState(false);}} className={themeEnabled ? "pressed" : ""}>
                 {icon("brush")}
             </div>
-            <div>
+            <div className={formEnabled ? "pressed" : ""} onClick={()=>{setThemeState(false); setFormState(!formEnabled);}}>
                 {icon("captive_portal")}
             </div>
             <div id="return" onClick={()=>return_action(dir, setter, loadedText, setText)} style={{opacity: dir.parent ? 1 : 0}}>

@@ -187,3 +187,20 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   cursor: pointer;
   background-color: var(--hover);
 }
+
+#meta-screen {
+  z-index: 2;
+  position: fixed;
+  top: 0; left: 0;
+  background-color: var(--background);
+  overflow-y: scroll;
+} #meta-screen > p {
+  margin: 5vh;
+  word-break: break-all;
+} #meta-screen > div {
+  position: absolute;
+  bottom: 0; right: 0;
+  z-index: 3;
+  border-left: solid var(--btn-border); border-top: solid var(--btn-border);
+  border-top-left-radius: 10px;
+}

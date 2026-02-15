@@ -6,7 +6,7 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
 import { DirectorySetter, Setter } from "./util";
-import { dir_action, file_action, form_action, return_action, SharedActionArgs } from "./action";
+import { dir_action, file_action, form_action, quit_metaverse, return_action, SharedActionArgs } from "./action";
 
 type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract" | "planet";
 function icon(name: Icon) {
@@ -25,7 +25,17 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
     const [formEnabled, setFormState] = useState(false);
     const [loadedText, setText] = useState<string[]>([]);
 
-    useEffect(()=>apply_default_theme(), []);
+    const [meta_txt, meta_setter] = useState("");
+    const metaScreenStyle = meta_txt.length > 0 ? 100 : 0;
+
+    useEffect(()=>{
+        apply_default_theme();
+        document.addEventListener("keydown", (event)=>{
+            if (event.key === "Escape") {
+                quit_metaverse();
+            }
+        });
+    }, []);
     useEffect(()=>{
         dir_setter(args.data);
         setText([]);
@@ -38,7 +48,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
         </div>
         <div id="main-container">
             {loadedText.length > 0 ? loadedText.map((x,i)=><p id="txt" key={"txt." + i}>{x}</p>) : render_dir(dir, setter, {
-                ip: args.ip, txt_setter: setText, themes, setThemes
+                ip: args.ip, txt_setter: setText, themes, setThemes, meta_setter
             })}
         </div>
         <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0, pointerEvents: themeEnabled ? "auto" : "none"}}>
@@ -63,6 +73,10 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <div id="return" onClick={()=>return_action(dir, setter, loadedText, setText)} style={{opacity: dir.parent ? 1 : 0}}>
                 {icon("undo")}
             </div>
+        </div>
+        <div id="meta-screen" style={{width: `${metaScreenStyle}vw`, height: `${metaScreenStyle}vh`, opacity: meta_txt.length > 0 ? 1 : 0}}>
+            <p>{meta_txt}</p>
+            <div onClick={()=>quit_metaverse()}>{icon("undo")}</div>
         </div>
     </div>;   
 }

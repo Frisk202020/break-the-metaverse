@@ -2,6 +2,10 @@ import { CpmFile, Directory, FileType } from "../parser";
 import { apply_theme, ThemeClass } from "./theme";
 import { DirectorySetter, Setter } from "./util";
 
+const DELAY = 10;
+let interrupt = false;
+export function quit_metaverse() { interrupt = true; }
+
 export function return_action(dir: Directory, setter: DirectorySetter, txt: string[], txt_setter: Setter<string[]>) {
     if (txt.length > 0) {
         txt_setter([]);
@@ -26,7 +30,8 @@ export function dir_action(x: Directory, setter: DirectorySetter) {
 export interface SharedActionArgs {
     ip: string, 
     txt_setter: Setter<string[]>, 
-    themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>
+    themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
+    meta_setter: Setter<string>
 }
 export function file_action(x: CpmFile, args: SharedActionArgs) {
     const path = `/${args.ip}/${x.path}`;
@@ -43,7 +48,24 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
                 .then((x)=>args.txt_setter(x.split("\n")));
         case FileType.IMG:
         case FileType.PDF:
-            window.open(path);
+            return window.open(path);
+        case FileType.MT:
+            return (async ()=>{
+                interrupt = false;
+
+                const elm = document.getElementById("meta-screen")!;
+                let txt = "0";
+                while(!interrupt) {
+                    if (elm.scrollHeight > elm.clientHeight) {
+                        txt = "0";
+                    }
+                    args.meta_setter(txt);
+                    await new Promise((r)=>setTimeout(r, DELAY));
+
+                    txt = txt + Math.round(Math.random()).toString();
+                }
+                args.meta_setter("");
+            })();
     }
 }
 

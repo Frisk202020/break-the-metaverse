@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "name": "os-cfg",
+                    "name": "os.cfg",
                     "attributes": {
                         "type": "sys"
                     }

@@ -43,7 +43,12 @@ const THEME_MAP = new Map([
     ["blood", new Theme("#bc1515", "#0e0664", "#d40202")],
     ["earth", new Theme("#6ac9f9", "#653e03", "#088b20")],
     ["gold", new Theme("#ffd700", "#b3b1b1", "#bf8970")],
-    ["strawberry", new Theme("hsl(0 100% 85%)", "hsl(106 100% 29%)", "hsl(51 100% 50%)")]
+    ["strawberry", new Theme("hsl(0 100% 85%)", "hsl(106 100% 29%)", "hsl(51 100% 50%)")],
+    ["green", new Theme("#85e485", "#036803", "#42a442")],
+    ["dracula", new Theme("#4d0520", "#a85016", "#360e5d")],
+    ["beach", new Theme("#fff67b", "#66ebef", "#fffbd5")],
+    ["love", new Theme("#f565bd","#b216b5","#ef5990")],
+    ["dusty", new Theme("#502e05", "#861010", "#8a670f")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
 

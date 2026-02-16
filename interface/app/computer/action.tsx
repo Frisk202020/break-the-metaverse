@@ -6,10 +6,16 @@ const DELAY = 10;
 let interrupt = false;
 export function quit_metaverse() { interrupt = true; }
 
-export function return_action(dir: Directory, setter: DirectorySetter, txt: string[], txt_setter: Setter<string[]>) {
+export function return_action(
+    dir: Directory, setter: DirectorySetter, 
+    txt: string[], txt_setter: Setter<string[]>, 
+    pending_file: CpmFile|null, pending_file_setter: Setter<CpmFile|null>
+) {
     if (txt.length > 0) {
         txt_setter([]);
         return;
+    } else if (pending_file) {
+        return pending_file_setter(null);
     }
 
     if (!dir.parent) { return; }
@@ -32,7 +38,8 @@ export interface SharedActionArgs {
     txt_setter: Setter<string[]>, 
     themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
     meta_setter: Setter<string>,
-    pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>
+    pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>,
+    hack: Setter<boolean>
 }
 export function file_action(x: CpmFile, args: SharedActionArgs) {
     if (!x.unlocked && x.attributes.key !== undefined) {
@@ -55,30 +62,37 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
         case FileType.PDF:
             return window.open(path);
         case FileType.MT:
-            return (async ()=>{
-                if (x.attributes.path.length > 0) {
-                    window.open(`/${args.ip}/${x.attributes.path}`);
-                }
-                interrupt = false;
-
-                const elm = document.getElementById("meta-screen")!;
-                let txt = "0";
-                while(!interrupt) {
-                    if (elm.scrollHeight > elm.clientHeight) {
-                        txt = "0";
-                    }
-                    args.meta_setter(txt);
-                    await new Promise((r)=>setTimeout(r, DELAY));
-
-                    txt = txt + Math.round(Math.random()).toString();
-                }
-                args.meta_setter("");
-            })();
+            return metaverse(x, args);
         case FileType.SYS:
+        case FileType.EXE:
             if (x.attributes.text.length > 0) {
                 args.txt_setter([x.attributes.text]);
             }
     }
+}
+
+async function metaverse(x:CpmFile, args: SharedActionArgs) {
+    if (x.hack) {
+        args.hack(true);
+    }
+
+    if (x.attributes.path.length > 0) {
+        window.open(`/${args.ip}/${x.attributes.path}`);
+    }
+    interrupt = false;
+
+    const elm = document.getElementById("meta-screen")!;
+    let txt = "0";
+    while(!interrupt) {
+        if (elm.scrollHeight > elm.clientHeight) {
+            txt = "0";
+        }
+        args.meta_setter(txt);
+        await new Promise((r)=>setTimeout(r, DELAY));
+
+        txt = txt + Math.round(Math.random()).toString();
+    }
+    args.meta_setter("");
 }
 
 export function form_action(x: FormData, setIp: Setter<string>, txt_setter: Setter<string[]>, enabler: Setter<boolean>) {

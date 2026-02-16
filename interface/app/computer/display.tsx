@@ -9,7 +9,7 @@ import { type DirectorySetter, icon, type Setter } from "./util";
 import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
 import Key from "./key";
 
-export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>}) {
+export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>, hack: Setter<boolean>}) {
     const [path, path_setter] = useState([args.ip]);
     const [dir, dir_setter] = useState(args.data);
     const setter: DirectorySetter = { path, path_setter, dir, dir_setter };
@@ -41,7 +41,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
         </div>
         <div id="main-container">
             {render_main(setter, loadedText, pending_file, {
-                ip: args.ip, txt_setter, themes, setThemes, meta_setter, pending_file, pending_file_setter
+                ip: args.ip, txt_setter, themes, setThemes, meta_setter, pending_file, pending_file_setter, hack: args.hack
             })}
         </div>
         <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0, pointerEvents: themeEnabled ? "auto" : "none"}}>
@@ -51,7 +51,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <p>Connect to another computer</p>
             <form>
                 <div>
-                    {[0,1,2,3].map((x)=><input type="number" min="0" max="255" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
+                    {[0,1,2,3].map((x)=><input type="number" min="0" max="999" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
                 </div>
                 <input type="submit" formAction={(x)=>form_action(x, args.setIp, txt_setter, setFormState)} value="Ok"></input>
             </form>
@@ -63,7 +63,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <div className={formEnabled ? "pressed" : ""} onClick={()=>{setThemeState(false); setFormState(!formEnabled);}}>
                 {icon("captive_portal")}
             </div>
-            <div id="return" onClick={()=>return_action(dir, setter, loadedText, txt_setter)} style={{opacity: dir.parent ? 1 : 0}}>
+            <div id="return" onClick={()=>return_action(dir, setter, loadedText, txt_setter, pending_file, pending_file_setter)} style={{opacity: dir.parent ? 1 : 0}}>
                 {icon("undo")}
             </div>
         </div>
@@ -112,5 +112,6 @@ function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
         case FileType.THM: return icon("brush");
         case FileType.PDF: return icon("contract");
         case FileType.MT: return icon("planet");
+        case FileType.EXE: return icon("code");
     }
 }

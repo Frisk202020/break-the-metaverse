@@ -1,4 +1,4 @@
-import { Setter } from "./util";
+import type { Setter } from "./util";
 
 interface Property {
     name: string, value: string
@@ -39,7 +39,11 @@ const DARK = new Theme("#1b1a1a", "#0c7f0c", "#355935");
 const THEME_MAP = new Map([
     ["light", LIGHT],
     ["dark", DARK],
-    ["void", new Theme("#000000", "#ffffff", "#636363")]
+    ["void", new Theme("#000000", "#ffffff", "#636363")],
+    ["blood", new Theme("#bc1515", "#0e0664", "#d40202")],
+    ["earth", new Theme("#6ac9f9", "#653e03", "#088b20")],
+    ["gold", new Theme("#ffd700", "#b3b1b1", "#bf8970")],
+    ["strawberry", new Theme("hsl(0 100% 85%)", "hsl(106 100% 29%)", "hsl(51 100% 50%)")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
 

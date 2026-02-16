@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Occoululus Trial</title>
+    </head>
+    <body>
+        <div id="main"></div>
+        <div id="bg"></div>
+    </body>
+    <style>
+        @keyframes fade {
+            to { opacity: 0; }
+        } @keyframes appear {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        #main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+            z-index: 2;
+        } #bg {
+            background-image: url("./bg.jpg");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+        } #main, #bg {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+        }
+
+        .chest {
+            margin: 50px;
+        } .chest > img {
+            height: 150px;
+        } .chest > p {
+            font-size: 30px;
+            text-align: center;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .appear {
+            animation: appear 3s forwards;
+        } .fade {
+            animation: fade 3s forwards;
+        }
+    </style>
+    <script>  
+        const CLOSED = "./close.png"; const OPEN = "./open.png";
+        const KEY = "five_trials";
+        const ANIM_T = 3000;
+
+        const container = document.getElementById("main");
+        const data = Array(); 
+        let rank = 1;
+
+        function set_open(elm, img) {
+            img.src = OPEN;
+            elm.style.cursor = "";
+        } function set_close(elm, img) {
+            img.src = CLOSED;
+            elm.style.cursor = "pointer";
+        }
+
+        function handler(elmData) {
+            if (rank === elmData.rank) {
+                rank++;
+                set_open(elmData.elm, elmData.img);
+                if (rank === 11) {
+                    return finalize();
+                }
+            } else {
+                for (let i = 0; i < rank-1; i++) {
+                    set_close(data[i].elm, data[i].img);
+                }
+                rank = 1;
+            }
+        } function finalize() {
+            data.forEach((x)=>{
+                x.elm.classList.add("fade");
+            });
+            new Promise((r)=>setTimeout(r, ANIM_T)).then(()=>{
+                data.forEach((x)=>{
+                    container.removeChild(x.elm);
+                });
+
+                const p = document.createElement("p");
+                p.textContent = KEY;
+                p.className = "appear";
+                container.appendChild(p);
+            });
+        }
+
+        function main() {
+            [
+                [1,1],[2,2],[3,3],[26,5],[70,4],
+                [81,6],[99,7],[103,9],[141,8],[945,10]
+            ].forEach((x)=>{
+                const elm = document.createElement("div");
+                const img = document.createElement("img");
+                const p = document.createElement("p");
+
+                elm.className = "chest";
+                set_close(elm, img);
+                p.textContent = x[0];
+
+                elm.appendChild(img); elm.appendChild(p);
+                container.appendChild(elm);
+                const elmData = {
+                    elm,
+                    img,
+                    rank: x[1],
+                }
+
+                elm.onclick = ()=>handler(elmData);
+                data.push(elmData);   
+            });
+        }
+        main();
+    </script>
+</html>

@@ -1,11 +1,9 @@
-import { readFileSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import parser from "../parser";
 import Computer from "./computer";
 
-const IPS = [
-    "0.0.0.0",
-    "0.0.0.1"
-];
+const IPS = readdirSync("app/computer/data")
+    .map((x)=>x.split(".json")[0]);
 
 export default function Server() {
     const data = new Map(

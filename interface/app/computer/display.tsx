@@ -5,13 +5,9 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
-import { DirectorySetter, Setter } from "./util";
-import { dir_action, file_action, form_action, quit_metaverse, return_action, SharedActionArgs } from "./action";
-
-type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract" | "planet";
-function icon(name: Icon) {
-    return <span className="material-symbols-outlined">{name}</span>
-}
+import { type DirectorySetter, icon, type Setter } from "./util";
+import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
+import Key from "./key";
 
 export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>}) {
     const [path, path_setter] = useState([args.ip]);
@@ -23,22 +19,19 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
     const themes_elm = Array.from(themes).map((x,i)=>x.getElm(i));
 
     const [formEnabled, setFormState] = useState(false);
-    const [loadedText, setText] = useState<string[]>([]);
+    const [loadedText, txt_setter] = useState<string[]>([]);
 
     const [meta_txt, meta_setter] = useState("");
     const metaScreenStyle = meta_txt.length > 0 ? 100 : 0;
 
+    const [pending_file, pending_file_setter] = useState<CpmFile | null>(null);
+
     useEffect(()=>{
         apply_default_theme();
-        document.addEventListener("keydown", (event)=>{
-            if (event.key === "Escape") {
-                quit_metaverse();
-            }
-        });
     }, []);
     useEffect(()=>{
         dir_setter(args.data);
-        setText([]);
+        txt_setter([]);
         path_setter([args.ip]);
     }, [args.data]);
 
@@ -47,8 +40,8 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <div id="nav-inner">{path.join("/")}</div>
         </div>
         <div id="main-container">
-            {loadedText.length > 0 ? loadedText.map((x,i)=><p id="txt" key={"txt." + i}>{x}</p>) : render_dir(dir, setter, {
-                ip: args.ip, txt_setter: setText, themes, setThemes, meta_setter
+            {render_main(setter, loadedText, pending_file, {
+                ip: args.ip, txt_setter, themes, setThemes, meta_setter, pending_file, pending_file_setter
             })}
         </div>
         <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0, pointerEvents: themeEnabled ? "auto" : "none"}}>
@@ -60,7 +53,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
                 <div>
                     {[0,1,2,3].map((x)=><input type="number" min="0" max="255" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
                 </div>
-                <input type="submit" formAction={(x)=>form_action(x, args.setIp, setText, setFormState)} value="Ok"></input>
+                <input type="submit" formAction={(x)=>form_action(x, args.setIp, txt_setter, setFormState)} value="Ok"></input>
             </form>
         </div>
         <div id="buttons">
@@ -70,7 +63,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
             <div className={formEnabled ? "pressed" : ""} onClick={()=>{setThemeState(false); setFormState(!formEnabled);}}>
                 {icon("captive_portal")}
             </div>
-            <div id="return" onClick={()=>return_action(dir, setter, loadedText, setText)} style={{opacity: dir.parent ? 1 : 0}}>
+            <div id="return" onClick={()=>return_action(dir, setter, loadedText, txt_setter)} style={{opacity: dir.parent ? 1 : 0}}>
                 {icon("undo")}
             </div>
         </div>
@@ -81,9 +74,19 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
     </div>;   
 }
 
-function render_dir(x: Directory, setter: DirectorySetter, args: SharedActionArgs) {
-    const dirs = x.directories.map((x,i)=>dir_elm(x,i,setter));
-    const files = x.files.map((x,i)=>file_elm(x,i,args));
+function render_main(dir_setter: DirectorySetter, loadedText: string[], pending_file: CpmFile | null, args: SharedActionArgs) {
+    if (loadedText.length > 0) {
+        return loadedText.map((x,i)=><p id="txt" key={"txt." + i}>{x}</p>);
+    } else if (pending_file) {
+        return <Key solution={pending_file.attributes.key} shared_args={args}></Key>
+    } else {
+        return render_dir(dir_setter, args);
+    }
+}
+
+function render_dir(setter: DirectorySetter, args: SharedActionArgs) {
+    const dirs = setter.dir.directories.map((x,i)=>dir_elm(x,i,setter));
+    const files = setter.dir.files.map((x,i)=>file_elm(x,i,args));
 
     return <div id="files">
         {dirs}

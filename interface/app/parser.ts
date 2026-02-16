@@ -17,10 +17,15 @@ export enum FileType {
     }
 }
 
-export interface CpmFile {
+interface Attributes {
+    path: string,
+    key: string,
+    text: string
+} export interface CpmFile {
     name: string,
     type: FileType,
-    path: string
+    unlocked: boolean,
+    attributes: Attributes
 } export interface Directory {
     name: string,
     files: CpmFile[],
@@ -28,6 +33,9 @@ export interface CpmFile {
     parent: Directory | null
 }
 
+function unwrap_or_default(x?: string): string {
+    return x === undefined ? "" : x;
+}
 export default function parser(data: any): Directory {
     if (data.name === undefined) {
         throw new Error("Parsing failed: missing dir name");
@@ -45,7 +53,12 @@ export default function parser(data: any): Directory {
             files.push(
                 {
                     name: x.name, type: parse_type(x.attributes.type),
-                    path: x.attributes.path === undefined ? null : x.attributes.path
+                    unlocked: x.attributes.key === undefined,
+                    attributes: {
+                        path: unwrap_or_default(x.attributes.path),
+                        key: unwrap_or_default(x.attributes.key),
+                        text: unwrap_or_default(x.attributes.text) 
+                    }
                 }
             );
         } else {

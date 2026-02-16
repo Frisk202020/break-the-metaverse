@@ -1,6 +1,6 @@
-import { CpmFile, Directory, FileType } from "../parser";
-import { apply_theme, ThemeClass } from "./theme";
-import { DirectorySetter, Setter } from "./util";
+import { type CpmFile, type Directory, FileType } from "../parser";
+import { apply_theme, type ThemeClass } from "./theme";
+import type { DirectorySetter, Setter } from "./util";
 
 const DELAY = 10;
 let interrupt = false;
@@ -31,10 +31,15 @@ export interface SharedActionArgs {
     ip: string, 
     txt_setter: Setter<string[]>, 
     themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
-    meta_setter: Setter<string>
+    meta_setter: Setter<string>,
+    pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>
 }
 export function file_action(x: CpmFile, args: SharedActionArgs) {
-    const path = `/${args.ip}/${x.path}`;
+    if (!x.unlocked && x.attributes.key !== undefined) {
+        return args.pending_file_setter(x);
+    }
+
+    const path = `/${args.ip}/${x.attributes.path}`;
     switch(x.type) {
         case FileType.THM: return apply_theme(x.name, args.themes, args.setThemes);
         case FileType.TXT: 
@@ -51,6 +56,9 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
             return window.open(path);
         case FileType.MT:
             return (async ()=>{
+                if (x.attributes.path.length > 0) {
+                    window.open(`/${args.ip}/${x.attributes.path}`);
+                }
                 interrupt = false;
 
                 const elm = document.getElementById("meta-screen")!;
@@ -66,6 +74,10 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
                 }
                 args.meta_setter("");
             })();
+        case FileType.SYS:
+            if (x.attributes.text.length > 0) {
+                args.txt_setter([x.attributes.text]);
+            }
     }
 }
 

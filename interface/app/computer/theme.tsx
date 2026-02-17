@@ -6,12 +6,13 @@ interface Property {
 export type ThemeClass = Theme;
 class Theme {
     #color: string;
+    #border: string;
     #properties: Property[];
 
     constructor(
         background: string, icon: string, hover:string
     ) {
-        this.#color = background;
+        this.#color = background; this.#border = icon;
         this.#properties = [
             {name: "--background", value: background},
             {name: "--color", value: icon},
@@ -22,7 +23,7 @@ class Theme {
         return <button 
             className="theme-icon" 
             onClick={()=>this.apply()}
-            style={{backgroundColor: this.#color}}
+            style={{backgroundColor: this.#color, borderColor: this.#border}}
             key={"theme"+id}
         ></button>
     }
@@ -48,11 +49,14 @@ const THEME_MAP = new Map([
     ["dracula", new Theme("#4d0520", "#a85016", "#360e5d")],
     ["beach", new Theme("#fff67b", "#66ebef", "#fffbd5")],
     ["love", new Theme("#f565bd","#b216b5","#ef5990")],
-    ["dusty", new Theme("#502e05", "#861010", "#8a670f")]
+    ["dusty", new Theme("#502e05", "#861010", "#8a670f")],
+    ["shades", new Theme("#9f9f9f","#4b4a4a","#8f8f8f")],
+    ["white", new Theme("#ffffff","#ffffff","#ffffff")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
 
-export const THEMES = new Set([LIGHT, DARK]);
+//export const THEMES = new Set([LIGHT, DARK]);
+export const THEMES = new Set(THEME_MAP.values())
 export function apply_default_theme() {
     DEFAULT.apply();
 }

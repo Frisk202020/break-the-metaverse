@@ -5,7 +5,8 @@ export enum FileType {
     THM,
     PDF,
     MT,
-    EXE
+    EXE,
+    WEB,
 } function parse_type(x: any): FileType {
     switch(x) {
         case "txt": return FileType.TXT;
@@ -15,6 +16,7 @@ export enum FileType {
         case "pdf": return FileType.PDF;
         case "mt": return FileType.MT;
         case "exe": return FileType.EXE;
+        case "web": return FileType.WEB;
         default: throw new Error("Parsing failed: Invalid type");
     }
 }

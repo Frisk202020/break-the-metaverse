@@ -4,7 +4,7 @@ import { Directory, hacked_dir } from "../parser";
 import Display from "./display";
 import { HOME_IP } from "./util";
 
-const DEV_DEFAULT = "322.702.44.681";
+const DEV_DEFAULT = "341.721.107.2";
 const HACKED = hacked_dir();
 
 export default function Computer(args: {data: Map<string, Directory>}) {

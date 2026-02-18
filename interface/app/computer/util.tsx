@@ -11,7 +11,7 @@ export interface DirectorySetter {
     dir_setter: Setter<Directory>
 }
 
-type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract" | "planet" | "key_vertical" | "code";
+type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" | "captive_portal" | "contract" | "planet" | "key_vertical" | "code" | "globe";
 export function icon(name: Icon) {
     return <span className="material-symbols-outlined">{name}</span>
 }

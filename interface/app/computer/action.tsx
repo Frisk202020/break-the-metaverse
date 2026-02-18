@@ -60,6 +60,7 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
                 .then((x)=>args.txt_setter(x.split("\n")));
         case FileType.IMG:
         case FileType.PDF:
+        case FileType.WEB:
             return window.open(path);
         case FileType.MT:
             return metaverse(x, args);

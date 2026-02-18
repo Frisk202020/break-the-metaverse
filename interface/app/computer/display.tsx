@@ -113,5 +113,6 @@ function dir_elm(x: Directory, i: number, setter: DirectorySetter) {
         case FileType.PDF: return icon("contract");
         case FileType.MT: return icon("planet");
         case FileType.EXE: return icon("code");
+        case FileType.WEB: return icon("globe");
     }
 }

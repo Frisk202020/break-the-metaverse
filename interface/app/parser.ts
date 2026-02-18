@@ -114,3 +114,21 @@ export function hacked_dir() {
 
     return dir;
 }
+
+export function hope_dir(): Directory {
+    return {
+        name: "h0pe",
+        files: [{
+            name: "h0pe",
+            type: FileType.WEB,
+            unlocked: true,
+            hack: false,
+            attributes: {
+                path: "index.html",
+                key: "", text: ""
+            }
+        }],
+        directories: [],
+        parent: null
+    }
+}

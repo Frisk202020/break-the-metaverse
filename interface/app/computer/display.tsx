@@ -5,11 +5,11 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 
 import "./style.css";
 import {apply_default_theme, THEMES} from "./theme";
-import { type DirectorySetter, icon, type Setter } from "./util";
+import { type DirectorySetter, icon, Sequence, type Setter } from "./util";
 import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
 import Key from "./key";
 
-export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>, hack: Setter<boolean>}) {
+export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>, set_sequence: Setter<Sequence>}) {
     const [path, path_setter] = useState([args.ip]);
     const [dir, dir_setter] = useState(args.data);
     const setter: DirectorySetter = { path, path_setter, dir, dir_setter };
@@ -33,6 +33,9 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
         dir_setter(args.data);
         txt_setter([]);
         path_setter([args.ip]);
+        if (args.data.name === "hope") {
+            args.set_sequence(Sequence.Hope);
+        }
     }, [args.data]);
 
     return <div id="main">
@@ -41,7 +44,7 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
         </div>
         <div id="main-container">
             {render_main(setter, loadedText, pending_file, {
-                ip: args.ip, txt_setter, themes, setThemes, meta_setter, pending_file, pending_file_setter, hack: args.hack
+                ip: args.ip, txt_setter, themes, setThemes, meta_setter, pending_file, pending_file_setter, set_sequence: args.set_sequence
             })}
         </div>
         <div id="theme-selector" style={{opacity: themeEnabled ? 1 : 0, pointerEvents: themeEnabled ? "auto" : "none"}}>

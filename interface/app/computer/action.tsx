@@ -1,6 +1,6 @@
 import { type CpmFile, type Directory, FileType } from "../parser";
 import { apply_theme, type ThemeClass } from "./theme";
-import type { DirectorySetter, Setter } from "./util";
+import { DirectorySetter, Sequence, Setter } from "./util";
 
 const DELAY = 10;
 let interrupt = false;
@@ -39,7 +39,7 @@ export interface SharedActionArgs {
     themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
     meta_setter: Setter<string>,
     pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>,
-    hack: Setter<boolean>
+    set_sequence: Setter<Sequence>
 }
 export function file_action(x: CpmFile, args: SharedActionArgs) {
     if (!x.unlocked && x.attributes.key !== undefined) {
@@ -74,7 +74,7 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
 
 async function metaverse(x:CpmFile, args: SharedActionArgs) {
     if (x.hack) {
-        args.hack(true);
+        args.set_sequence(Sequence.Hack);
     }
 
     if (x.attributes.path.length > 0) {

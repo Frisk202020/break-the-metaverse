@@ -59,12 +59,12 @@ const THEME_MAP = new Map([
     ["dusty", new Theme("#502e05", "#2e1a01", "#861010", "#8a670f")],
     ["shades", new Theme("#9f9f9f", "#797979", "#4b4a4a","#8f8f8f", "#2b2a2a")],
     ["white", new Theme("#ffffff", "#ffffff", "#ffffff","#ffffff")],
-    ["neon", new Theme("#d011aac9", "#9a0fdfc9", "#1029cf", "#8316ae", "#eab429")]
+    ["neon", new Theme("#d011aac9", "#9a0fdfc9", "#1029cf", "#8316ae", "#eab429")],
+    ["none", new Theme("transparent", "transparent", "transparent", "transparent")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
 
-//export const THEMES = new Set([LIGHT, DARK]);
-export const THEMES = new Set(THEME_MAP.values())
+export const THEMES = new Set([LIGHT, DARK]);
 export function apply_default_theme() {
     DEFAULT.apply();
 }

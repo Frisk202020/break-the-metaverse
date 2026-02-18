@@ -15,3 +15,9 @@ type Icon = "folder" | "text_snippet" | "settings" | "image" | "brush" | "undo" 
 export function icon(name: Icon) {
     return <span className="material-symbols-outlined">{name}</span>
 }
+
+export enum Sequence {
+    Default,
+    Hope,
+    Hack
+}

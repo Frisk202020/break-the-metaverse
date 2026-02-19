@@ -4,10 +4,11 @@ import { CSSProperties, JSX, useEffect, useState } from "react"
 import { type CpmFile, type Directory, FileType } from "../parser";
 
 import "./style.css";
-import {apply_default_theme, THEMES} from "./theme";
-import { type DirectoryParams, DisplayText, type Icon, icon, NavState, Sequence, type Setter } from "./util";
+import {apply_default_theme, load_themes} from "./theme";
+import { type DirectoryParams, type DisplayText, type Icon, icon, NavState, SaveData, Sequence, type Setter } from "./util";
 import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
 import Key from "./key";
+import { clear_save, save_ip, save_sequence } from "./server_actions";
 
 function hidden_box_style(state: NavState, expected_state: NavState): CSSProperties {
     return state === expected_state ? {
@@ -30,26 +31,67 @@ interface BtnParams {
     </div>
 }
 
-export default function Display(args: {data: Directory, ip: string, setIp: Setter<string>, set_sequence: Setter<Sequence>}) {
+enum Arrows {
+    Up ="ArrowUp",
+    Down = "ArrowDown",
+    Left = "ArrowLeft",
+    Right = "ArrowRight"
+} 
+const spell = [Arrows.Up, Arrows.Left, Arrows.Up, Arrows.Right, Arrows.Down, Arrows.Right];
+const event = (event: KeyboardEvent)=>{
+    if (event.key === spell[spell_index]) {
+        spell_index++;
+        if (spell_index === spell.length) {
+            clear_save();
+            spell_index = 0;
+        }
+    } else {
+        spell_index = 0;
+    }
+}
+let spell_index = 0;
+
+function connect_handler(ip: string, set_ip: Setter<string>, set_state: Setter<NavState>) {
+    set_state(NavState.None);
+    set_ip(ip);
+}
+
+function visited_ip_btn(x: string, i: number, set_ip: Setter<string>, set_nav: Setter<NavState>) {
+    return <button
+        onClick={()=>connect_handler(x, set_ip, set_nav)}
+        key={"visited_ip"+i}
+    >{x}</button>
+}
+
+export default function Display(args: {data: Directory, save_data: SaveData, ip: string, setIp: Setter<string>, set_sequence: Setter<Sequence>}) {
     const [dir_params, dir_setter] = useState<DirectoryParams>({relative_path: [args.ip], dir: args.data});
     const [nav_state, set_nav_state] = useState(NavState.None);
 
-    const [themes, setThemes] = useState(THEMES)
+    const [themes, setThemes] = useState(load_themes(args.save_data.themes))
     const themes_elm = Array.from(themes).map((x,i)=>x.getElm(i));
 
     const [txt, set_txt] = useState<DisplayText>({is_meta: false, content: []})
     const metaScreenStyle = txt.is_meta ? 100 : 0;
 
     const [pending_file, pending_file_setter] = useState<CpmFile | null>(null);
+    const visited_ips_elm = Array.from(args.save_data.ips).map((x,i)=>visited_ip_btn(x,i,args.setIp,set_nav_state));
 
     useEffect(()=>{
         apply_default_theme();
+        document.addEventListener("keydown", event);
     }, []);
     useEffect(()=>{
         dir_setter({dir: args.data, relative_path: [args.ip]});
         set_txt({is_meta: false, content: []});
         if (args.data.name === "hope") {
             args.set_sequence(Sequence.Hope);
+            save_sequence(Sequence.Hope);
+        }
+
+        if (!args.save_data.ips.has(args.ip)) {
+            args.save_data.ips.add(args.ip);
+            visited_ips_elm.push(visited_ip_btn(args.ip,visited_ips_elm.length,args.setIp,set_nav_state));
+            save_ip(args.ip);
         }
     }, [args.data]);
 
@@ -67,12 +109,23 @@ export default function Display(args: {data: Directory, ip: string, setIp: Sette
         </div>
         <div id="connect" style={hidden_box_style(nav_state, NavState.Form)}>
             <p>Connect to another computer</p>
-            <form>
+            <div>
                 <div>
-                    {[0,1,2,3].map((x)=><input type="number" min="0" max="999" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
+                    <p>Query a new computer</p>
+                    <form>
+                        <div>
+                            {[0,1,2,3].map((x)=><input type="number" min="0" max="999" key={x} name={x.toString()} step={1} defaultValue="0" required={true}></input>)}  
+                        </div>
+                        <input type="submit" formAction={(x)=>form_action(x, args.setIp, set_txt, set_nav_state)} value="Ok"></input>
+                    </form>
                 </div>
-                <input type="submit" formAction={(x)=>form_action(x, args.setIp, set_txt, set_nav_state)} value="Ok"></input>
-            </form>
+                <div>
+                    <p>Visit a known address</p>
+                    <div id="visited">
+                        {visited_ips_elm}
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="buttons">
             {btn_elm(nav_state, NavState.Thm, set_nav_state, "brush", "theme-btn")}

@@ -1,16 +1,19 @@
 import { readdirSync, readFileSync } from "fs";
 import parser from "../parser";
 import Computer from "./computer";
+import { load } from "./server_actions";
 
-const IPS = readdirSync("app/computer/data")
+const ROOT = "app/computer/data/computers";
+const IPS = readdirSync(ROOT)
     .map((x)=>x.split(".json")[0]);
 
-export default function Server() {
+export default async function Server() {
+    const save_data = await load(); 
     const data = new Map(
         IPS.map((x)=>[
             x,
-            parser(JSON.parse(readFileSync(`app/computer/data/${x}.json`, "utf-8")))
+            parser(JSON.parse(readFileSync(`${ROOT}/${x}.json`, "utf-8")))
         ])
     )
-    return <Computer data={data}></Computer>
+    return <Computer data={data} save_data={save_data}></Computer>
 }

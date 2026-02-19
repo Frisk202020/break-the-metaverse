@@ -1,4 +1,5 @@
-import type { Setter } from "./util";
+import { save_theme } from "./server_actions";
+import { DEFAULT_SAVE, type Setter } from "./util";
 
 interface Property {
     name: string, value: string
@@ -63,8 +64,8 @@ const THEME_MAP = new Map([
     ["none", new Theme("transparent", "transparent", "transparent", "transparent")]
 ]);
 const DEFAULT = THEME_MAP.get("light")!;
+const DEFAULT_SAVED_THEMES = new Set(Array.from(DEFAULT_SAVE.themes).map((x)=>THEME_MAP.get(x)!));
 
-export const THEMES = new Set([LIGHT, DARK]);
 export function apply_default_theme() {
     DEFAULT.apply();
 }
@@ -76,6 +77,19 @@ export function apply_theme(name: string, themes: Set<Theme>, themes_setter: Set
         const new_set = new Set(themes);
         new_set.add(t);
         themes_setter(new_set);
+        save_theme(name);
     }
     t.apply();
+} export function load_themes(data: Set<string>) {
+    const themes = [];
+    for (const x of data) {
+        const val = THEME_MAP.get(x);
+        if (val === undefined) {
+            console.log("Invalid themes file");
+            return DEFAULT_SAVED_THEMES;
+        }
+        themes.push(val);
+    }
+
+    return new Set(themes);
 }

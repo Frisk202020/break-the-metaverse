@@ -1,4 +1,5 @@
 import { type CpmFile, type Directory, FileType } from "../parser";
+import { save_sequence } from "./server_actions";
 import { apply_theme, type ThemeClass } from "./theme";
 import { DirectoryParams, DisplayText, NavState, Sequence, Setter } from "./util";
 
@@ -72,6 +73,7 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
 async function metaverse(x:CpmFile, args: SharedActionArgs) {
     if (x.hack) {
         args.set_sequence(Sequence.Hack);
+        save_sequence(Sequence.Hack)
     }
 
     if (x.attributes.path.length > 0) {
@@ -102,7 +104,9 @@ export function form_action(x: FormData, setIp: Setter<string>, txt_setter: Sett
     } else {
         txt_setter({is_meta: false, content: ["Failed to connect: Invalid IP"]});
     }
-} function parse_ip(x: FormData): string | null {
+} 
+
+function parse_ip(x: FormData): string | null {
     const segments = [];
     for (const name of ["0", "1", "2", "3"]) {
         const value = x.get(name);

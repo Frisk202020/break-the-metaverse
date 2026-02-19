@@ -24,3 +24,13 @@ export enum Sequence {
 } export enum NavState {
     None, Thm, Form
 }
+
+export interface SaveData {
+    themes: Set<string>,
+    ips: Set<string>,
+    sequence: Sequence
+} export const DEFAULT_SAVE: SaveData = {
+    themes: new Set(["light", "dark"]),
+    ips: new Set(["0.0.0.0"]),
+    sequence: Sequence.Default   
+}

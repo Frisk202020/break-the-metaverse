@@ -202,7 +202,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   z-index: 2;
   position: fixed;
   top: 0; left: 0;
-  background-color: var(--background);
+  background-image: linear-gradient(var(--background), var(--background-minor) 90%);
   overflow-y: scroll;
 } #meta-screen > p {
   margin: 5vh;

@@ -1,0 +1,45 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "doc",
+            "files": []
+        },
+        {
+            "name": "bin",
+            "files": []
+        },
+        {
+            "name": "data",
+            "files": [{
+                "name": "meta",
+                "attributes": {
+                    "type": "mt"
+                }
+            }]
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "love",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

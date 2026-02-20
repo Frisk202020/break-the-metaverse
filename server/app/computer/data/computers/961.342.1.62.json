@@ -1,0 +1,35 @@
+{
+    "name":"",
+    "files":[
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "door",
+                    "attributes": {
+                        "type": "sys",
+                        "text": "Opened door !"
+                    }
+                },
+                {
+                    "name": "none",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

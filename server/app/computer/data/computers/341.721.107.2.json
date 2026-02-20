@@ -1,0 +1,76 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "doc",
+            "files": [
+                {
+                    "name": "notes",
+                    "attributes": {
+                        "type": "txt",
+                        "path": "notes.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "bin",
+            "files": []
+        },
+        {
+            "name": "log",
+            "files": []
+        },
+        {
+            "name": "data",
+            "files": [
+                {
+                    "name": "room",
+                    "attributes": {
+                        "type": "mt"
+                    }
+                }, {
+                    "name": "Clovernet",
+                    "files": [
+                        {
+                            "name": "app",
+                            "attributes": {
+                                "type": "sys"
+                            }
+                        },
+                        {
+                            "name": "Clovernet",
+                            "attributes": {
+                                "type": "web",
+                                "path": "clovernet/index.html"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "neon",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,9 +1,0 @@
-102.566.765.730$d
->doc$d
->bin$d
->data$d
->>meta.mt
->sys$d
->>bootcfg.dll
->>netcfgx.dll
->>os-config.sys

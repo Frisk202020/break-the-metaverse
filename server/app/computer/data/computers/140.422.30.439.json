@@ -1,0 +1,54 @@
+{
+    "name": "hope",
+    "files": [
+        {
+            "name": "doc",
+            "files": [
+                {
+                    "name": "key",
+                    "attributes": {
+                        "type": "mt",
+                        "path": "index.html",
+                        "sequence": 2
+                    }
+                }
+            ]
+        },
+        {
+            "name": "bin",
+            "files": [
+                {
+                    "name": "key",
+                    "attributes": {
+                        "type": "sys",
+                        "key": "five.trials",
+                        "text": "Unlocked INFINITE HOME keys !"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "strawberry",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

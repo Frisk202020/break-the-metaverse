@@ -1,0 +1,72 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "doc",
+            "files": [
+                {
+                    "name": "estelle workspace",
+                    "files":[]
+                }, {
+                    "name": "hank workspace",
+                    "files": [
+                        {
+                            "name": "hitchmann only",
+                            "files": [
+                                {
+                                    "name": "Im serious dont go there",
+                                    "files": [
+                                        {
+                                            "name": "nothing",
+                                            "attributes": {
+                                                "type": "txt",
+                                                "path": "password.txt"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "bin",
+            "files": []
+        },
+        {
+            "name": "data",
+            "files": [{
+                "name": "metaverse",
+                "attributes": {
+                    "type": "mt",
+                    "key": "clover.dont.kill.us"
+                }
+            }]
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "beach",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

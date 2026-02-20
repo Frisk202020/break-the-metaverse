@@ -1,0 +1,46 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "doc",
+            "files": []
+        },
+        {
+            "name": "bin",
+            "files": []
+        },
+        {
+            "name": "data",
+            "files": [{
+                "name": "trial",
+                "attributes": {
+                    "type": "mt",
+                    "path": "index.html"
+                }
+            }]
+        },
+        {
+            "name": "sys",
+            "files": [
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "os.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "white",
+                    "attributes": {
+                        "type": "thm"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,11 +1,12 @@
 "use client"
 import { useState } from "react";
-import { Directory, hacked_dir, hope_dir } from "../parser";
+import { Directory, hacked_dir, hope_dir, map_dir } from "../parser";
 import Display from "./display";
 import { HOME_IP, SaveData, Sequence } from "./util";
 
 const HOPE = hope_dir();
 const HACKED = hacked_dir();
+const MAP = map_dir();
 
 export default function Computer(args: {data: Map<string, Directory>, save_data: SaveData}) {
     const [ip, setIp] = useState(HOME_IP);
@@ -17,13 +18,12 @@ export default function Computer(args: {data: Map<string, Directory>, save_data:
         setIp("0.0.0.0");
     }
 
-    switch(sequence) {
-        case Sequence.Hope:
-            try_append_directory(data!, HOPE, ip, 4);
-            break;
-        case Sequence.Hack:
-            try_append_directory(data!, HOPE, ip, 4);
-            try_append_directory(data!, HACKED, ip, 5);
+    if (sequence >= Sequence.Hope) {
+        try_append_directory(data!, HOPE, ip, 4);
+    } if (sequence >= Sequence.Map) {
+        try_append_directory(data!, MAP, ip, 5);
+    } if (sequence >= Sequence.Hack) {
+        try_append_directory(data!, HACKED, ip, 6);
     }
     return <Display data={data!} save_data={args.save_data} ip={ip} setIp={setIp} set_sequence={set_sequence}></Display>
 }

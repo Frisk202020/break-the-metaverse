@@ -14,6 +14,6 @@ export default async function Server() {
             x,
             parser(JSON.parse(readFileSync(`${ROOT}/${x}.json`, "utf-8")))
         ])
-    )
+    );
     return <Computer data={data} save_data={save_data}></Computer>
 }

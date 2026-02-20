@@ -70,12 +70,14 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
     }
 }
 
+function try_set_sequence(seq: Sequence, expect: Sequence, set: Setter<Sequence>) {
+    if (seq === expect) {
+        set(expect);
+        save_sequence(expect)
+    } 
+}
 async function metaverse(x:CpmFile, args: SharedActionArgs) {
-    if (x.hack) {
-        args.set_sequence(Sequence.Hack);
-        save_sequence(Sequence.Hack)
-    }
-
+    [Sequence.Map, Sequence.Hack].forEach((expect)=>try_set_sequence(x.sequence, expect, args.set_sequence)); 
     if (x.attributes.path.length > 0) {
         window.open(`/${args.ip}/${x.attributes.path}`);
     }

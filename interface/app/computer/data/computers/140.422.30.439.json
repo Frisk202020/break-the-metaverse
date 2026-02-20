@@ -8,7 +8,8 @@
                     "name": "key",
                     "attributes": {
                         "type": "mt",
-                        "path": "index.html"
+                        "path": "index.html",
+                        "sequence": 2
                     }
                 }
             ]

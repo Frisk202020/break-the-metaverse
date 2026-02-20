@@ -29,7 +29,7 @@ interface Attributes {
     name: string,
     type: FileType,
     unlocked: boolean,
-    hack: boolean,
+    sequence: number,
     attributes: Attributes
 } export interface Directory {
     name: string,
@@ -59,7 +59,7 @@ export default function parser(data: any): Directory {
                 {
                     name: x.name, type: parse_type(x.attributes.type),
                     unlocked: x.attributes.key === undefined,
-                    hack: x.attributes.hack !== undefined && x.attributes.hack,
+                    sequence: x.attributes.sequence === undefined ? 0 : x.attributes.sequence,
                     attributes: {
                         path: unwrap_or_default(x.attributes.path),
                         key: unwrap_or_default(x.attributes.key),
@@ -89,7 +89,7 @@ export function hacked_dir() {
             {name: "readme", type: FileType.TXT, unlocked: true, path: "README.txt", key: "", text: "" },
             {name: "pieces", type: FileType.EXE, unlocked: false, path: "", key: "./pieces.exe 19931 h0pe", text: "Decrypted 33 pieces"}
         ].map((x)=>{return {
-            name: x.name, type: x.type, unlocked: x.unlocked, hack: false, attributes: {
+            name: x.name, type: x.type, unlocked: x.unlocked, sequence: 0, attributes: {
                 path: x.path, key: x.key, text: x.text
             }
         }}),
@@ -102,7 +102,7 @@ export function hacked_dir() {
     dir.directories.push({
         name:"19", directories: [], parent: dir,
         files:[
-            {"name":"readme", type: FileType.TXT, unlocked: true, hack: false, attributes: {
+            {"name":"readme", type: FileType.TXT, unlocked: true, sequence: 0, attributes: {
                 path: "README.txt",
                 key:"", text: ""
             }}
@@ -113,16 +113,30 @@ export function hacked_dir() {
     }
 
     return dir;
-}
-
-export function hope_dir(): Directory {
+} export function map_dir() {
+    return {
+        name: "map",
+        files: [{
+            name: "map",
+            type: FileType.WEB,
+            unlocked: true,
+            sequence: 0,
+            attributes: {
+                path: "map/index.html",
+                key: "", text: ""
+            }
+        }],
+        directories: [],
+        parent: null
+    }
+} export function hope_dir(): Directory {
     return {
         name: "h0pe",
         files: [{
             name: "h0pe",
             type: FileType.WEB,
             unlocked: true,
-            hack: false,
+            sequence: 0,
             attributes: {
                 path: "index.html",
                 key: "", text: ""

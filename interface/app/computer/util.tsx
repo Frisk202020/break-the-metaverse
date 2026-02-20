@@ -20,6 +20,7 @@ export function icon(name: Icon) {
 export enum Sequence {
     Default,
     Hope,
+    Map,
     Hack
 } export enum NavState {
     None, Thm, Form

@@ -15,7 +15,7 @@
                 "name": "meta",
                 "attributes": {
                     "type": "mt",
-                    "hack": true
+                    "sequence": 3
                 }
             }]
         },

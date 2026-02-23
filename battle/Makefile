@@ -8,9 +8,9 @@ LDFLAGS = -lm
 %.o: ./src/%.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
+battle:
+	$(CC) $(CFLAGS) -o main src/main.c src/attack.c src/utilities.c src/dragon.c src/sensei.c src/spirit.c src/final.c $(LDFLAGS)
+
 clean:
 	- rm -f *.o
 	- find . -maxdepth 2 -executable -type f \( ! -name "Makefile" \) -delete
-
-battle:
-	$(CC) $(CFLAGS) -o battle src/battle/battle.c src/battle/attack.c src/utilities.c src/battle/dragon.c src/battle/sensei.c src/battle/spirit.c src/battle/final.c $(LDFLAGS)

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "battle.h"
+#include "main.h"
 
 stats final_initialize(){
     character Derek = { 

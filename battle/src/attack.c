@@ -17,7 +17,7 @@ Ranges of the dices :
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "battle.h"
+#include "main.h"
 
 /* Attributes a grade to a dice throw regarding the charcater*/
 int dice_range(character ch, int result){

@@ -1,5 +1,5 @@
-#ifndef BATTLE
-#define BATTLE
+#ifndef MAIN
+#define MAIN
 
 #include <stdbool.h>
 

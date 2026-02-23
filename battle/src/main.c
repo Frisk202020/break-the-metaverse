@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <assert.h>
-#include "battle.h"
+#include "main.h"
 
 /* Checks if the battle reaches the end (i-e one party goes down)*/
 bool end(stats s){
@@ -140,7 +140,7 @@ state affect_state(char* retrieve, int end){
 
 // restore the state of the battle if the software crashed
 stats restore_state(stats s){
-    FILE* file = fopen("src/battle/data/state.txt", "r");
+    FILE* file = fopen("data/state.txt", "r");
     assert(file != NULL);
     char* battle = (char*)malloc(100*sizeof(char));
     fscanf(file, "%s\n", battle);
@@ -159,7 +159,7 @@ stats restore_state(stats s){
     else{
         free(battle);
         fclose(file);
-        FILE* file2 = fopen("src/battle/data/state.txt", "r");
+        FILE* file2 = fopen("data/state.txt", "r");
         char* element = (char*)malloc(10*sizeof(char));
         char* enemy = (char*)malloc(10*sizeof(char));
         char** strings = (char**)malloc(2*sizeof(char*));
@@ -267,7 +267,7 @@ stats restore_state(stats s){
 
 // write the current state of the battle for every action
 void write_state(stats s){
-    FILE* file = fopen("src/battle/data/state.txt", "w");
+    FILE* file = fopen("data/state.txt", "w");
     assert(file != NULL);
     fprintf(file, "%s\n", s.enemy.name);
     for (int i = 0; i < 5; i++){

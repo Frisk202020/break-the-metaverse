@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "battle.h"
+#include "main.h"
 
 state NULL_STATE(){
     state ans = {

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "battle.h"
+#include "main.h"
 
 /* Initialize the stats for the dragon fight*/
 stats sensei_initialize(){

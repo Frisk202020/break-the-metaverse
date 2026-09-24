@@ -1,1 +1,4 @@
-battle
+**/obj/*.o
+**/dist/**
+!**/dist/.gitkeep
+

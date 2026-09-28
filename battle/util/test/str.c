@@ -1,8 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
+
+#include "util/include/print.h"
 #include "util/include/str.h"
 
-void test_equals() {
+int main() {
     Str s = str_from_static("hello");
     Str s2 = str_from_static("helli");
 
@@ -11,15 +13,11 @@ void test_equals() {
     s2 = str_from_static("hel");
     assert(!str_equals(s, s2));
 
-    str_concat(&s, "lo", 2);
+    str_concat(&s2, "lo", 2);
     assert(str_equals(s, s2));
 
     str_free(s); str_free(s2);
-    printf("Test passed : Str::equals");
-}
-
-int main() {
-    test_equals();
+    println(LOG_INFO, "Test passed : Str::equals");
 
     return 0;
 }

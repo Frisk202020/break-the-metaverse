@@ -1,4 +1,4 @@
-#include "game_manager.h"
+#include "dragon/include/game_manager.h"
 
 const char* INVALID_PARTY = "Invalid party id :";
 

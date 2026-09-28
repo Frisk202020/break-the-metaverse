@@ -1,10 +1,19 @@
-#include "game_manager.h"
-#include "server.h"
+#define _POSIX_C_SOURCE 200809L
+
+#include <signal.h>
+
+#include "dragon/include/game_manager.h"
+#include "dragon/include/server.h"
+#include "util/include/print.h"
 
 GameManager* gm;
-pthread_cond_t shutdown_signal;
 
 int main() {
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGINT);
+    pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+
     Action derek[] = {
         action_init_derek_shared(), 
         action_init("", ""),
@@ -22,7 +31,7 @@ int main() {
         action_init("", ""),
         action_init("", "")
     };
-
+    
     Action clover[] = {
         action_init_clover_shared(),
         action_init("", ""),
@@ -35,28 +44,39 @@ int main() {
         action_init("", "")
     };
 
-    Character party[] = {
-        character_init("Derek", 80, 5, derek),
-        character_init("Flavie", 80, 5, flavie),
-        character_init("Haloise", 80, 5, haloise),
-        character_init("CLover", 80, 5, clover),
-        character_init("Xhara", 80, 5, xhara)
+    Action dragon[] = {
+        action_init("", ""),
+        action_init("", ""),
+        action_init("", ""),
+        action_init("", "")
     };
-;
-    int reset_state[] = {[0 ... 4] -1};
+
     GameManager instance = {
-        .party = party,
-        .dragon = dragon_init(),
-        .reset_state = reset_state,
+        .party = {
+            (Character) { character_base_init("", 80), 5, derek}, 
+            (Character) { character_base_init("Flavie", 80), 5, flavie }, 
+            (Character) { character_base_init("Haloise", 80), 5, haloise }, 
+            (Character) { character_base_init("Clover", 80), 5, clover }, 
+            (Character) { character_base_init("Xhara", 80), 5, xhara }
+        }, 
+        .dragon = (Character) { character_base_init("Dragon", 1000), 0, dragon },
+        .reset_state = {[0 ... 4] -1},
     };
-    pthread_mutex_init(&gm->mutex, NULL);
-    pthread_mutex_lock(&gm->mutex);
+    pthread_mutex_init(&instance.mutex, NULL);
+    pthread_mutex_lock(&instance.mutex);
     gm = &instance;
 
-    start_server();
+    pthread_t server;
+    const char* err = start_server(&server);
+    if (err != NULL) {
+        println(LOG_ERR, err);
+        return 0;
+    }
 
-    pthread_cond_init(&shutdown_signal, NULL);
-    pthread_cond_wait(&shutdown_signal, &gm->mutex);
+    int sig;
+    sigwait(&sigset, &sig);
+    close_server();
 
+    pthread_join(server, NULL);
     return 0;
 }

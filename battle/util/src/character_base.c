@@ -1,4 +1,4 @@
-#include "character_base.h"
+#include "util/include/character_base.h"
 
 CharacterBase character_base_init(const char* name, const unsigned int hp) {
     return (CharacterBase) {

@@ -41,10 +41,11 @@ void process_payload(Str* message_holder, char* buff, int size) {
 }
 
 void receiver(Str* payload_holder) {
-    char buff[SIZE];
-    int n = recv(client_fd, buff, SIZE, 0); 
+    char buff[SIZE]; 
     
     while (atomic_load(&alive)) {
+        int n = recv(client_fd, buff, SIZE, 0);
+
         switch (n) {
             case 0: return;
             case -1:

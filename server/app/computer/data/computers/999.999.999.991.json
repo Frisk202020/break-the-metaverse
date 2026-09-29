@@ -1,0 +1,51 @@
+{
+    "name": "Home",
+    "files": [
+        {
+            "name": "Bin",
+            "files": [
+                {
+                    "name": "trial",
+                    "attributes": {
+                        "type": "mt",
+                        "path": "index.html"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Sys",
+            "files": [
+                {
+                    "name": "os.config",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "boot.cfg",
+                    "attributes": {
+                        "type": "sys"
+                    }
+                },
+                {
+                    "name": "Themes",
+                    "files": [
+                        {
+                            "name": "light",
+                            "attributes": {
+                                "type": "thm"
+                            }
+                        },
+                        {
+                            "name": "dark",
+                            "attributes": {
+                                "type": "thm"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

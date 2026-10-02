@@ -1,10 +1,17 @@
 #include "util/include/print.h"
 
+static LogLevel Level = LOG_INFO;
+
+void override_log_level(LogLevel lvl) {
+    Level = lvl;
+}
+
 unsigned int color(LogLevel log) {
     switch(log) {
         case LOG_ERR: return 31;
         case LOG_INFO: return 32;
         case LOG_WARN: return 33;
+        case LOG_DEBUG: return 35;
     }
 
     return 0;
@@ -16,13 +23,16 @@ int print_level(LogLevel log) {
     switch(log) {
         case LOG_ERR: ret += printf("ERR"); break;
         case LOG_WARN: ret += printf("WARN"); break;
-        case LOG_INFO: ret += printf("INFO"); break; 
+        case LOG_INFO: ret += printf("INFO"); break;
+        case LOG_DEBUG: ret += printf("DEBUG"); break; 
     }
 
     return ret + printf("] ");
 }
 
 int println(LogLevel lvl, const char* __restrict__ __format, ...) {
+    if (lvl < Level) return 0;
+
     va_list args;
     va_start(args, __format);
 
@@ -33,4 +43,12 @@ int println(LogLevel lvl, const char* __restrict__ __format, ...) {
 
     ret += printf("\033[0m\n");
     return ret;
+}
+
+int print_n(LogLevel lvl, int n) {
+    return println(lvl, "%d", n);
+}
+
+int print_str(LogLevel lvl, char* str) {
+    return println(lvl, "%s", str);
 }

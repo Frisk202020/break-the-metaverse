@@ -25,20 +25,32 @@ export function return_action(
     dir_setter({relative_path: dir_params.relative_path, dir: dir_params.dir.parent})
 }
 
-export function dir_action(x: Directory, dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>) {
+export function dir_action(x: Directory, dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>, set_pending_dir: Setter<PendingDir|null>) {
+    if (x.unlocked === false && x.key !== null) {   
+        set_pending_dir({ dir: x, params: dir_params });
+        return;
+    }
+
     const new_path = dir_params.relative_path;
     new_path.push(x.name);
 
     dir_setter({relative_path: new_path, dir: x})
 }
 
+export interface PendingDir {
+    dir: Directory,
+    params: DirectoryParams
+}
+
 export interface SharedActionArgs {
     ip: string, 
-    txt_setter: Setter<DisplayText>, 
+    txt_setter: Setter<DisplayText>, dir_setter: Setter<DirectoryParams>,
     themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
     pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>,
+    pending_dir: PendingDir | null, pending_dir_setter: Setter<PendingDir | null>,
     set_sequence: Setter<Sequence>
 }
+
 export function file_action(x: CpmFile, args: SharedActionArgs) {
     if (!x.unlocked && x.attributes.key !== undefined) {
         return args.pending_file_setter(x);

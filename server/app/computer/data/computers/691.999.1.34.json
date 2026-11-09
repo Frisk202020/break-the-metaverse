@@ -1,0 +1,158 @@
+{
+    "name": "",
+    "files": [
+        {
+            "name": "usr",
+            "files": [
+                {
+                    "name": "brigitte",
+                    "key": "azerty",
+                    "files": [
+                        {
+                            "name": "doc",
+                            "files": [
+                                {
+                                    "name": "feignard",
+                                    "files": [
+                                        {
+                                            "name": "Code of Conduct",
+                                            "attributes": {
+                                                "type": "txt",
+                                                "path": "conduct.md"
+                                            }
+                                        }
+                                    ]
+                                }, {
+                                    "name": "news",
+                                    "files": [
+                                        {
+                                            "name": "news_12_8_42",
+                                            "attributes": {
+                                                "type": "web",
+                                                "path": "news_12_8_42.pdf"
+                                            }
+                                        }, {
+                                            "name": "news_13_8_42",
+                                            "attributes": {
+                                                "type": "web",
+                                                "path": "news_13_8_42.pdf"
+                                            }
+                                        }
+                                    ]
+                                }, {
+                                    "name": "confidential",
+                                    "key": "qwerty",
+                                    "files": [
+                                        {
+                                            "name": "muuske",
+                                            "files": [
+                                                {
+                                                    "name": "1",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "1.pdf"
+                                                    }
+                                                }, {
+                                                    "name": "2",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "2.pdf"
+                                                    }
+                                                }, {
+                                                    "name": "3",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "3.pdf"
+                                                    }
+                                                }, {
+                                                    "name": "4",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "4.pdf"
+                                                    }
+                                                }, {
+                                                    "name": "5",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "5.pdf"
+                                                    }
+                                                }, {
+                                                    "name": "6",
+                                                    "attributes": {
+                                                        "type": "web",
+                                                        "path": "6.pdf"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }, {
+                            "name": "bin", 
+                            "files": [
+                                {
+                                    "name": "cards",
+                                    "files": [
+                                        {
+                                            "name": "Hope.hex",
+                                            "attributes": {
+                                                "type": "sys"
+                                            }
+                                        }, {
+                                            "name": "Alexander.hex",
+                                            "attributes": {
+                                                "type": "sys"
+                                            }
+                                        }, {
+                                            "name": "Dyle.hex",
+                                            "attributes": {
+                                                "type": "sys"
+                                            }
+                                        }, {
+                                            "name": "Jane.hex",
+                                            "attributes": {
+                                                "type": "sys"
+                                            }
+                                        }, {
+                                            "name": "Astral.hex",
+                                            "attributes": {
+                                                "type": "sys"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }, {
+                        "name": "sys",
+                            "files": [
+                                {
+                                    "name": "boot.cfg",
+                                    "attributes": {
+                                        "type": "sys"
+                                    }
+                                }, {
+                                    "name": "os.cfg",
+                                    "attributes": {
+                                        "type": "sys"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }, {
+            "name": "shared",
+            "files":  [
+                {
+                    "name": "Code of Conduct",
+                    "attributes": {
+                        "type": "txt",
+                        "path": "conduct.md"
+                    }
+                }
+            ]
+        }
+    ]
+}

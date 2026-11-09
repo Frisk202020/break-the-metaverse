@@ -6,7 +6,7 @@ import { type CpmFile, type Directory, FileType } from "../parser";
 import "./style.css"
 import {apply_default_theme, load_themes} from "./theme";
 import { type DirectoryParams, type DisplayText, type Icon, icon, NavState, SaveData, Sequence, type Setter } from "./util";
-import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
+import { dir_action, file_action, form_action, PendingDir, quit_metaverse, return_action, type SharedActionArgs } from "./action";
 import Key from "./key";
 import { clear_save, save_ip, save_sequence } from "./server_actions";
 
@@ -74,6 +74,8 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
     const metaScreenStyle = txt.is_meta ? 100 : 0;
 
     const [pending_file, pending_file_setter] = useState<CpmFile | null>(null);
+    const [pending_dir, set_pending_dir] = useState<PendingDir | null>(null);
+
     const visited_ips_elm = Array.from(args.save_data.ips).map((x,i)=>visited_ip_btn(x,i,args.setIp,set_nav_state));
 
     useEffect(()=>{
@@ -101,8 +103,12 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
             <div id="nav-inner">{dir_params.relative_path.join("/")}</div>
         </div>
         <div id="main-container">
-            {render_main(dir_params, dir_setter, txt.content, pending_file, {
-                ip: args.ip, txt_setter: set_txt, themes, setThemes, pending_file, pending_file_setter, set_sequence: args.set_sequence
+            {render_main(dir_params, dir_setter, txt.content, {
+                ip: args.ip, themes, setThemes, 
+                txt_setter: set_txt, dir_setter,
+                pending_file, pending_file_setter, 
+                pending_dir, pending_dir_setter: set_pending_dir,
+                set_sequence: args.set_sequence
             })}
         </div>
         <div id="theme-selector" style={hidden_box_style(nav_state, NavState.Thm)}>
@@ -158,19 +164,20 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
 function render_main(
     dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>, 
     loadedText: string[], 
-    pending_file: CpmFile | null, args: SharedActionArgs
+    args: SharedActionArgs
 ) {
     if (loadedText.length > 0) {
         return loadedText.map((x,i)=><p id="txt" key={"txt." + i}>{x}</p>);
-    } else if (pending_file) {
-        return <Key solution={pending_file.attributes.key} shared_args={args}></Key>
+    } else if (args.pending_file || args.pending_dir) {
+        const key = args.pending_dir?.dir.key ?? args.pending_file!.attributes.key;
+        return <Key solution={key} shared_args={args}></Key>
     } else {
         return render_dir(dir_params, dir_setter, args);
     }
 }
 
 function render_dir(dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>, args: SharedActionArgs) {
-    const dirs = dir_params.dir.directories.map((x,i)=>dir_elm(x,i,dir_params, dir_setter));
+    const dirs = dir_params.dir.directories.map((x,i)=>dir_elm(x,i,dir_params, dir_setter, args.pending_dir_setter));
     const files = dir_params.dir.files.map((x,i)=>file_elm(x,i,args));
 
     return <div id="files">
@@ -179,8 +186,8 @@ function render_dir(dir_params: DirectoryParams, dir_setter: Setter<DirectoryPar
     </div>
 }
 
-function dir_elm(x: Directory, i: number, dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>) {
-    return <div className="file" key={"d"+i} onClick={()=>dir_action(x, dir_params, dir_setter)}>
+function dir_elm(x: Directory, i: number, dir_params: DirectoryParams, dir_setter: Setter<DirectoryParams>, pending_dir_setter: Setter<PendingDir|null>) {
+    return <div className="file" key={"d"+i} onClick={()=>dir_action(x, dir_params, dir_setter, pending_dir_setter)}>
         {icon("folder")}
         <p>{x.name}</p>
     </div>;

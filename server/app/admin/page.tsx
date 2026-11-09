@@ -11,6 +11,7 @@ export default function Page() {
         ["Hitchmann", "178.170.160.780"],
         ["Poor", "254.651.235.272"],
         ["RickRoll", "961.342.001.062"],
+        ["Brigitte", "691.999.1.34"],
         ["Feignard", "138.433.302.268"]
     ].map(([name, ip], i) => <button 
         key={`btn.${i}`}

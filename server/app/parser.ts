@@ -17,7 +17,7 @@ export enum FileType {
         case "mt": return FileType.MT;
         case "exe": return FileType.EXE;
         case "web": return FileType.WEB;
-        default: throw new Error("Parsing failed: Invalid type");
+        default: throw new Error(`Parsing failed: Invalid type : ${x}`);
     }
 }
 
@@ -35,6 +35,8 @@ interface Attributes {
 } export interface Directory {
     name: string,
     files: CpmFile[],
+    unlocked?: boolean,
+    key: string | null,
     directories: Directory[],
     parent: Directory | null
 }
@@ -75,7 +77,7 @@ export default function parser(data: any): Directory {
     }
 
     const self = {
-        name: data.name,
+        name: data.name, key: data.key ?? null, unlocked: data.key === undefined,
         files, directories, parent: null
     };
     self.directories.forEach((x)=>x.parent = self);
@@ -87,6 +89,7 @@ export function hacked_dir() {
     const dir: Directory = {
         name: "REDEMPTION",
         directories: [],
+        key: null,
         files: [
             {name: "readme", type: FileType.TXT, unlocked: true, path: "README.txt", key: "", text: "" },
             {name: "pieces", type: FileType.EXE, unlocked: false, path: "", key: "./pieces.exe 19931 h0pe", text: "Decrypted 33 pieces" }
@@ -99,10 +102,10 @@ export function hacked_dir() {
     }
 
     for (let i = 1; i < 19; i++) {
-        dir.directories.push({name: i.toString(), files: [], directories: [], parent: dir});
+        dir.directories.push({name: i.toString(), key: null, files: [], directories: [], parent: dir});
     }
     dir.directories.push({
-        name:"19", directories: [], parent: dir,
+        name:"19", directories: [], parent: dir, key: null,
         files:[
             {"name":"readme", type: FileType.TXT, unlocked: true, sequence: 0, attributes: {
                 path: "README.txt",
@@ -111,13 +114,14 @@ export function hacked_dir() {
         ]
     });
     for (let i = 20; i < 100; i++) {
-        dir.directories.push({name: i.toString(), files: [], directories: [], parent: dir});
+        dir.directories.push({name: i.toString(), key: null, files: [], directories: [], parent: dir});
     }
 
     return dir;
 } export function map_dir() {
     return {
         name: "map",
+        key: null,
         files: [{
             name: "map",
             type: FileType.WEB,
@@ -125,7 +129,7 @@ export function hacked_dir() {
             sequence: 0,
             attributes: {
                 path: "map/index.html",
-                key: "", text: ""
+                key: "", text: "", delay: 0
             }
         }],
         directories: [],
@@ -134,6 +138,7 @@ export function hacked_dir() {
 } export function hope_dir(): Directory {
     return {
         name: "h0pe",
+        key: null,
         files: [{
             name: "h0pe",
             type: FileType.WEB,

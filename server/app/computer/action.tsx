@@ -79,7 +79,7 @@ function try_set_sequence(seq: Sequence, expect: Sequence, set: Setter<Sequence>
 async function metaverse(x:CpmFile, args: SharedActionArgs) {
     [Sequence.Map, Sequence.Hack].forEach((expect)=>try_set_sequence(x.sequence, expect, args.set_sequence)); 
     if (x.attributes.path.length > 0) {
-        window.open(`/${args.ip}/${x.attributes.path}`);
+        new Promise(r => setTimeout(r, x.attributes.delay)).then(() => window.open(`/${args.ip}/${x.attributes.path}`));
     }
     interrupt = false;
 

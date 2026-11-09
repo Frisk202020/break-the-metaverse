@@ -63,12 +63,14 @@ const THEME_MAP = new Map([
     ["neon", new Theme("#d011aac9", "#9a0fdfc9", "#1029cf", "#8316ae", "#eab429")],
     ["none", new Theme("transparent", "transparent", "transparent", "transparent")]
 ]);
-const DEFAULT = THEME_MAP.get("light")!;
+
 const DEFAULT_SAVED_THEMES = new Set(Array.from(DEFAULT_SAVE.themes).map((x)=>THEME_MAP.get(x)!));
 
-export function apply_default_theme() {
-    DEFAULT.apply();
+export function apply_default_theme(dark: boolean) {
+    const name = dark ? "dark" : "light";
+    THEME_MAP.get(name)!.apply();
 }
+
 export function apply_theme(name: string, themes: Set<Theme>, themes_setter: Setter<Set<Theme>>) {
     const t = THEME_MAP.get(name);
     if (t === undefined) { throw new Error("Invalid theme"); }

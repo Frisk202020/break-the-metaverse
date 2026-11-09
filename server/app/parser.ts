@@ -24,7 +24,8 @@ export enum FileType {
 interface Attributes {
     path: string,
     key: string,
-    text: string
+    text: string,
+    delay: number
 } export interface CpmFile {
     name: string,
     type: FileType,
@@ -63,7 +64,8 @@ export default function parser(data: any): Directory {
                     attributes: {
                         path: unwrap_or_default(x.attributes.path),
                         key: unwrap_or_default(x.attributes.key),
-                        text: unwrap_or_default(x.attributes.text) 
+                        text: unwrap_or_default(x.attributes.text),
+                        delay: x.attributes.delay ?? 0
                     }
                 }
             );
@@ -87,10 +89,10 @@ export function hacked_dir() {
         directories: [],
         files: [
             {name: "readme", type: FileType.TXT, unlocked: true, path: "README.txt", key: "", text: "" },
-            {name: "pieces", type: FileType.EXE, unlocked: false, path: "", key: "./pieces.exe 19931 h0pe", text: "Decrypted 33 pieces"}
+            {name: "pieces", type: FileType.EXE, unlocked: false, path: "", key: "./pieces.exe 19931 h0pe", text: "Decrypted 33 pieces" }
         ].map((x)=>{return {
             name: x.name, type: x.type, unlocked: x.unlocked, sequence: 0, attributes: {
-                path: x.path, key: x.key, text: x.text
+                path: x.path, key: x.key, text: x.text, delay: 0
             }
         }}),
         parent: null
@@ -104,7 +106,7 @@ export function hacked_dir() {
         files:[
             {"name":"readme", type: FileType.TXT, unlocked: true, sequence: 0, attributes: {
                 path: "README.txt",
-                key:"", text: ""
+                key:"", text: "", delay: 0
             }}
         ]
     });
@@ -139,7 +141,8 @@ export function hacked_dir() {
             sequence: 0,
             attributes: {
                 path: "index.html",
-                key: "", text: ""
+                key: "", text: "",
+                delay: 0
             }
         }],
         directories: [],

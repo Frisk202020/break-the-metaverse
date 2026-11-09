@@ -19,7 +19,9 @@
                 {
                     "name": "metaverse",
                     "attributes": {
-                        "type": "mt"
+                        "type": "mt",
+                        "path": "moon.png",
+                        "delay": 3000
                     }
                 }
             ]

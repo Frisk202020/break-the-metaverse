@@ -3,7 +3,7 @@
 import { CSSProperties, JSX, useEffect, useState } from "react"
 import { type CpmFile, type Directory, FileType } from "../parser";
 
-import "./style.css";
+import "./style.css"
 import {apply_default_theme, load_themes} from "./theme";
 import { type DirectoryParams, type DisplayText, type Icon, icon, NavState, SaveData, Sequence, type Setter } from "./util";
 import { dir_action, file_action, form_action, quit_metaverse, return_action, type SharedActionArgs } from "./action";
@@ -77,7 +77,8 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
     const visited_ips_elm = Array.from(args.save_data.ips).map((x,i)=>visited_ip_btn(x,i,args.setIp,set_nav_state));
 
     useEffect(()=>{
-        apply_default_theme();
+        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+        apply_default_theme(isDark && isDark.matches);
         document.addEventListener("keydown", event);
     }, []);
     useEffect(()=>{
@@ -118,6 +119,19 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
                         </div>
                         <input type="submit" formAction={(x)=>form_action(x, args.setIp, set_txt, set_nav_state)} value="Ok"></input>
                     </form>
+                    <button onClick={async () => {
+                        set_nav_state(NavState.None);
+                        set_txt({ is_meta: false, content: ["Scanning nearby IPs..."] })
+
+                        fetch("scan", { method: "POST" }).then(async (res) => {
+                            if (!res.ok) set_txt({ is_meta: false, content: ["An error occurred"] });
+                            else {
+                                const body = await res.json();
+                                if (!body || !body.content) set_txt({ is_meta: false, content: ["No terminal found"] });
+                                else args.setIp(body.content);
+                            }
+                        });
+                    }}>Scan a nearby IP</button>
                 </div>
                 <div>
                     <p>Visit a known address</p>

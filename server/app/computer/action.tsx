@@ -48,12 +48,17 @@ export interface SharedActionArgs {
     themes: Set<ThemeClass>, setThemes: Setter<Set<ThemeClass>>,
     pending_file: CpmFile | null, pending_file_setter: Setter<CpmFile | null>,
     pending_dir: PendingDir | null, pending_dir_setter: Setter<PendingDir | null>,
-    set_sequence: Setter<Sequence>
+    sequence: Sequence, set_sequence: Setter<Sequence>
 }
 
 export function file_action(x: CpmFile, args: SharedActionArgs) {
     if (!x.unlocked && x.attributes.key !== undefined) {
         return args.pending_file_setter(x);
+    }
+
+    if (x.sequence >= args.sequence){ 
+        args.set_sequence(x.sequence);
+        save_sequence(x.sequence);
     }
 
     const path = `/${args.ip}/${x.attributes.path}`;
@@ -82,14 +87,7 @@ export function file_action(x: CpmFile, args: SharedActionArgs) {
     }
 }
 
-function try_set_sequence(seq: Sequence, expect: Sequence, set: Setter<Sequence>) {
-    if (seq === expect) {
-        set(expect);
-        save_sequence(expect)
-    } 
-}
 async function metaverse(x:CpmFile, args: SharedActionArgs) {
-    [Sequence.Map, Sequence.Hack].forEach((expect)=>try_set_sequence(x.sequence, expect, args.set_sequence)); 
     if (x.attributes.path.length > 0) {
         new Promise(r => setTimeout(r, x.attributes.delay)).then(() => window.open(`/${args.ip}/${x.attributes.path}`));
     }

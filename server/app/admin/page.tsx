@@ -5,16 +5,18 @@ import { useState } from "react";
 export default function Page() {
     const [txt, setTxt] = useState("");
 
-    const buttons = [
+    const buttons = ([
         ["Intro room", "0.0.0.1"],
         ["Clover room", "341.721.107.2"],
         ["Hitchmann", "178.170.160.780"],
         ["Poor", "254.651.235.272"],
         ["RickRoll", "961.342.001.062"],
         ["Brigitte", "691.999.1.34"],
-        ["Feignard", "138.433.302.268"]
-    ].map(([name, ip], i) => <button 
+        ["Feignard", "138.433.302.268", true],
+        ["Spa", "961.342.1.62"]
+    ] as const).map(([name, ip, enabled], i) => <button 
         key={`btn.${i}`}
+        disabled={enabled ?? false}
         style={{margin: "1vh"}}
         onClick={() => {
             fetch("scan", { body: JSON.stringify({ content: ip }), method: "PUT" }).then((res) => {

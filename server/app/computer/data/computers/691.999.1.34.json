@@ -20,6 +20,18 @@
                                                 "type": "txt",
                                                 "path": "conduct.md"
                                             }
+                                        }, {
+                                            "name": "rib",
+                                            "attributes": {
+                                                "type": "txt",
+                                                "path": "rib.md"
+                                            }
+                                        }, {
+                                            "name": "notes",
+                                            "attributes": {
+                                                "type": "txt",
+                                                "path": "notes.md"
+                                            }
                                         }
                                     ]
                                 }, {

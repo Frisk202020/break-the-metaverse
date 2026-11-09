@@ -9,7 +9,7 @@
                     "attributes": {
                         "type": "mt",
                         "path": "index.html",
-                        "sequence": 2
+                        "sequence": 1
                     }
                 }
             ]
@@ -21,8 +21,9 @@
                     "name": "key",
                     "attributes": {
                         "type": "sys",
-                        "key": "five.trials",
-                        "text": "Unlocked INFINITE HOME keys !"
+                        "key": "four.trials",
+                        "text": "Unlocked INFINITE HOME keys !",
+                        "sequence": 2
                     }
                 }
             ]

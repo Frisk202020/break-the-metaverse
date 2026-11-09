@@ -35,21 +35,56 @@ enum Arrows {
     Up ="ArrowUp",
     Down = "ArrowDown",
     Left = "ArrowLeft",
-    Right = "ArrowRight"
+    Right = "ArrowRight",
+    Flip = "Enter"
 } 
-const spell = [Arrows.Up, Arrows.Left, Arrows.Up, Arrows.Right, Arrows.Down, Arrows.Right];
-const event = (event: KeyboardEvent)=>{
-    if (event.key === spell[spell_index]) {
-        spell_index++;
-        if (spell_index === spell.length) {
-            clear_save();
-            spell_index = 0;
+const reset_spell = [Arrows.Up, Arrows.Left, Arrows.Up, Arrows.Right, Arrows.Down, Arrows.Right];
+const white_spell = [
+    Arrows.Right, Arrows.Down, Arrows.Down, Arrows.Down, Arrows.Down, 
+    Arrows.Left, Arrows.Up, Arrows.Flip, Arrows.Right, Arrows.Left, Arrows.Up,
+    Arrows.Up, Arrows.Flip, Arrows.Down, Arrows.Flip, Arrows.Right
+];
+
+let spell_id: 0|1|null = null;
+let spell_index = 0;
+
+const event = (event: KeyboardEvent, txt_setter: Setter<DisplayText>)=>{
+    if (spell_id === null) {
+        switch(event.key) {
+            case reset_spell[0]: 
+                spell_id = 0;
+                spell_index = 1;
+                break;
+            case white_spell[0]:
+                spell_id = 1;
+                spell_index = 1;
+                break;
         }
     } else {
-        spell_index = 0;
+        const spell = spell_id === 0 ? reset_spell : white_spell;
+        if (event.key === spell[spell_index]) {
+            spell_index++;
+            if (spell_index === spell.length) {
+                spell_index = 0;
+                if (spell_id === 0) clear_save();
+                else {
+                    const x = new Audio("/white.mp3");
+                    x.load();
+
+                    new Promise((r) => setTimeout(r, 4000)).then(() => {
+                        txt_setter({ is_meta: false, content: ["Vous avez reçu un fragment d'IP"] });
+                        new Promise((r) => setTimeout(r, 5000)).then(() => window.location.reload());
+                    });
+
+                    x.play();
+                }
+            }
+        } else {
+            spell_index = 0;
+        }
     }
+    console.log(spell_index)
 }
-let spell_index = 0;
 
 function connect_handler(ip: string, set_ip: Setter<string>, set_state: Setter<NavState>) {
     set_state(NavState.None);
@@ -81,15 +116,11 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
     useEffect(()=>{
         const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
         apply_default_theme(isDark && isDark.matches);
-        document.addEventListener("keydown", event);
+        document.addEventListener("keydown", (e) => event(e, set_txt));
     }, []);
     useEffect(()=>{
         dir_setter({dir: args.data, relative_path: [args.ip]});
         set_txt({is_meta: false, content: []});
-        if (args.data.name === "hope") {
-            args.set_sequence(Sequence.Hope);
-            save_sequence(Sequence.Hope);
-        }
 
         if (!args.save_data.ips.has(args.ip)) {
             args.save_data.ips.add(args.ip);
@@ -108,7 +139,7 @@ export default function Display(args: {data: Directory, save_data: SaveData, ip:
                 txt_setter: set_txt, dir_setter,
                 pending_file, pending_file_setter, 
                 pending_dir, pending_dir_setter: set_pending_dir,
-                set_sequence: args.set_sequence
+                sequence: args.save_data.sequence, set_sequence: args.set_sequence
             })}
         </div>
         <div id="theme-selector" style={hidden_box_style(nav_state, NavState.Thm)}>

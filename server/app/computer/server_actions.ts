@@ -25,7 +25,8 @@ async function parse(path: string) {
     switch ((await readFile(SEQ_PATH())).toString()) {
         case "0": return Sequence.Default;
         case "1": return Sequence.Hope;
-        case "2": return Sequence.Hack;
+        case "2": return Sequence.Map;
+        case "3": return Sequence.Hack;
         default: console.log("Unrecognized sequence"); return Sequence.Default;
     }
 } 

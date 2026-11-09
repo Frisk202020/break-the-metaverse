@@ -2,3 +2,4 @@ battle
 assets/toPrint
 server/app/computer/data/save/*.txt
 server/app/scan/data.txt
+server/global.d.ts
